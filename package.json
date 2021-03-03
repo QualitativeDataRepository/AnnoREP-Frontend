@@ -1,7 +1,16 @@
 {
   "name": "anno-rep-frontend",
+  "description": "Frontend for the AnnoREP tool to Restructure, Edit, and Publish annotations",
+  "author": {
+    "name": "QualitativeDataRepository"
+  },
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QualitativeDataRepository/AnnoREP-Frontend.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
