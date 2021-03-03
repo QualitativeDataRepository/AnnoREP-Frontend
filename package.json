@@ -17,6 +17,7 @@
     "start": "next start",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "lint:fix": "npm run lint -- --fix"
   },
