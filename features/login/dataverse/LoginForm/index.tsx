@@ -56,7 +56,12 @@ const LoginForm: FC<LoginFormProps> = ({
           Server Uniform Resource Locator (<abbr>URL</abbr>) and your Application programming
           interface (<abbr>API</abbr>) token. Instructions for getting an <abbr>API</abbr> token are
           described in the{" "}
-          <Link size="lg" href="https://guides.dataverse.org/en/latest/user/account.html">
+          <Link
+            size="lg"
+            href="https://guides.dataverse.org/en/latest/user/account.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Account Creation + Management
           </Link>{" "}
           section of the User Guide.
