@@ -3,8 +3,6 @@ import React, { ChangeEvent, FC } from "react"
 import { Button, Form, TextInput, Link, Checkbox } from "carbon-components-react"
 import "carbon-components/css/carbon-components.min.css"
 
-import "./styles.css"
-
 export interface LoginFormProps {
   /**The dataverse server url */
   serverUrl: string
