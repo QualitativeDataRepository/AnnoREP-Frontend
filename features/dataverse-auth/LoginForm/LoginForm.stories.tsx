@@ -4,7 +4,7 @@ import LoginForm, { LoginFormProps } from "."
 
 export default {
   component: LoginForm,
-  title: "Login/Dataverse/Login Form",
+  title: "Dataverse Auth/Login Form",
 } as Meta
 
 const Template: Story<LoginFormProps> = (args) => <LoginForm {...args} />

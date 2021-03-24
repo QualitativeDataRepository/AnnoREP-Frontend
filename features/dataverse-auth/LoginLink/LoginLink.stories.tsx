@@ -4,7 +4,7 @@ import LoginLink from "."
 
 export default {
   component: LoginLink,
-  title: "Login/Dataverse/Login Link",
+  title: "Dataverse Auth/Login Link",
 } as Meta
 
 const Template: Story = (args) => <LoginLink {...args} />
