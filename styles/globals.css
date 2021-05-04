@@ -35,3 +35,7 @@ a {
 .ar--form-submit-btn {
   margin-top: 2rem;
 }
+
+.ar--secondary-text {
+  color: #525252;
+}
