@@ -1,6 +1,3 @@
-//show login form
-// redirect to dashboard/home
-
 import { useState } from "react"
 
 import { signIn } from "next-auth/client"
