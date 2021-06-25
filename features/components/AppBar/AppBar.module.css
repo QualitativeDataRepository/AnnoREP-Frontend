@@ -1,0 +1,12 @@
+.container {
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.logolink {
+  cursor: pointer;
+  font-size: 1.5rem;
+}

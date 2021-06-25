@@ -42,15 +42,22 @@
     ]
   },
   "dependencies": {
-    "@carbon/icons-react": "^10.27.0",
-    "@types/carbon-components-react": "^7.30.0",
+    "@carbon/icons-react": "^10.33.0",
+    "@fluentui/react": "^8.20.2",
+    "@types/carbon-components-react": "^7.34.0",
     "@types/carbon__icons-react": "^10.31.0",
-    "carbon-components": "^10.30.0",
-    "carbon-components-react": "^7.30.0",
+    "axios": "^0.21.1",
+    "carbon-components": "^10.37.0",
+    "carbon-components-react": "^7.37.1",
     "carbon-icons": "^7.0.7",
     "next": "10.0.7",
+    "next-auth": "^3.27.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-copy-to-clipboard": "^5.0.3",
+    "react-dom": "^16.14.0",
+    "react-pdf": "^5.3.0",
+    "react-sizeme": "^3.0.1",
+    "swr": "^0.5.6"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
@@ -62,6 +69,8 @@
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.31",
     "@types/react": "^17.0.2",
+    "@types/react-copy-to-clipboard": "^5.0.0",
+    "@types/react-pdf": "^5.0.4",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "babel-jest": "^26.6.3",

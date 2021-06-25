@@ -1,16 +1,12 @@
 import React, { FC } from "react"
 
 import { Button, Form, TextInput, FileUploader, Select, SelectItem } from "carbon-components-react"
-import "carbon-components/css/carbon-components.min.css"
 
-export interface Dataset {
-  id: string
-  title: string
-}
+import { IDataset } from "../../../types/dataverse"
 
 export interface NewAtiProjectFormProps {
   /**List of Dataverse datasets */
-  datasets?: Dataset[]
+  datasets?: IDataset[]
 }
 
 /**Form to create a new ATI project */
@@ -27,6 +23,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
         <div className="ar--form-item">
           <TextInput
             id="ati-project-title"
+            name="atiProjectTitle"
             labelText="Project Title"
             placeholder="Enter your project title"
             required={true}
@@ -39,6 +36,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
           <div className="ar--form-item">
             <Select
               defaultValue="placeholder-item"
+              name="dataset"
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               id="dataverse-dataset"
               labelText="Link to a Dataverse dataset"

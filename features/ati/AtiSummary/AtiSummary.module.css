@@ -1,0 +1,19 @@
+.section {
+  margin-top: 24px;
+}
+
+.header {
+  font-size: 1rem;
+  font-weight: 550;
+}
+
+.listcontainer {
+  padding-left: 1rem;
+}
+
+.buttoncontainer {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  column-gap: 8px;
+}

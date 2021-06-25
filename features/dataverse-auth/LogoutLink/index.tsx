@@ -1,7 +1,6 @@
 import React, { FC, MouseEventHandler } from "react"
 
 import { Link } from "carbon-components-react"
-import "carbon-components/css/carbon-components.min.css"
 
 export interface LogoutLinkProps {
   /**Callback to handle dataverse logout */

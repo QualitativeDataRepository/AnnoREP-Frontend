@@ -1,7 +1,6 @@
-import React, { ChangeEvent, FC } from "react"
+import React, { ChangeEvent, FC, FormEventHandler } from "react"
 
 import { Button, Form, TextInput, Link, Checkbox } from "carbon-components-react"
-import "carbon-components/css/carbon-components.min.css"
 
 export interface LoginFormProps {
   /**The dataverse server url */
@@ -24,6 +23,8 @@ export interface LoginFormProps {
   rememberUser: boolean
   /**Callback to handle the remember user input changes */
   handleRememberUser(checked: boolean): void
+  /**Callback to handle login */
+  handleLogin(): void
 }
 
 /**Dataverse Login Form */
@@ -38,16 +39,21 @@ const LoginForm: FC<LoginFormProps> = ({
   handleApiTokenChange,
   rememberUser,
   handleRememberUser,
+  handleLogin,
 }: LoginFormProps) => {
   const onServerUrlChange = (event: ChangeEvent<HTMLInputElement>) =>
     handleServerUrlChange(event.target.value)
   const onApiTokenChange = (event: ChangeEvent<HTMLInputElement>) =>
     handleApiTokenChange(event.target.value)
   const onRememberUserChange = (checked: boolean) => handleRememberUser(checked)
+  const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault()
+    handleLogin()
+  }
 
   return (
     <main className="ar--form-container">
-      <Form action="/session" method="post">
+      <Form onSubmit={onSubmit}>
         <h1 className="ar--form-title">Log in to a Dataverse</h1>
         <p className="ar--form-desc">
           Give AnnoREP permissions to access your Dataverse resources by providing the Dataverse

@@ -2,9 +2,7 @@ import React, { FC } from "react"
 
 import Link from "next/link"
 
-import "carbon-components/css/carbon-components.min.css"
-
-const DATAVERSE_LOGIN_PATH = "/dataverse-login"
+const DATAVERSE_LOGIN_PATH = "/auth/dataverse-login"
 
 /**Dataverse Login Link */
 const LoginLink: FC = () => {

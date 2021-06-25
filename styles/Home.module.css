@@ -25,3 +25,26 @@
 .title {
   text-align: center;
 }
+
+.callout {
+  display: grid;
+  grid-template-columns: auto;
+  justify-content: center;
+  align-items: center;
+  row-gap: 8px;
+}
+
+.callout p {
+  font-size: 1rem;
+}
+
+.callout * {
+  text-align: center;
+}
+
+.titlecontainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -2,7 +2,7 @@ import React, { FC } from "react"
 
 import Link from "next/link"
 
-import "./styles.css"
+import styles from "./AtiProject.module.css"
 
 export interface AtiProjectProps {
   /**The id of the ati project */
@@ -18,7 +18,7 @@ export interface AtiProjectProps {
 /**A summary view of an ati project */
 const AtiProject: FC<AtiProjectProps> = ({ id, title, version, status }) => {
   return (
-    <section aria-label={title} className="ar--ati-card">
+    <section aria-label={title} className={styles.atiproject}>
       <h2>
         <Link href={`/ati/${id}`}>
           <a className="bx--link bx--link--lg" href={`/ati/${id}`}>

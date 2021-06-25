@@ -16,18 +16,22 @@ Default.args = {
     {
       id: "datasource-1",
       name: "Datasource 1",
+      uri: "Uri 1",
     },
     {
       id: "datasource-2",
       name: "Datasource 2",
+      uri: "Uri 2",
     },
     {
       id: "datasource-3",
       name: "Datasource 3",
+      uri: "Uri 3",
     },
     {
       id: "datasource-4",
       name: "Datasource 4",
+      uri: "Uri 4",
     },
   ],
 }
