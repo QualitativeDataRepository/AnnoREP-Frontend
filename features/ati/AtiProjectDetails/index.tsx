@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC } from "react"
 
 import { Tabs, Tab } from "carbon-components-react"
 import { IATIProjectDetails, IDatasource } from "../../../types/dataverse"
@@ -12,21 +12,15 @@ interface ATIProjectDetailsProps {
 }
 
 const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ atiProjectDetails }) => {
-  const [selectedTab, setSelectedTab] = useState(0)
-  const onSelectionChange = (index: number) => {
-    //console.log("selected", index)
-    setSelectedTab(index)
-  }
   return (
     <>
       <h1>{atiProjectDetails.dataset.title}</h1>
-      <Tabs selected={selectedTab} onSelectionChange={onSelectionChange}>
+      <Tabs>
         <Tab id="summary" label="Summary">
           <AtiSummary atiProjectDetails={atiProjectDetails} />
         </Tab>
         <Tab id="manuscript" label="Manuscript">
           <AtiManuscript
-            isSelected={selectedTab === 1}
             manuscriptId={atiProjectDetails.manuscript.id}
             datasources={atiProjectDetails.datasources}
           />
