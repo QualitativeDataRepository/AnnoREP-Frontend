@@ -1,7 +1,7 @@
 import { FC } from "react"
 
-//import { getSession } from "next-auth/client"
 import { GetServerSideProps } from "next"
+import { getSession } from "next-auth/client"
 
 import Layout from "../../features/components/Layout"
 import ATIProjectDetails from "../../features/ati/AtiProjectDetails"
@@ -29,7 +29,9 @@ const Ati: FC<AtiProps> = ({ hasAccess, atiProjectDetails }) => {
 export default Ati
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  //const session = await getSession(context)
+  const session = await getSession(context)
+  //use session to check if user can access ati
+  const hasAccess = session ? true : false
   //console.log("id", context?.params?.id)
   //check if apitoken can access this id
 
@@ -62,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   return {
     props: {
-      hasAccess: true,
+      hasAccess,
       atiProjectDetails,
     },
   }
