@@ -21,19 +21,19 @@ a {
 }
 
 .ar--form-title {
-  margin-bottom: 0.25rem;
+  margin-bottom: 4px;
 }
 
 .ar--form-desc {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .ar--form-item {
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 }
 
 .ar--form-submit-btn {
-  margin-top: 2rem;
+  margin-top: 32px;
 }
 
 .ar--secondary-text {
