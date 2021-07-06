@@ -15,6 +15,7 @@ interface ATISummaryProps {
 //api/access/dataset/id dl bundle
 //update annotations first then use api
 //https://github.com/QualitativeDataRepository/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L1088
+//layout the doi link
 
 const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const { doi, title, status, version } = atiProjectDetails.dataset
@@ -31,7 +32,17 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       </div>
       <section aria-label="about" className={styles.section}>
         <h2 className={styles.header}>About</h2>
-        <p>Project Title: {title}</p>
+        <p>
+          Project Title:{" "}
+          <Link
+            href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            size="lg"
+          >
+            {title}
+          </Link>
+        </p>
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
       </section>
       <section aria-label="manuscript" className={styles.section}>
@@ -40,14 +51,6 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       </section>
       <section aria-label="datasources" className={styles.section}>
         <h2 className={styles.header}>Datasources</h2>
-        <Link
-          href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          size="lg"
-        >
-          Modify datasources
-        </Link>
         <div className={styles.listcontainer}>
           <UnorderedList>
             {datasources.map(({ id, name }) => (
