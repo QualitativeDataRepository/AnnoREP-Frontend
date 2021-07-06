@@ -1,6 +1,7 @@
 export interface IDataset {
   id: string
-  title: string //orname
+  doi: string
+  title: string
   status?: string
   version?: string
 }
