@@ -33,6 +33,7 @@ WithDatasets.args = {
       title: "Dataset 4",
     },
   ],
+  serverUrl: "https://test.com",
 }
 
 export const WithoutDatasets = Template.bind({})

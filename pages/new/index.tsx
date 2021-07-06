@@ -19,7 +19,7 @@ const NewAti: FC<NewAtiProps> = ({ session, datasets }) => {
   return (
     <Layout title="AnnoREP - New ATI Project">
       {session ? (
-        <NewAtiProjectForm datasets={datasets} />
+        <NewAtiProjectForm datasets={datasets} serverUrl={session.serverUrl} />
       ) : (
         <div>Login to create a new ATI project.</div>
       )}

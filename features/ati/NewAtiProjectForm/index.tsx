@@ -1,7 +1,7 @@
 import React, { FC, FormEventHandler } from "react"
 
 import axios from "axios"
-import { Button, Form, FileUploader, Select, SelectItem } from "carbon-components-react"
+import { Button, Form, FileUploader, Select, SelectItem, Link } from "carbon-components-react"
 import { useRouter } from "next/router"
 
 import { IDataset } from "../../../types/dataverse"
@@ -9,10 +9,12 @@ import { IDataset } from "../../../types/dataverse"
 export interface NewAtiProjectFormProps {
   /**List of Dataverse datasets */
   datasets: IDataset[]
+  /**Dataverse server URL */
+  serverUrl: string
 }
 
 /**Form to create a new ATI project */
-const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
+const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) => {
   const router = useRouter()
   //const [errorMsg, setErrorMsg] = useState<string>("")
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -50,6 +52,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
     //401 unathorized
     //400 general error show message
   }
+  //TODO: is ownerId=1 justified?
   return (
     <div className="ar--form-container">
       <Form encType="multipart/form-data" onSubmit={onSubmit}>
@@ -59,7 +62,16 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
         <p className="ar--form-desc">
           Upload files from your device to create a new <abbr>ATI</abbr> project.
         </p>
-        <div className="ar--form-item"></div>
+        <div className="ar--form-item">
+          <Link
+            href={`${serverUrl}/dataset.xhtml?ownerId=1`}
+            target="_blank"
+            rel="noopener noreferrer"
+            size="lg"
+          >
+            Create dataset
+          </Link>
+        </div>
         <div className="ar--form-item">
           <Select
             name="dataset"
