@@ -86,7 +86,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           id: items[i].entity_id,
           title: items[i].name,
           status: items[i].publication_statuses.join(", "),
-          version: items[i].versionState,
+          version: items[i].majorVersion
+            ? `${items[i].majorVersion}.${items[i].minorVersion}`
+            : items[i].versionState,
         })
       }
     }

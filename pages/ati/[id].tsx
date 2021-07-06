@@ -50,8 +50,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           id: latest.datasetId,
           doi: latest.datasetPersistentId,
           title: metadataFields.find((field: any) => field.typeName === "title").value, //TODO: multiple titles
-          version: latest.versionState,
-          status: "test",
+          version: latest.versionNumber
+            ? `${latest.versionNumber}.${latest.versionMinorNumber}`
+            : latest.versionState,
+          status: latest.versionState, //TODO: get publication status from dv api
         },
         //TODO: find the file with CLEAN MANUSCRIPT TAG
         manuscript: {
