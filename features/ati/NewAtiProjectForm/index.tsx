@@ -1,16 +1,7 @@
-import React, { FC, FormEventHandler, useState } from "react"
+import React, { FC, FormEventHandler } from "react"
 
 import axios from "axios"
-import {
-  Button,
-  Form,
-  TextArea,
-  TextInput,
-  FileUploader,
-  Select,
-  SelectItem,
-  Toggle,
-} from "carbon-components-react"
+import { Button, Form, FileUploader, Select, SelectItem } from "carbon-components-react"
 import { useRouter } from "next/router"
 
 import { IDataset } from "../../../types/dataverse"
@@ -23,12 +14,6 @@ export interface NewAtiProjectFormProps {
 /**Form to create a new ATI project */
 const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
   const router = useRouter()
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const [datasetsState, setDatasets] = useState<IDataset[]>(datasets || [])
-  const [newDataset, setNewDataset] = useState<boolean>(datasets.length === 0)
-  const onNewDatasetToggle = () => {
-    setNewDataset((prev) => !prev)
-  }
   //const [errorMsg, setErrorMsg] = useState<string>("")
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -40,15 +25,9 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
       manuscript: { files: FileList }
     }
     const formData = new FormData()
-    formData.append("newDataset", newDataset ? "on" : "off")
     formData.append("manuscript", target.manuscript.files[0])
-    if (newDataset) {
-      formData.append("atiProjectTitle", target.atiProjectTitle.value)
-      formData.append("atiProjectDesc", target.atiProjectDesc.value)
-      formData.append("atiProjectSubject", target.atiProjectSubject.value)
-    } else {
-      formData.append("dataset", target.dataset.value)
-    }
+    formData.append("dataset", target.dataset.value)
+
     const { status, data } = await axios({
       method: "POST",
       url: "/api/ati",
@@ -80,70 +59,21 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
         <p className="ar--form-desc">
           Upload files from your device to create a new <abbr>ATI</abbr> project.
         </p>
+        <div className="ar--form-item"></div>
         <div className="ar--form-item">
-          <Toggle
-            aria-label="Create new dataset"
-            id="new-dataset-toggle"
-            labelText="Create new dataset"
-            disabled={datasets.length === 0}
-            toggled={newDataset}
-            onToggle={onNewDatasetToggle}
-          />
+          <Select
+            name="dataset"
+            helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
+            id="dataverse-dataset"
+            labelText="Link to a Dataverse dataset"
+            required={true}
+            aria-required={true}
+          >
+            {datasets.map((dataset) => (
+              <SelectItem key={dataset.id} text={dataset.title} value={dataset.id} />
+            ))}
+          </Select>
         </div>
-        {newDataset ? (
-          <>
-            <div className="ar--form-item">
-              <TextInput
-                id="ati-project-title"
-                name="atiProjectTitle"
-                labelText="Project Title"
-                placeholder="Enter your project title"
-                required={true}
-                aria-required={true}
-                size="xl"
-                type="text"
-              />
-            </div>
-            <div className="ar--form-item">
-              <TextArea
-                id="ati-project-desc"
-                name="atiProjectDesc"
-                labelText="Project Description"
-                placeholder="Enter your project description"
-                required={true}
-                aria-required={true}
-                rows={4}
-              />
-            </div>
-            <div className="ar--form-item">
-              <TextInput
-                id="ati-project-subject"
-                name="atiProjectSubject"
-                labelText="Project Subject"
-                placeholder="Enter your project subject"
-                required={true}
-                aria-required={true}
-                size="xl"
-                type="text"
-              />
-            </div>
-          </>
-        ) : (
-          <div className="ar--form-item">
-            <Select
-              name="dataset"
-              helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
-              id="dataverse-dataset"
-              labelText="Link to a Dataverse dataset"
-              required={true}
-              aria-required={true}
-            >
-              {datasetsState.map((dataset) => (
-                <SelectItem key={dataset.id} text={dataset.title} value={dataset.id} />
-              ))}
-            </Select>
-          </div>
-        )}
         <div className="ar--form-item">
           <FileUploader
             aria-required={true}
