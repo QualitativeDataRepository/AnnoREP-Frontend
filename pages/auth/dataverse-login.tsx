@@ -23,9 +23,6 @@ const Login: FC = () => {
   const [apiTokenInvalidText, setApiTokenInvalidText] = useState<string>("")
   const handleApiTokenChange = (apiToken: string) => setApiToken(apiToken)
 
-  const [rememberUser, setRememberUser] = useState<boolean>(false)
-  const handleRememberUser = (rememberUser: boolean) => setRememberUser(rememberUser)
-
   const handleLogin = () => {
     signIn(DATAVERSE_LOGIN_ID, { redirect: false, serverUrl, apiToken }).then((res) => {
       const loginRes = (res as unknown) as SignInResponse
@@ -56,8 +53,6 @@ const Login: FC = () => {
         apiTokenIsInvalid={apiTokenIsInvalid}
         apiTokenInvalidText={apiTokenInvalidText}
         handleApiTokenChange={handleApiTokenChange}
-        rememberUser={rememberUser}
-        handleRememberUser={handleRememberUser}
         handleLogin={handleLogin}
       />
     </Layout>

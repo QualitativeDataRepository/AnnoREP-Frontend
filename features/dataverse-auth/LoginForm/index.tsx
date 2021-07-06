@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, FormEventHandler } from "react"
 
-import { Button, Form, TextInput, Link, Checkbox } from "carbon-components-react"
+import { Button, Form, TextInput, Link } from "carbon-components-react"
 
 export interface LoginFormProps {
   /**The dataverse server url */
@@ -19,10 +19,6 @@ export interface LoginFormProps {
   apiTokenInvalidText: string
   /**Callback to handle the dataverse api token input changes */
   handleApiTokenChange(value: string): void
-  /**Remember the user's login credentials */
-  rememberUser: boolean
-  /**Callback to handle the remember user input changes */
-  handleRememberUser(checked: boolean): void
   /**Callback to handle login */
   handleLogin(): void
 }
@@ -37,15 +33,12 @@ const LoginForm: FC<LoginFormProps> = ({
   apiTokenIsInvalid,
   apiTokenInvalidText,
   handleApiTokenChange,
-  rememberUser,
-  handleRememberUser,
   handleLogin,
 }: LoginFormProps) => {
   const onServerUrlChange = (event: ChangeEvent<HTMLInputElement>) =>
     handleServerUrlChange(event.target.value)
   const onApiTokenChange = (event: ChangeEvent<HTMLInputElement>) =>
     handleApiTokenChange(event.target.value)
-  const onRememberUserChange = (checked: boolean) => handleRememberUser(checked)
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
     handleLogin()
@@ -108,13 +101,6 @@ const LoginForm: FC<LoginFormProps> = ({
             onChange={onApiTokenChange}
           />
         </div>
-        <Checkbox
-          className="ar--form-item"
-          id="remember-user"
-          labelText="Remember me"
-          checked={rememberUser}
-          onChange={onRememberUserChange}
-        />
         <Button className="ar--form-submit-btn" type="submit">
           Log in
         </Button>
