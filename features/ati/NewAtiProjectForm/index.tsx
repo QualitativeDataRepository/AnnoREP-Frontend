@@ -20,9 +20,6 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
-      atiProjectTitle: { value: string }
-      atiProjectDesc: { value: string }
-      atiProjectSubject: { value: string }
       dataset: { value: string }
       manuscript: { files: FileList }
     }
