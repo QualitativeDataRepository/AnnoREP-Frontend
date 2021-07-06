@@ -1,7 +1,9 @@
 import { FC } from "react"
 
+import axios from "axios"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
+import qs from "qs"
 
 import { Add16 } from "@carbon/icons-react"
 import { Link } from "carbon-components-react"
@@ -58,28 +60,36 @@ export default Home
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
-  let atiProjects: IAtiProject[] = []
+  const atiProjects: IAtiProject[] = []
   if (session) {
-    /*const { status, data } = await axios.get<IAtiProject[]>(
+    const { status, data } = await axios.get(
       //TODO: change to X-Dataverse-key header later
-      `${session.serverUrl}/api/mydata/retrieve?key=${session.apiToken}`,
-    )*/
-    //filter to only atis
-    //atiProjects = data;
-    atiProjects = [
+      `${session.serverUrl}/api/mydata/retrieve`,
       {
-        id: "test-1",
-        title: "project 1",
-        status: "Draft",
-        version: "1.0.0",
-      },
-      {
-        id: "test-2",
-        title: "project 2",
-        status: "Draft",
-        version: "1.0.0",
-      },
-    ]
+        params: {
+          key: session.apiToken,
+          dvobject_types: "Dataset",
+          published_states: ["Published", "Unpublished", "Draft", "In Review"],
+          //ar only?
+          role_ids: [5, 6, 7, 26, 27],
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { indices: false })
+        },
+      }
+    )
+    if (status === 200 && data.success) {
+      const items = data.data.items
+      //filter for ar only
+      for (let i = 0; i < items.length; i++) {
+        atiProjects.push({
+          id: items[i].entity_id,
+          title: items[i].name,
+          status: items[i].publication_statuses.join(", "),
+          version: items[i].versionState,
+        })
+      }
+    }
   }
   return {
     props: { session, atiProjects },
