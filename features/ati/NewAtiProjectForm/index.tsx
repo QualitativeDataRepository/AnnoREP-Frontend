@@ -38,14 +38,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
       atiProjectSubject: { value: string }
       dataset: { value: string }
       manuscript: { files: FileList }
-      datasources: { files: FileList }
     }
     const formData = new FormData()
     formData.append("newDataset", newDataset ? "on" : "off")
     formData.append("manuscript", target.manuscript.files[0])
-    for (let i = 0; i < target.datasources.files.length; i++) {
-      formData.append("datasources[]", target.datasources.files[i])
-    }
     if (newDataset) {
       formData.append("atiProjectTitle", target.atiProjectTitle.value)
       formData.append("atiProjectDesc", target.atiProjectDesc.value)
@@ -159,20 +155,6 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets }) => {
             labelDescription="Supported file types are .docx and .pdf."
             labelTitle="Manuscript"
             name="manuscript"
-            size="small"
-          />
-        </div>
-        <div className="ar--form-item">
-          <FileUploader
-            accept={[".docx, .pdf"]}
-            buttonKind="tertiary"
-            buttonLabel="Add file(s)"
-            filenameStatus="edit"
-            iconDescription="Clear file"
-            labelDescription="Supported file types are .docx and .pdf."
-            labelTitle="Datasources"
-            multiple={true}
-            name="datasources"
             size="small"
           />
         </div>
