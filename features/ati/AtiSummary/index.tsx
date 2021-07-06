@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { UnorderedList, ListItem, Button } from "carbon-components-react"
+import { UnorderedList, ListItem, Button, Link } from "carbon-components-react"
 
 import { IATIProjectDetails } from "../../../types/dataverse"
 
@@ -8,11 +8,16 @@ import styles from "./ATISummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface ATISummaryProps {
+  serverUrl: string
   atiProjectDetails: IATIProjectDetails
 }
 
-const ATISummary: FC<ATISummaryProps> = ({ atiProjectDetails }) => {
-  const { title, status, version } = atiProjectDetails.dataset
+//api/access/dataset/id dl bundle
+//update annotations first then use api
+//https://github.com/QualitativeDataRepository/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L1088
+
+const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
+  const { doi, title, status, version } = atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
   return (
     <div className={layoutStyles.maxwidth}>
@@ -35,6 +40,14 @@ const ATISummary: FC<ATISummaryProps> = ({ atiProjectDetails }) => {
       </section>
       <section aria-label="datasources" className={styles.section}>
         <h2 className={styles.header}>Datasources</h2>
+        <Link
+          href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          size="lg"
+        >
+          Modify datasources
+        </Link>
         <div className={styles.listcontainer}>
           <UnorderedList>
             {datasources.map(({ id, name }) => (

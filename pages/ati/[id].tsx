@@ -10,17 +10,18 @@ import { IATIProjectDetails } from "../../types/dataverse"
 import { DATAVERSE_HEADER_NAME } from "../../constants/dataverse"
 
 interface AtiProps {
+  serverUrl?: string
   atiProjectDetails?: IATIProjectDetails
 }
 
-const Ati: FC<AtiProps> = ({ atiProjectDetails }) => {
+const Ati: FC<AtiProps> = ({ serverUrl, atiProjectDetails }) => {
   return (
     <Layout
       title={`AnnoREP - ${atiProjectDetails ? atiProjectDetails.dataset.title : ""}`}
       isFullWidth={true}
     >
-      {atiProjectDetails ? (
-        <ATIProjectDetails atiProjectDetails={atiProjectDetails} />
+      {atiProjectDetails && serverUrl ? (
+        <ATIProjectDetails serverUrl={serverUrl} atiProjectDetails={atiProjectDetails} />
       ) : (
         "You don't have access to this ATI."
       )}
@@ -70,6 +71,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   return {
     props: {
+      serverUrl: session ? session.serverUrl : undefined,
       atiProjectDetails,
     },
   }
