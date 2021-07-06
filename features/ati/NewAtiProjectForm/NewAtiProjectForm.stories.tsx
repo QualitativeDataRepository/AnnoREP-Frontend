@@ -14,18 +14,22 @@ WithDatasets.args = {
   datasets: [
     {
       id: "dataset-1",
+      doi: "doi:123",
       title: "Dataset 1",
     },
     {
       id: "dataset-2",
+      doi: "doi:123",
       title: "Dataset 2",
     },
     {
       id: "dataset-3",
+      doi: "doi:123",
       title: "Dataset 3",
     },
     {
       id: "dataset-3",
+      doi: "doi:123",
       title: "Dataset 4",
     },
   ],
