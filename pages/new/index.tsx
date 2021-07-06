@@ -53,6 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       for (let i = 0; i < items.length; i++) {
         datasets.push({
           id: items[i].entity_id,
+          doi: items[i].global_id,
           title: items[i].name,
         })
       }
