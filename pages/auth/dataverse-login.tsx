@@ -1,45 +1,66 @@
-import { useState } from "react"
+import { FC, useState } from "react"
 
-import { signIn } from "next-auth/client"
+import { signIn, SignInResponse } from "next-auth/client"
+import { useRouter } from "next/router"
 
+import Layout from "../../features/components/Layout"
 import LoginForm from "../../features/dataverse-auth/LoginForm"
+import {
+  DATAVERSE_LOGIN_ID,
+  INVALID_API_TOKEN,
+  INVALID_SERVER_URL,
+} from "../../constants/dataverse"
 
-const Login = (): JSX.Element => {
+const Login: FC = () => {
+  const router = useRouter()
   const [serverUrl, setServerUrl] = useState<string>("")
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [serverUrlIsInvalid, setServerUrlIsInvalid] = useState<boolean>(false)
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [serverUrlInvalidText, setServerUrlInvalidText] = useState<string>("")
   const handleServerUrlChange = (serverUrl: string) => setServerUrl(serverUrl)
 
   const [apiToken, setApiToken] = useState<string>("")
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [apiTokenIsInvalid, setApiTokenIsInvalid] = useState<boolean>(false)
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const [apiTokenInvalidText, setApiTokenInvalidText] = useState<string>("")
   const handleApiTokenChange = (apiToken: string) => setApiToken(apiToken)
 
   const [rememberUser, setRememberUser] = useState<boolean>(false)
   const handleRememberUser = (rememberUser: boolean) => setRememberUser(rememberUser)
 
-  //handle stay on page if error
-  //redirect if session created
-  const handleLogin = () => signIn("dataverse-login", { serverUrl, apiToken, callbackUrl: "/" })
+  const handleLogin = () => {
+    signIn(DATAVERSE_LOGIN_ID, { redirect: false, serverUrl, apiToken }).then((res) => {
+      const loginRes = (res as unknown) as SignInResponse
+      if (loginRes.error) {
+        if (loginRes.error === INVALID_SERVER_URL) {
+          setServerUrlIsInvalid(true)
+          setServerUrlInvalidText(INVALID_SERVER_URL)
+          setApiTokenIsInvalid(false)
+        } else {
+          setApiTokenIsInvalid(true)
+          setApiTokenInvalidText(INVALID_API_TOKEN)
+          setServerUrlIsInvalid(false)
+        }
+      } else {
+        router.push("/")
+      }
+    })
+  }
 
   return (
-    <LoginForm
-      serverUrl={serverUrl}
-      serverUrlIsInvalid={serverUrlIsInvalid}
-      serverUrlInvalidText={serverUrlInvalidText}
-      handleServerUrlChange={handleServerUrlChange}
-      apiToken={apiToken}
-      apiTokenIsInvalid={apiTokenIsInvalid}
-      apiTokenInvalidText={apiTokenInvalidText}
-      handleApiTokenChange={handleApiTokenChange}
-      rememberUser={rememberUser}
-      handleRememberUser={handleRememberUser}
-      handleLogin={handleLogin}
-    />
+    <Layout title="AnnoREP - Dataverse Login">
+      <LoginForm
+        serverUrl={serverUrl}
+        serverUrlIsInvalid={serverUrlIsInvalid}
+        serverUrlInvalidText={serverUrlInvalidText}
+        handleServerUrlChange={handleServerUrlChange}
+        apiToken={apiToken}
+        apiTokenIsInvalid={apiTokenIsInvalid}
+        apiTokenInvalidText={apiTokenInvalidText}
+        handleApiTokenChange={handleApiTokenChange}
+        rememberUser={rememberUser}
+        handleRememberUser={handleRememberUser}
+        handleLogin={handleLogin}
+      />
+    </Layout>
   )
 }
 

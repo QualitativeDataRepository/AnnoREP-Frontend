@@ -1,11 +1,23 @@
+import axios, { AxiosError } from "axios"
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
-import axios from "axios"
+
+import {
+  DATAVERSE_HEADER_NAME,
+  DATAVERSE_LOGIN_ID,
+  INVALID_API_TOKEN,
+  INVALID_SERVER_URL,
+} from "../../../constants/dataverse"
+
+interface Creds {
+  serverUrl: string
+  apiToken: string
+}
 
 export default NextAuth({
   providers: [
     Providers.Credentials({
-      id: "dataverse-login",
+      id: DATAVERSE_LOGIN_ID,
       type: "credentials",
       name: "Dataverse Credentials",
       credentials: {
@@ -13,26 +25,37 @@ export default NextAuth({
         apiToken: { label: "Dataverse API Token", type: "password" },
       },
       async authorize(credentials) {
-        const { status, data } = await axios.post(
-          `${process.env.NEXTAUTH_URL}/api/auth/verify-user`,
-          { ...credentials },
-          {
+        const creds = { ...credentials } as Creds
+        let user
+        let msg
+        try {
+          const { status, data } = await axios.get(`${creds.serverUrl}/api/users/:me`, {
             headers: {
-              accept: "*/*",
-              "Content-Type": "application/json",
+              [DATAVERSE_HEADER_NAME]: creds.apiToken,
             },
-          }
-        )
+          })
 
-        // If no error and we have user data, return it
-        if (status === 200 && data) {
-          //console.log("user", data)
-          return data
+          if (status === 200 && data.status === "OK") {
+            const userData = {
+              ...creds,
+              name: data.data.displayName,
+              email: data.data.email,
+            }
+            user = userData
+          }
+        } catch (error) {
+          const axiosError = error as AxiosError
+          if (axiosError.response?.status === 400) {
+            msg = INVALID_API_TOKEN
+          } else {
+            msg = INVALID_SERVER_URL
+          }
         }
-        // Return null if user data could not be retrieved
-        return null
-        //valid, redirect to home
-        //invalid, stay on page
+        if (user) {
+          return user
+        } else {
+          throw new Error(msg)
+        }
       },
     }),
   ],
@@ -42,12 +65,15 @@ export default NextAuth({
       if (isSignIn) {
         token.serverUrl = user?.serverUrl
         token.apiToken = user?.apiToken
+        token.name = user?.name
+        token.email = user?.email
       }
       return token
     },
     async session(session, user) {
       session.serverUrl = user?.serverUrl
       session.apiToken = user?.apiToken
+      session.user = user
       return session
     },
     async redirect(url, baseUrl) {
