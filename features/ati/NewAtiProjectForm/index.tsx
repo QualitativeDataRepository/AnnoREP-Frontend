@@ -60,7 +60,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
           New <abbr>ATI</abbr> Project
         </h1>
         <p className="ar--form-desc">
-          Upload files from your device to create a new <abbr>ATI</abbr> project.
+          Link to a Dataverse dataset and upload a manuscript to create a new <abbr>ATI</abbr>{" "}
+          project
         </p>
         <div className="ar--form-item">
           <Link
