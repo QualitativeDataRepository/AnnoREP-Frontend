@@ -1,6 +1,6 @@
 import { FC, FormEventHandler, useState } from "react"
 
-import { Button, TooltipIcon, Form, FileUploader } from "carbon-components-react"
+import { Button, TooltipIcon, Form, FileUploader, Link } from "carbon-components-react"
 import { Panel, PanelType } from "@fluentui/react"
 import { useBoolean } from "@fluentui/react-hooks"
 import { CopyToClipboard } from "react-copy-to-clipboard"
@@ -18,16 +18,25 @@ interface AtiManuscriptProps {
   //file upload has to me form
   //just form that has delete or upload? wher to put it? in relation to datasources button
   datasetId: string
+  doi: string
   datasources: IDatasource[]
+  serverUrl: string
   manuscriptId?: string
 }
 
-const AtiManuscript: FC<AtiManuscriptProps> = ({ manuscriptId, datasources }) => {
+const AtiManuscript: FC<AtiManuscriptProps> = ({
+  datasetId,
+  doi,
+  manuscriptId,
+  datasources,
+  serverUrl,
+}) => {
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
   const [copiedUri, setCopiedUri] = useState("")
 
   const onDelete: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
+    datasetId
     //api call delete both original and clean manu
   }
 
@@ -79,6 +88,14 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({ manuscriptId, datasources }) =>
         onDismiss={dismissPanel}
         closeButtonAriaLabel="Close"
       >
+        <Link
+          href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          size="lg"
+        >
+          Modify datasources
+        </Link>
         <div className={styles.infotext}>{`${copiedUri} ${copiedUri ? "copied!" : ""}`}</div>
         {datasources.length === 0 && (
           <div className={styles.infotext}>No datasources found for this project.</div>
