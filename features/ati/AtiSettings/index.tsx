@@ -1,6 +1,6 @@
-import { ChangeEvent, FC, useState } from "react"
+import { FC, FormEventHandler } from "react"
 
-import { Form, TextInput, Button } from "carbon-components-react"
+import { Button, Form } from "carbon-components-react"
 
 import { IDataset } from "../../../types/dataverse"
 
@@ -12,41 +12,27 @@ interface AtiSettingsProps {
 }
 
 const AtiSettings: FC<AtiSettingsProps> = ({ dataset }) => {
-  const [title, setTitle] = useState(dataset.title)
-  const onTitleChange = (event: ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)
+  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault()
+    dataset.id //remove the tag
+    //api call remove ar tag, delete files
+  }
   return (
     <div className={layoutStyles.maxwidth}>
-      <h2>Settings</h2>
-      <Form>
-        <div className={styles.input}>
-          <TextInput
-            id="project-title"
-            name="projecttitle"
-            labelText="Project title"
-            placeholder="Project title"
-            value={title}
-            onChange={onTitleChange}
-          />
-          <div>
-            <Button type="submit" kind="tertiary" size="field">
-              Rename
-            </Button>
-          </div>
-        </div>
-      </Form>
-      <h2 className={styles.dangertitle}>Danger zone</h2>
+      <h2>Danger zone</h2>
       <div className={styles.dangerzone}>
-        <div className={styles.dangeritem}>
-          <div>
-            <div className={styles.bold}>Delete this project</div>
-            <div>Once you delete a project, there is no going back. Please be certain.</div>
+        <Form onSubmit={onSubmit}>
+          <div className={styles.title}>
+            Delete <abbr>ATI</abbr> project
           </div>
-          <div>
-            <Button kind="danger" size="field">
-              Delete this project
-            </Button>
-          </div>
-        </div>
+          <p className={styles.desc}>
+            Unmark the Dataverse dataset as an <abbr>ATI</abbr> project and remove the manuscript
+            and annotation files.
+          </p>
+          <Button type="submit" kind="danger" size="sm">
+            Delete
+          </Button>
+        </Form>
       </div>
     </div>
   )
