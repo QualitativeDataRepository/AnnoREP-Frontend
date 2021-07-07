@@ -21,6 +21,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
         </Tab>
         <Tab id="manuscript" label="Manuscript">
           <AtiManuscript
+            datasetId={atiProjectDetails.dataset.id}
             manuscriptId={atiProjectDetails.manuscript.id}
             datasources={atiProjectDetails.datasources}
           />

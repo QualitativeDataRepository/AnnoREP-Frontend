@@ -48,12 +48,11 @@ const Manuscript: FC<ManuscriptProps> = ({ manuscript }) => {
 
 export default Manuscript
 
-// trystatic props but with dev api token
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   let manuscript = null
   if (session && context?.params?.id) {
-    const { data } = await axios({
+    const { status, data } = await axios({
       method: "get",
       url: "http://www.africau.edu/images/default/sample.pdf",
       //url: `${session.serverUrl}/api/access/datafile/1864775`,
@@ -63,7 +62,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         //Accept: "application/pdf",
       },
     })
-    manuscript = Buffer.from(data, "binary").toString("base64")
+    if (status === 200) {
+      manuscript = Buffer.from(data, "binary").toString("base64")
+    }
   }
   //get the id
   //axios download the pdf file from jim's api
