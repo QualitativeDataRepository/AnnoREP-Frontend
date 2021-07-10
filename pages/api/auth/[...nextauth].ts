@@ -1,60 +1,64 @@
-import axios, { AxiosError } from "axios"
+import axios from "axios"
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
 
-import {
-  DATAVERSE_HEADER_NAME,
-  DATAVERSE_LOGIN_ID,
-  INVALID_API_TOKEN,
-  INVALID_SERVER_URL,
-} from "../../../constants/dataverse"
+import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
+import { LOGIN_ID, SEPARATOR } from "../../../features/auth/constants"
 
 interface Creds {
-  serverUrl: string
-  apiToken: string
+  dataverseApiToken: string
+  hypothesisApiToken: string
 }
 
 export default NextAuth({
   providers: [
     Providers.Credentials({
-      id: DATAVERSE_LOGIN_ID,
+      id: LOGIN_ID,
       type: "credentials",
-      name: "Dataverse Credentials",
+      name: "Dataverse and Hypothes.is Credentials",
       credentials: {
-        serverUrl: { label: "Dataverse Server Url", type: "text", placeholder: "demo dv" },
-        apiToken: { label: "Dataverse API Token", type: "password" },
+        dataverseApiToken: { label: "Dataverse API Token", type: "password" },
+        hypothesisApiToken: { label: "Hypothes.is API Token", type: "password" },
       },
       async authorize(credentials) {
         const creds = { ...credentials } as Creds
-        let user
-        let msg
+        const user = {
+          dataverseApiToken: "",
+          hypothesisApiToken: "",
+        }
+        /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
         try {
-          const { status, data } = await axios.get(`${creds.serverUrl}/api/users/:me`, {
+          const { status, data } = await axios.get(
+            `${process.env.DATAVERSE_SERVER_URL}/api/users/:me`,
+            {
+              headers: {
+                [DATAVERSE_HEADER_NAME]: creds.dataverseApiToken.trim(),
+              },
+            }
+          )
+          if (status === 200 && data.status === "OK") {
+            user.dataverseApiToken = creds.dataverseApiToken.trim()
+          }
+        } catch (error) {}
+        /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+        try {
+          const { status } = await axios({
+            method: "GET",
+            url: `${process.env.HYPOTHESIS_API_SERVER_URL}/api/profile`,
             headers: {
-              [DATAVERSE_HEADER_NAME]: creds.apiToken,
+              Authorization: `Bearer ${creds.hypothesisApiToken.trim()}`,
             },
           })
-
-          if (status === 200 && data.status === "OK") {
-            const userData = {
-              ...creds,
-              name: data.data.displayName,
-              email: data.data.email,
-            }
-            user = userData
+          if (status === 200) {
+            user.hypothesisApiToken = creds.hypothesisApiToken.trim()
           }
-        } catch (error) {
-          const axiosError = error as AxiosError
-          if (axiosError.response?.status === 400) {
-            msg = INVALID_API_TOKEN
-          } else {
-            msg = INVALID_SERVER_URL
-          }
-        }
-        if (user) {
-          return user
+        } catch (error) {}
+        if (user.dataverseApiToken === "" || user.hypothesisApiToken === "") {
+          throw new Error(
+            `${user.dataverseApiToken === ""}${SEPARATOR}${user.hypothesisApiToken === ""}`
+          )
         } else {
-          throw new Error(msg)
+          return user
         }
       },
     }),
@@ -63,17 +67,17 @@ export default NextAuth({
     async jwt(token, user) {
       const isSignIn = user ? true : false
       if (isSignIn) {
-        token.serverUrl = user?.serverUrl
-        token.apiToken = user?.apiToken
-        token.name = user?.name
-        token.email = user?.email
+        token.dataverseApiToken = user?.dataverseApiToken
+        token.hypothesisApiToken = user?.hypothesisApiToken
+        //token.name = user?.name
+        //token.email = user?.email
       }
       return token
     },
     async session(session, user) {
-      session.serverUrl = user?.serverUrl
-      session.apiToken = user?.apiToken
-      session.user = user
+      session.dataverseApiToken = user?.dataverseApiToken
+      session.hypothesisApiToken = user?.hypothesisApiToken
+      //session.user = user
       return session
     },
     async redirect(url, baseUrl) {

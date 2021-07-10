@@ -3,11 +3,11 @@ import React, { FC, MouseEventHandler } from "react"
 import { Link } from "carbon-components-react"
 
 export interface LogoutLinkProps {
-  /**Callback to handle dataverse logout */
+  /**Callback to handle logout */
   handleLogout(): void
 }
 
-/**Dataverse logout link */
+/**Logout link */
 const LogoutLink: FC<LogoutLinkProps> = ({ handleLogout }) => {
   const onClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault()
@@ -15,7 +15,7 @@ const LogoutLink: FC<LogoutLinkProps> = ({ handleLogout }) => {
   }
 
   return (
-    <Link href="/dataverse-logout" size="lg" inline={false} onClick={onClick}>
+    <Link href="/logout" size="lg" inline={false} onClick={onClick}>
       Log out
     </Link>
   )

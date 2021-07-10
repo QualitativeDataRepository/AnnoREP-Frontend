@@ -4,7 +4,7 @@ import LogoutLink, { LogoutLinkProps } from "."
 
 export default {
   component: LogoutLink,
-  title: "Dataverse Auth/Logout Link",
+  title: "Auth/Logout Link",
 } as Meta
 
 const Template: Story<LogoutLinkProps> = (args) => <LogoutLink {...args} />

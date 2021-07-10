@@ -3,8 +3,8 @@ import { FC } from "react"
 import { signOut } from "next-auth/client"
 import Link from "next/link"
 
-import LoginLink from "../../dataverse-auth/LoginLink"
-import LogoutLink from "../../dataverse-auth/LogoutLink"
+import LoginLink from "../../auth/LoginLink"
+import LogoutLink from "../../auth/LogoutLink"
 
 import styles from "./AppBar.module.css"
 
