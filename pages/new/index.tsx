@@ -11,15 +11,16 @@ import Layout from "../../features/components/Layout"
 import { IDataset } from "../../types/dataverse"
 
 interface NewAtiProps {
-  session: any
+  isLoggedIn: boolean
   datasets: IDataset[]
+  serverUrl: string
 }
 
-const NewAti: FC<NewAtiProps> = ({ session, datasets }) => {
+const NewAti: FC<NewAtiProps> = ({ isLoggedIn, datasets, serverUrl }) => {
   return (
-    <Layout title="AnnoREP - New ATI Project">
-      {session ? (
-        <NewAtiProjectForm datasets={datasets} serverUrl={session.serverUrl} />
+    <Layout isLoggedIn={isLoggedIn} title="AnnoREP - New ATI Project">
+      {isLoggedIn ? (
+        <NewAtiProjectForm datasets={datasets} serverUrl={serverUrl} />
       ) : (
         <div>Login to create a new ATI project.</div>
       )}
@@ -59,12 +60,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     }
   }
-  //also get the subjects?
-  //change textinput to select?
-  //ask jim for api call to get subjects?
   return {
     props: {
-      session,
+      isLoggedIn: session ? true : false,
+      severUrl: process.env.DATAVERSE_SERVER_URL,
       datasets,
     },
   }

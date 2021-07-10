@@ -1,6 +1,7 @@
 import { FC, useState } from "react"
 
-import { signIn, SignInResponse } from "next-auth/client"
+import { GetServerSideProps } from "next"
+import { getSession, signIn, SignInResponse } from "next-auth/client"
 import { useRouter } from "next/router"
 
 import Layout from "../../features/components/Layout"
@@ -11,7 +12,11 @@ import {
   INVALID_SERVER_URL,
 } from "../../constants/dataverse"
 
-const Login: FC = () => {
+interface LoginProps {
+  isLoggedIn: boolean
+}
+
+const Login: FC<LoginProps> = ({ isLoggedIn }) => {
   const router = useRouter()
   const [serverUrl, setServerUrl] = useState<string>("")
   const [serverUrlIsInvalid, setServerUrlIsInvalid] = useState<boolean>(false)
@@ -42,8 +47,12 @@ const Login: FC = () => {
     })
   }
 
+  if (isLoggedIn) {
+    router.push("/")
+  }
+
   return (
-    <Layout title="AnnoREP - Dataverse Login">
+    <Layout isLoggedIn={false} title="AnnoREP - Dataverse Login">
       <LoginForm
         serverUrl={serverUrl}
         serverUrlIsInvalid={serverUrlIsInvalid}
@@ -60,3 +69,12 @@ const Login: FC = () => {
 }
 
 export default Login
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
+  return {
+    props: {
+      isLoggedIn: session ? true : false,
+    },
+  }
+}

@@ -9,10 +9,11 @@ import styles from "./Layout.module.css"
 interface LayoutProps {
   title: string
   children: ReactNode
+  isLoggedIn: boolean
   isFullWidth?: boolean
 }
 
-const Layout: FC<LayoutProps> = ({ title, children, isFullWidth }) => {
+const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth }) => {
   return (
     <>
       <Head>
@@ -21,7 +22,7 @@ const Layout: FC<LayoutProps> = ({ title, children, isFullWidth }) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className={styles.container}>
-        <AppBar />
+        <AppBar isLoggedIn={isLoggedIn} />
         <main className={`${styles.main} ${isFullWidth ? styles.fullmaxwidth : styles.maxwidth}`}>
           {children}
         </main>

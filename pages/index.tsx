@@ -16,14 +16,14 @@ import { IAtiProject } from "../types/ati"
 import styles from "../styles/Home.module.css"
 
 interface HomeProps {
-  session: any
+  isLoggedIn: boolean
   atiProjects: IAtiProject[]
 }
-const Home: FC<HomeProps> = ({ session, atiProjects }) => {
+const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
   return (
-    <Layout title="AnnoREP">
+    <Layout isLoggedIn={isLoggedIn} title="AnnoREP">
       <div>
-        {session ? (
+        {isLoggedIn ? (
           <div>
             <div className={styles.titlecontainer}>
               <h1>ATI Projects</h1>
@@ -94,6 +94,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
   return {
-    props: { session, atiProjects },
+    props: { isLoggedIn: session ? true : false, atiProjects },
   }
 }
