@@ -6,8 +6,9 @@ export const INVALID_API_TOKEN = "The dataverse API token is invalid."
 
 export const INVALID_SERVER_URL = "The dataverse server URL is invalid."
 
-export enum FileTag {
-  OrigManuscript = "Original manuscript",
-  CleanManuscript = "Clean manuscript",
-  Annotation = "Annotation",
-}
+export const SOURCE_MANUSCRIPT_TAG = "Source manuscript"
+
+export const ANNOREP_METADATA_FIELD =
+  "https://rdf-vocabulary.ddialliance.org/discovery.html#kindOfData"
+
+export const ANNOREP_METADATA_VALUE = "AnnoRep"
