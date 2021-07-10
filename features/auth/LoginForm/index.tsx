@@ -91,7 +91,7 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Dataverse API token"
             size="xl"
-            type="text"
+            type="password"
             value={dataverseApiToken}
             onChange={onDataverseApiTokenChange}
           />
@@ -131,7 +131,7 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Hypothes.is API token"
             size="xl"
-            type="text"
+            type="password"
             value={hypothesisApiToken}
             onChange={onHypothesisApiTokenChange}
           />
