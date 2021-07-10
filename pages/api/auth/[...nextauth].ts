@@ -42,14 +42,14 @@ export default NextAuth({
         } catch (error) {}
         /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
         try {
-          const { status } = await axios({
+          const { data } = await axios({
             method: "GET",
-            url: `${process.env.HYPOTHESIS_API_SERVER_URL}/api/profile`,
+            url: `${process.env.HYPOTHESIS_SERVER_URL}/api/profile`,
             headers: {
               Authorization: `Bearer ${creds.hypothesisApiToken.trim()}`,
             },
           })
-          if (status === 200) {
+          if (data.userid !== null) {
             user.hypothesisApiToken = creds.hypothesisApiToken.trim()
           }
         } catch (error) {}

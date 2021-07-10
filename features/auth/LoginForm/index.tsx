@@ -75,7 +75,7 @@ const LoginForm: FC<LoginFormProps> = ({
             }
             helperText={
               <Link
-                href={`${dataverseServerUrl}/dataverseuser?xhtml?selectTab=apiTokenTab`}
+                href={`${dataverseServerUrl}/dataverseuser.xhtml?selectTab=apiTokenTab`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -88,7 +88,7 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Dataverse API token"
             size="xl"
-            type="password"
+            type="text"
             value={dataverseApiToken}
             onChange={onDataverseApiTokenChange}
           />
@@ -116,7 +116,7 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Hypothes.is API token"
             size="xl"
-            type="password"
+            type="text"
             value={hypothesisApiToken}
             onChange={onHypothesisApiTokenChange}
           />

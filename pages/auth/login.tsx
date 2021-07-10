@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 
 import { GetServerSideProps } from "next"
 import { getSession, signIn, SignInResponse } from "next-auth/client"
@@ -50,9 +50,11 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
     })
   }
 
-  if (isLoggedIn) {
-    router.push("/")
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/")
+    }
+  }, [isLoggedIn])
 
   return (
     <Layout isLoggedIn={false} title="AnnoREP - Login">
