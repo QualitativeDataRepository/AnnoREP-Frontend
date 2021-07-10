@@ -64,10 +64,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const { status, data } = await axios.get(
       //TODO: change to X-Dataverse-key header later
-      `${session.serverUrl}/api/mydata/retrieve`,
+      `${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`,
       {
         params: {
-          key: session.apiToken,
+          key: session.dataverseApiToken,
           dvobject_types: "Dataset",
           published_states: ["Published", "Unpublished", "Draft", "In Review"],
           //ar only?

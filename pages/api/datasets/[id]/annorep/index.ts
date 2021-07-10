@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const { status, data } = await axios({
           method: "PUT",
-          url: `${session.serverUrl}/api/datasets/${id}/metadata`,
+          url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/metadata`,
           params: {
             replace: true,
           },
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
           headers: {
             "Content-type": "application/ld+json", //TODO: this is right?
-            [DATAVERSE_HEADER_NAME]: session.apiToken,
+            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
           },
         })
         res.status(status).json(data)

@@ -39,11 +39,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const datasetId = context?.params?.id
   let atiProjectDetails
   if (session && datasetId) {
-    const { status, data } = await axios.get(`${session.serverUrl}/api/datasets/${datasetId}`, {
-      headers: {
-        [DATAVERSE_HEADER_NAME]: session.apiToken,
-      },
-    })
+    const { status, data } = await axios.get(
+      `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`,
+      {
+        headers: {
+          [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+        },
+      }
+    )
     if (status === 200 && data.status === "OK") {
       const latest = data.data.latestVersion
       const metadataFields = latest.metadataBlocks.citation.fields
@@ -67,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           return {
             id: `${file.dataFile.id}`,
             name: file.dataFile.filename,
-            uri: `${session.serverUrl}/file.xhtml?fileId=${file.dataFile.id}`,
+            uri: `${process.env.DATAVERSE_SERVER_URL}/file.xhtml?fileId=${file.dataFile.id}`,
           }
         }),
       }
