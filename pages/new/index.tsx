@@ -63,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       isLoggedIn: session ? true : false,
-      severUrl: process.env.DATAVERSE_SERVER_URL,
+      serverUrl: process.env.DATAVERSE_SERVER_URL,
       datasets,
     },
   }
