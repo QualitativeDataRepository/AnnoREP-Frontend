@@ -50,20 +50,11 @@ const LoginForm: FC<LoginFormProps> = ({
   return (
     <main className="ar--form-container">
       <Form onSubmit={onSubmit}>
-        <h1 className="ar--form-title">Log in to a Dataverse</h1>
+        <h1 className="ar--form-title">Log in</h1>
         <p className="ar--form-desc">
-          Give AnnoREP permissions to access your Dataverse resources by providing your Application
-          programming interface (<abbr>API</abbr>) token. Instructions for getting an{" "}
-          <abbr>API</abbr> token are described in the{" "}
-          <Link
-            size="lg"
-            href="https://guides.dataverse.org/en/latest/user/account.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Account Creation + Management
-          </Link>{" "}
-          section of the User Guide.
+          Give AnnoREP permissions to access your Dataverse resources and to write annotations to
+          Hypothes.is server by providing your Application programming interface (<abbr>API</abbr>)
+          tokens.
         </p>
         <div className="ar--form-item">
           <TextInput
@@ -74,13 +65,25 @@ const LoginForm: FC<LoginFormProps> = ({
               </div>
             }
             helperText={
-              <Link
-                href={`${dataverseServerUrl}/dataverseuser.xhtml?selectTab=apiTokenTab`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Get your Dataverse API token
-              </Link>
+              <div>
+                <Link
+                  size="sm"
+                  href={`${dataverseServerUrl}/loginpage.xhtml?redirectPage=%2Fdataverse.xhtml`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Log in
+                </Link>{" "}
+                to Dataverse and get your{" "}
+                <Link
+                  size="sm"
+                  href={`${dataverseServerUrl}/dataverseuser.xhtml?selectTab=apiTokenTab`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  API token
+                </Link>
+              </div>
             }
             invalid={dataverseApiTokenIsInvalid}
             invalidText={dataverseApiTokenInvalidText}
@@ -102,13 +105,25 @@ const LoginForm: FC<LoginFormProps> = ({
               </div>
             }
             helperText={
-              <Link
-                href="https://hypothes.is/account/developer"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Get your Hypothes.is API token
-              </Link>
+              <div>
+                <Link
+                  size="sm"
+                  href="https://hypothes.is/login"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Log in
+                </Link>{" "}
+                to Hypothes.is and get your{" "}
+                <Link
+                  size="sm"
+                  href="https://hypothes.is/account/developer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  API token
+                </Link>
+              </div>
             }
             invalid={hypothesisApiTokenIsInvalid}
             invalidText={hypothesisApiTokenInvalidText}
