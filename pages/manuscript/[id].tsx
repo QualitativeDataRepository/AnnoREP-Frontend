@@ -1,29 +1,31 @@
 import { FC, useState } from "react"
 
-import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
 import axios from "axios"
-import { SizeMe } from "react-sizeme"
+import { GetServerSideProps } from "next"
+import Head from "next/head"
+import { getSession } from "next-auth/client"
+
 import { Document, Page, pdfjs } from "react-pdf"
+import { SizeMe } from "react-sizeme"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 import { DATAVERSE_HEADER_NAME } from "../../constants/dataverse"
 
 interface ManuscriptProps {
-  session: any
+  isLoggedIn: boolean
   manuscript: string
 }
 
-const Manuscript: FC<ManuscriptProps> = ({ manuscript }) => {
+const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript }) => {
   const [numPages, setNumPages] = useState(1)
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)
   }
-
-  return (
-    <>
+  let content
+  if (manuscript) {
+    content = (
       <SizeMe>
         {({ size }) => (
           <Document
@@ -41,7 +43,22 @@ const Manuscript: FC<ManuscriptProps> = ({ manuscript }) => {
           </Document>
         )}
       </SizeMe>
-      <script src="https://hypothes.is/embed.js" async></script>
+    )
+  } else if (isLoggedIn) {
+    content = "You don't have access to this manuscript."
+  } else {
+    content = "Unauthorized. Please login."
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Manuscript</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <script src="https://hypothes.is/embed.js" async></script>
+      </Head>
+      <main>{content}</main>
     </>
   )
 }
@@ -50,28 +67,29 @@ export default Manuscript
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
+  const id = context?.params?.id
   let manuscript = null
-  if (session && context?.params?.id) {
-    const { status, data } = await axios({
-      method: "get",
-      url: "http://www.africau.edu/images/default/sample.pdf",
-      //url: `${session.serverUrl}/api/access/datafile/1864775`,
-      responseType: "arraybuffer",
-      headers: {
-        [DATAVERSE_HEADER_NAME]: session.apiToken,
-        //Accept: "application/pdf",
-      },
-    })
-    if (status === 200) {
-      manuscript = Buffer.from(data, "binary").toString("base64")
-    }
+  if (session && id) {
+    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+    try {
+      const { status, data } = await axios({
+        method: "GET",
+        url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}/pdf`,
+        responseType: "arraybuffer",
+        headers: {
+          [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+          Accept: "application/pdf",
+        },
+      })
+      if (status === 200) {
+        //TODO: find success status
+        manuscript = Buffer.from(data, "binary").toString("base64")
+      }
+    } catch (error) {}
   }
-  //get the id
-  //axios download the pdf file from jim's api
-  //pass it to probs
   return {
     props: {
-      session,
+      isLoggedIn: session ? true : false,
       manuscript,
     },
   }
