@@ -9,7 +9,7 @@ const LoginLink: FC = () => {
   return (
     <Link href={LOGIN_PATH}>
       <a className="bx--link bx--link--lg" href={LOGIN_PATH}>
-        Log in
+        Login
       </a>
     </Link>
   )

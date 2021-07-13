@@ -50,7 +50,7 @@ const LoginForm: FC<LoginFormProps> = ({
   return (
     <main className="ar--form-container">
       <Form onSubmit={onSubmit}>
-        <h1 className="ar--form-title">Log in</h1>
+        <h1 className="ar--form-title">Login</h1>
         <p className="ar--form-desc">
           Give AnnoREP permissions to access your Dataverse resources and to write annotations to
           Hypothes.is server by providing your Application programming interface (<abbr>API</abbr>)
@@ -72,7 +72,7 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Log in
+                  Login
                 </Link>{" "}
                 to Dataverse and get your{" "}
                 <Link
@@ -112,7 +112,7 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Log in
+                  Login
                 </Link>{" "}
                 to Hypothes.is and get your{" "}
                 <Link
@@ -137,7 +137,7 @@ const LoginForm: FC<LoginFormProps> = ({
           />
         </div>
         <Button className="ar--form-submit-btn" type="submit">
-          Log in
+          Login
         </Button>
       </Form>
     </main>

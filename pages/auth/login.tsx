@@ -57,7 +57,7 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
   }, [isLoggedIn])
 
   return (
-    <Layout isLoggedIn={false} title="AnnoREP - Log in">
+    <Layout isLoggedIn={false} title="AnnoREP - Login">
       <LoginForm
         dataverseServerUrl={serverUrl}
         dataverseApiToken={dataverseApiToken}
