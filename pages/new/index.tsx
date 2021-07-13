@@ -51,11 +51,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     )
     if (status === 200 && data.success) {
       const items = data.data.items
+      const datasetDict: Record<string, any> = {}
+      //TODO: filter to only non-ar datasets
       for (let i = 0; i < items.length; i++) {
+        const id = items[i].entity_id
+        if (datasetDict[i]) {
+          const foundDataset = datasetDict[id]
+          if (foundDataset.versionId < items[i].versionId) {
+            datasetDict[id] = items[i]
+          }
+        } else {
+          datasetDict[id] = items[i]
+        }
+      }
+      const filteredDatasets = Object.values(datasetDict)
+      for (let i = 0; i < filteredDatasets.length; i++) {
         datasets.push({
-          id: items[i].entity_id,
-          doi: items[i].global_id,
-          title: items[i].name,
+          id: filteredDatasets[i].entity_id,
+          doi: filteredDatasets[i].global_id,
+          title: filteredDatasets[i].name,
         })
       }
     }

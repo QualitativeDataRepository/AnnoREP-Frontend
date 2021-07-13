@@ -80,15 +80,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     )
     if (status === 200 && data.success) {
       const items = data.data.items
-      //filter for ar only
+      //TODO: filter for ar only
+      const datasetDict: Record<string, any> = {}
       for (let i = 0; i < items.length; i++) {
+        const id = items[i].entity_id
+        if (datasetDict[i]) {
+          const foundDataset = datasetDict[id]
+          if (foundDataset.versionId < items[i].versionId) {
+            datasetDict[id] = items[i]
+          }
+        } else {
+          datasetDict[id] = items[i]
+        }
+      }
+      const filteredDatasets = Object.values(datasetDict)
+      for (let i = 0; i < filteredDatasets.length; i++) {
         atiProjects.push({
-          id: items[i].entity_id,
-          title: items[i].name,
-          status: items[i].publication_statuses.join(", "),
-          version: items[i].majorVersion
-            ? `${items[i].majorVersion}.${items[i].minorVersion}`
-            : items[i].versionState,
+          id: filteredDatasets[i].entity_id,
+          title: filteredDatasets[i].name,
+          status: filteredDatasets[i].publication_statuses.join(", "),
+          version: filteredDatasets[i].majorVersion
+            ? `${filteredDatasets[i].majorVersion}.${filteredDatasets[i].minorVersion}`
+            : filteredDatasets[i].versionState,
         })
       }
     }
