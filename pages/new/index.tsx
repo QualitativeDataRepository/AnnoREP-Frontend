@@ -55,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       //TODO: filter to only non-ar datasets
       for (let i = 0; i < items.length; i++) {
         const id = items[i].entity_id
-        if (datasetDict[i]) {
+        if (datasetDict[id]) {
           const foundDataset = datasetDict[id]
           if (foundDataset.versionId < items[i].versionId) {
             datasetDict[id] = items[i]

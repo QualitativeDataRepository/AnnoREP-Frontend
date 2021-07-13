@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       const datasetDict: Record<string, any> = {}
       for (let i = 0; i < items.length; i++) {
         const id = items[i].entity_id
-        if (datasetDict[i]) {
+        if (datasetDict[id]) {
           const foundDataset = datasetDict[id]
           if (foundDataset.versionId < items[i].versionId) {
             datasetDict[id] = items[i]
