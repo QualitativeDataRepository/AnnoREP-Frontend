@@ -11,30 +11,32 @@ import {
   SOURCE_MANUSCRIPT_TAG,
 } from "../../../../../constants/dataverse"
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "PUT") {
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
       const { dataverseApiToken } = session
-      const form = formidable({ multiples: true })
+      const form = formidable({ multiples: false })
       form.parse(req, async (err, _, files) => {
         const manuscript = files.manuscript as formidable.File
         if (err) {
-          res.status(400).json({ msg: `Failed to parse manuscript file. Error: ${err}` })
+          res.status(400).json({ msg: `Failed to parse form data. ${err}` })
         }
 
         try {
           const addManuscriptForm = new FormData()
-          //addManuscriptForm.append("file", manuscript, manuscript.name as string)
-          //addManuscriptForm.append("file", Buffer.from(JSON.stringify(manuscript.toJSON())))
-          addManuscriptForm.append(
-            "file",
-            fs.createReadStream((manuscript as formidable.File).path)
-          )
+          addManuscriptForm.append("file", fs.createReadStream(manuscript.path))
           addManuscriptForm.append(
             "jsonData",
             JSON.stringify({
+              label: manuscript.name,
               description: SOURCE_MANUSCRIPT_TAG,
               directoryLabel: `${ANNOREP_METADATA_VALUE}`,
               categories: [SOURCE_MANUSCRIPT_TAG],
@@ -46,14 +48,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/add`,
             data: addManuscriptForm,
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": `${addManuscriptForm.getHeaders()["content-type"]}`,
               [DATAVERSE_HEADER_NAME]: dataverseApiToken,
             },
           })
           res.status(status).json(data)
         } catch (e) {
           res.status(400).json({
-            msg: `Failed to add manuscript to dataset ${id}. Error: ${e}`,
+            msg: `Failed to add manuscript to dataset ${id}. ${e}`,
           })
         }
       })
