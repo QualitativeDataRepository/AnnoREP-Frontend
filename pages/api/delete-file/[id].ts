@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         res.status(status).json(data)
       } catch (error) {
-        res.status(400).json({ msg: `Failed to delete file ${id}. Error: ${error}` })
+        res.status(400).json({ msg: `Failed to delete file ${id}. ${error}` })
       }
     } else {
       res.status(401).json({ msg: "Unauthorized! Please login." })

@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(status).json(data)
       } catch (e) {
         res.status(400).json({
-          msg: `Failed to delete ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}. Error: ${e}`,
+          msg: `Failed to delete ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}. ${e}`,
         })
       }
     } else {
