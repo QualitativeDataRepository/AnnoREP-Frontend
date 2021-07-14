@@ -9,6 +9,7 @@ import NewAtiProjectForm from "../../features/ati/NewAtiProjectForm"
 import Layout from "../../features/components/Layout"
 
 import { IDataset } from "../../types/dataverse"
+import { ANNOREP_METADATA_VALUE, KIND_OF_DATA_NAME } from "../../constants/dataverse"
 
 interface NewAtiProps {
   isLoggedIn: boolean
@@ -42,6 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           key: session.dataverseApiToken,
           dvobject_types: "Dataset",
           published_states: ["Published", "Unpublished", "Draft", "In Review"],
+          mydata_search_term: `-${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
           role_ids: [5, 6, 7, 26, 27],
         },
         paramsSerializer: (params) => {
@@ -52,7 +54,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (status === 200 && data.success) {
       const items = data.data.items
       const datasetDict: Record<string, any> = {}
-      //TODO: filter to only non-ar datasets
       for (let i = 0; i < items.length; i++) {
         const id = items[i].entity_id
         if (datasetDict[id]) {
