@@ -10,6 +10,7 @@ import {
   SelectItem,
   Link,
   Loading,
+  InlineNotification,
 } from "carbon-components-react"
 import { useRouter } from "next/router"
 
@@ -25,7 +26,7 @@ export interface NewAtiProjectFormProps {
 /**Form to create a new ATI project */
 const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) => {
   const router = useRouter()
-  //const [errorMsg, setErrorMsg] = useState<string>("")
+  const [errorMsg, setErrorMsg] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
@@ -36,6 +37,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     const formData = new FormData()
     formData.append("manuscript", target.manuscript.files[0])
     setIsLoading(true)
+    setErrorMsg("")
     Promise.all([
       axios({
         method: "PUT",
@@ -72,9 +74,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
         }
       )
       .catch((error) => {
-        error
         setIsLoading(false)
-        //toast the error
+        setErrorMsg(`${error}`)
       })
   }
   //TODO: is ownerId=1 justified?
@@ -100,6 +101,16 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
               Create dataset
             </Link>
           </div>
+          {errorMsg && (
+            <div className="ar--form-item">
+              <InlineNotification
+                hideCloseButton
+                kind="error"
+                subtitle={<span>{errorMsg}</span>}
+                title="Error"
+              />
+            </div>
+          )}
           <div className="ar--form-item">
             <Select
               name="dataset"
