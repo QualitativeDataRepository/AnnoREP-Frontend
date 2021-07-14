@@ -29,7 +29,10 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
           />
         </Tab>
         <Tab id="settings" label="Settings">
-          <AtiSettings dataset={atiProjectDetails.dataset} />
+          <AtiSettings
+            dataset={atiProjectDetails.dataset}
+            manuscriptId={atiProjectDetails.manuscript.id}
+          />
         </Tab>
       </Tabs>
     </>
