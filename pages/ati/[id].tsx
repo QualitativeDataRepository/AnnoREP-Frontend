@@ -7,7 +7,11 @@ import { getSession } from "next-auth/client"
 import Layout from "../../features/components/Layout"
 import ATIProjectDetails from "../../features/ati/AtiProjectDetails"
 import { IATIProjectDetails } from "../../types/dataverse"
-import { DATAVERSE_HEADER_NAME } from "../../constants/dataverse"
+import {
+  ANNOREP_METADATA_VALUE,
+  DATAVERSE_HEADER_NAME,
+  SOURCE_MANUSCRIPT_TAG,
+} from "../../constants/dataverse"
 
 interface AtiProps {
   isLoggedIn: boolean
@@ -35,7 +39,6 @@ export default Ati
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
-  //create the callbacks to update ati, using id
   const datasetId = context?.params?.id
   let atiProjectDetails
   if (session && datasetId) {
@@ -50,6 +53,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (status === 200 && data.status === "OK") {
       const latest = data.data.latestVersion
       const metadataFields = latest.metadataBlocks.citation.fields
+      const manuscript = latest.files.find(
+        (file: any) =>
+          file.directoryLabel === ANNOREP_METADATA_VALUE &&
+          file.description === SOURCE_MANUSCRIPT_TAG
+      )
       atiProjectDetails = {
         dataset: {
           id: latest.datasetId,
@@ -60,10 +68,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             : latest.versionState,
           status: latest.versionState, //TODO: get publication status from dv api
         },
-        //TODO: find the file with CLEAN MANUSCRIPT TAG
         manuscript: {
-          id: "manuscript",
-          name: "manuscript",
+          id: manuscript?.dataFile.id || "",
+          name: manuscript?.dataFile.filename || "",
         },
         //TODO: only consider data files, no manifest?
         datasources: latest.files.map((file: any) => {
