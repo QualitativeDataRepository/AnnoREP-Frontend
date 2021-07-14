@@ -13,6 +13,8 @@ import Layout from "../features/components/Layout"
 
 import { IAtiProject } from "../types/ati"
 
+import { ANNOREP_METADATA_VALUE, KIND_OF_DATA_NAME } from "../constants/dataverse"
+
 import styles from "../styles/Home.module.css"
 
 interface HomeProps {
@@ -70,7 +72,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           key: session.dataverseApiToken,
           dvobject_types: "Dataset",
           published_states: ["Published", "Unpublished", "Draft", "In Review"],
-          //ar only?
+          mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
           role_ids: [5, 6, 7, 26, 27],
         },
         paramsSerializer: (params) => {
@@ -80,7 +82,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     )
     if (status === 200 && data.success) {
       const items = data.data.items
-      //TODO: filter for ar only
       const datasetDict: Record<string, any> = {}
       for (let i = 0; i < items.length; i++) {
         const id = items[i].entity_id
