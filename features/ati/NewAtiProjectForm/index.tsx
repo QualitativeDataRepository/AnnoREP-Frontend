@@ -1,5 +1,6 @@
 import React, { FC, FormEventHandler } from "react"
 
+import FormData from "form-data"
 import axios from "axios"
 import { Button, Form, FileUploader, Select, SelectItem, Link } from "carbon-components-react"
 import { useRouter } from "next/router"
@@ -17,7 +18,7 @@ export interface NewAtiProjectFormProps {
 const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) => {
   const router = useRouter()
   //const [errorMsg, setErrorMsg] = useState<string>("")
-  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
       dataset: { value: string }
@@ -25,29 +26,47 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     }
     const formData = new FormData()
     formData.append("manuscript", target.manuscript.files[0])
-    formData.append("dataset", target.dataset.value)
-
-    const { status, data } = await axios({
-      method: "POST",
-      url: "/api/ati",
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    //console.log("api post", status, data)
-    if (status === 201) {
-      router.push(`/ati/${data.atiId}`)
-    } else {
-      //setErrorMsg(data.errorMsg)
-      //error msg for each input?
-      //if datasetId is new, added to datasets
-    }
-    //get back response
-    //success, status 201 get ati id, redirect to ati/id
-    //failure, show message
-    //401 unathorized
-    //400 general error show message
+    //loading start on the creat button
+    Promise.all([
+      axios({
+        method: "PUT",
+        url: `/api/datasets/${target.dataset.value}/annorep`,
+      }),
+      axios({
+        method: "POST",
+        url: `/api/datasets/${target.dataset.value}/manuscript`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+    ])
+      .then(
+        (results) => {
+          const manuscriptId = results[1].data.files[0].dataFile.id
+          return axios({
+            method: "PUT",
+            url: `/api/arcore/${manuscriptId}`,
+          })
+        },
+        (error) => {
+          throw new Error(`${error}`)
+        }
+      )
+      .then(
+        () => {
+          //loading over
+          router.push(`/ati/${target.dataset.value}`)
+        },
+        (error) => {
+          throw new Error(`${error}`)
+        }
+      )
+      .catch((error) => {
+        error
+        //loading over
+        //toast the error
+      })
   }
   //TODO: is ownerId=1 justified?
   return (
