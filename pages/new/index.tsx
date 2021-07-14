@@ -58,8 +58,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         const id = items[i].entity_id
         if (datasetDict[id]) {
           const foundDataset = datasetDict[id]
-          if (foundDataset.versionId < items[i].versionId) {
+          if (items[i].is_draft_state) {
             datasetDict[id] = items[i]
+          } else {
+            const foundVersion = `${foundDataset.majorVersion}.${foundDataset.minorVersion}`
+            const version = `${items[i].majorVersion}.${items[i].minorVersion}`
+            if (!foundDataset.is_draft_state && foundVersion < version) {
+              datasetDict[id] = items[i]
+            }
           }
         } else {
           datasetDict[id] = items[i]
