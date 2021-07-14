@@ -1,8 +1,18 @@
-import { FC, FormEventHandler, useState } from "react"
+import { FC, FormEventHandler, useState, useRef } from "react"
 
-import { Button, TooltipIcon, Form, FileUploader, Link } from "carbon-components-react"
+import axios from "axios"
+import {
+  Button,
+  TooltipIcon,
+  Form,
+  FileUploader,
+  Link,
+  Loading,
+  InlineNotification,
+} from "carbon-components-react"
 import { Panel, PanelType } from "@fluentui/react"
 import { useBoolean } from "@fluentui/react-hooks"
+import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Copy32, Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
 
@@ -11,12 +21,6 @@ import { IDatasource } from "../../../types/dataverse"
 import styles from "./AtiManuscript.module.css"
 
 interface AtiManuscriptProps {
-  //need dataset id for upload new manu
-  //internal api call? dont wanna use session on frontend
-  //differet api struct
-  //api/ati/id/manscript/ post or delete
-  //file upload has to me form
-  //just form that has delete or upload? wher to put it? in relation to datasources button
   datasetId: string
   doi: string
   datasources: IDatasource[]
@@ -33,52 +37,118 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
 }) => {
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
   const [copiedUri, setCopiedUri] = useState("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [errorMsg, setErrorMsg] = useState<string>("")
+  const [mId, setMId] = useState(manuscriptId)
+  const mIdRef = useRef("")
 
   const onDelete: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
-    datasetId
-    //api call delete both original and clean manu
+    const id = mId as string
+    setIsLoading(true)
+    setErrorMsg("")
+    axios.delete(`/api/delete-file/${id}`).then(
+      () => {
+        setIsLoading(false)
+        setMId("")
+      },
+      (error) => {
+        setIsLoading(false)
+        setErrorMsg(`${error}`)
+      }
+    )
   }
 
-  const onUpload: FormEventHandler<HTMLFormElement> = (e) => {
+  const onUpload: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-    //api call upload file
+    const target = e.target as typeof e.target & {
+      manuscript: { files: FileList }
+    }
+    const formData = new FormData()
+    formData.append("manuscript", target.manuscript.files[0])
+    setIsLoading(true)
+    setErrorMsg("")
+    axios({
+      method: "POST",
+      url: `/api/datasets/${datasetId}/manuscript`,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then(
+        ({ data }) => {
+          const newManuscriptId = data.files[0].dataFile.id
+          mIdRef.current = newManuscriptId
+          return axios({
+            method: "PUT",
+            url: `/api/arcore/${newManuscriptId}`,
+          })
+        },
+        (error) => {
+          throw new Error(`${error}`)
+        }
+      )
+      .then(
+        () => {
+          setIsLoading(false)
+          setMId(mIdRef.current)
+        },
+        (error) => {
+          throw new Error(`${error}`)
+        }
+      )
+      .catch((error) => {
+        setIsLoading(false)
+        setErrorMsg(`${error}`)
+      })
   }
 
   return (
     <>
-      <Form encType="multipart/form-data" onSubmit={manuscriptId ? onDelete : onUpload}>
-        {manuscriptId ? (
-          <div className={styles.buttoncontainer}>
-            <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openPanel}>
-              Datasources
-            </Button>
+      {isLoading && <Loading description="Uploading manuscript" />}
+      <div className={styles.container}>
+        <Form encType="multipart/form-data" onSubmit={mId ? onDelete : onUpload}>
+          {errorMsg && (
+            <div className="ar--form-item">
+              <InlineNotification
+                hideCloseButton
+                kind="error"
+                subtitle={<span>{errorMsg}</span>}
+                title="Error"
+              />
+            </div>
+          )}
+          {mId ? (
             <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
               Delete manuscript
             </Button>
-          </div>
-        ) : (
-          <>
-            <div className="ar--form-item">
-              <FileUploader
-                aria-required={true}
-                accept={[".docx, .pdf"]}
-                buttonKind="tertiary"
-                buttonLabel="Add file"
-                filenameStatus="edit"
-                iconDescription="Clear file"
-                labelDescription="Supported file types are .docx and .pdf."
-                labelTitle="Upload manuscript"
-                name="manuscript"
-                size="small"
-              />
-            </div>
-            <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
-              Upload manuscript
-            </Button>
-          </>
-        )}
-      </Form>
+          ) : (
+            <>
+              <div className="ar--form-item">
+                <FileUploader
+                  aria-required={true}
+                  accept={[".docx, .pdf"]}
+                  buttonKind="tertiary"
+                  buttonLabel="Add file"
+                  filenameStatus="edit"
+                  iconDescription="Clear file"
+                  labelDescription="Supported file types are .docx and .pdf."
+                  labelTitle="Upload manuscript"
+                  name="manuscript"
+                  size="small"
+                />
+              </div>
+              <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
+                Upload manuscript
+              </Button>
+            </>
+          )}
+        </Form>
+        <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openPanel}>
+          Datasources
+        </Button>
+      </div>
       <Panel
         type={PanelType.customNear}
         customWidth={"300px"}
@@ -114,12 +184,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           </div>
         ))}
       </Panel>
-      {manuscriptId && (
+      {mId && (
         <iframe
           className={styles.iframe}
-          id={`manuscript__${manuscriptId}`}
+          id={`manuscript__${mId}`}
           title="manuscript"
-          src={`/manuscript/${manuscriptId}`}
+          src={`/manuscript/${mId}`}
           width="100%"
         />
       )}
