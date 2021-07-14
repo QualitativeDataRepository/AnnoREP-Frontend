@@ -18,7 +18,7 @@ export const config = {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "PUT") {
+  if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
