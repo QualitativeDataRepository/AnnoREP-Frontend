@@ -58,6 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           file.directoryLabel === ANNOREP_METADATA_VALUE &&
           file.description === SOURCE_MANUSCRIPT_TAG
       )
+      const datasources = latest.files.filter((file: any) => file.categories.includes("Data"))
       atiProjectDetails = {
         dataset: {
           id: latest.datasetId,
@@ -72,8 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           id: manuscript?.dataFile.id || "",
           name: manuscript?.dataFile.filename || "",
         },
-        //TODO: only consider data files, no manifest?
-        datasources: latest.files.map((file: any) => {
+        datasources: datasources.map((file: any) => {
           return {
             id: `${file.dataFile.id}`,
             name: file.dataFile.filename,
