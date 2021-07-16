@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           dvobject_types: "Dataset",
           published_states: ["Published", "Unpublished", "Draft", "In Review"],
           mydata_search_term: `-${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
-          role_ids: [5, 6, 7, 26, 27],
+          //role_ids: [5, 6, 7, 26, 27],
         },
         paramsSerializer: (params) => {
           return qs.stringify(params, { indices: false })
