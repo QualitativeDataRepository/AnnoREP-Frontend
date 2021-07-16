@@ -30,8 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         res.status(status).json(data)
       } catch (e) {
-        res.status(400).json({
-          msg: `Failed to add ${ANNOREP_METADATA_VALUE} metadata to dataset ${id}. ${e}`,
+        res.status(e.response.status).json({
+          msg: `Failed to add ${ANNOREP_METADATA_VALUE} metadata to dataset ${id}. ${e.response.data.message}.`,
         })
       }
     } else {

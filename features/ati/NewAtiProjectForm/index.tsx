@@ -28,7 +28,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
   const router = useRouter()
   const [errorMsg, setErrorMsg] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
       dataset: { value: string }
@@ -38,44 +38,34 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     formData.append("manuscript", target.manuscript.files[0])
     setIsLoading(true)
     setErrorMsg("")
-    Promise.all([
-      axios({
-        method: "PUT",
-        url: `/api/datasets/${target.dataset.value}/annorep`,
-      }),
-      axios({
-        method: "POST",
-        url: `/api/datasets/${target.dataset.value}/manuscript`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }),
-    ])
-      .then(
-        (results) => {
-          const manuscriptId = results[1].data.files[0].dataFile.id
-          return axios({
-            method: "PUT",
-            url: `/api/arcore/${manuscriptId}`,
-          })
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
-        }
-      )
-      .then(
-        () => {
-          setIsLoading(false)
-          router.push(`/ati/${target.dataset.value}`)
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
-        }
-      )
+    await axios({
+      method: "PUT",
+      url: `/api/datasets/${target.dataset.value}/annorep`,
+    })
+      .then(() => {
+        return axios({
+          method: "POST",
+          url: `/api/datasets/${target.dataset.value}/manuscript`,
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      })
+      .then(({ data }) => {
+        const manuscriptId = data.files[0].dataFile.id
+        return axios({
+          method: "PUT",
+          url: `/api/arcore/${manuscriptId}`,
+        })
+      })
+      .then(() => {
+        setIsLoading(false)
+        router.push(`/ati/${target.dataset.value}`)
+      })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error}`)
+        setErrorMsg(`${error.response.data.msg}`)
       })
   }
   //TODO: is ownerId=1 justified?
