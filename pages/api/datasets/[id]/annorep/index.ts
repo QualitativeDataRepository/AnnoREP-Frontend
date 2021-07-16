@@ -31,13 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(status).json(data)
       } catch (e) {
         res.status(e.response.status).json({
-          msg: `Failed to add ${ANNOREP_METADATA_VALUE} metadata to dataset ${id}. ${e.response.data.message}.`,
+          message: `Failed to add ${ANNOREP_METADATA_VALUE} metadata to dataset ${id}. ${e.response.data.message}.`,
         })
       }
     } else {
-      res.status(401).json({ msg: "Unauthorized. Please login." })
+      res.status(401).json({ message: "Unauthorized. Please login." })
     }
   } else {
-    res.status(405).json({ msg: `${req.method} method is not allowed.` })
+    res.status(405).json({ message: `${req.method} method is not allowed.` })
   }
 }

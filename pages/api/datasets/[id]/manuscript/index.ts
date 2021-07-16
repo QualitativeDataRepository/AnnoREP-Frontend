@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       form.parse(req, async (err, _, files) => {
         const manuscript = files.manuscript as formidable.File
         if (err) {
-          res.status(400).json({ msg: `Failed to parse form data. ${err}` })
+          res.status(400).json({ message: `Failed to parse form data. ${err}` })
         }
 
         try {
@@ -55,14 +55,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           res.status(status).json(data)
         } catch (e) {
           res.status(e.response.status).json({
-            msg: `Failed to add manuscript to dataset ${id}. ${e.resonse.data.message}`,
+            message: `Failed to add manuscript to dataset ${id}. ${e.resonse.data.message}`,
           })
         }
       })
     } else {
-      res.status(401).json({ msg: "Unauthorized. Please login." })
+      res.status(401).json({ message: "Unauthorized. Please login." })
     }
   } else {
-    res.status(405).json({ msg: `${req.method} method is not allowed.` })
+    res.status(405).json({ message: `${req.method} method is not allowed.` })
   }
 }

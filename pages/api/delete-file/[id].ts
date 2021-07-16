@@ -21,12 +21,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (e) {
         res
           .status(e.response.status)
-          .json({ msg: `Failed to delete file ${id}. ${e.response.data.message}` })
+          .json({ message: `Failed to delete file ${id}. ${e.response.data.message}` })
       }
     } else {
-      res.status(401).json({ msg: "Unauthorized! Please login." })
+      res.status(401).json({ message: "Unauthorized! Please login." })
     }
   } else {
-    res.status(405).json({ msg: `${req.method} method is not allowed.` })
+    res.status(405).json({ message: `${req.method} method is not allowed.` })
   }
 }
