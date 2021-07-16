@@ -17,6 +17,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Copy32, Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
 
 import { IDatasource } from "../../../types/dataverse"
+import { errorMsgHelper } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiManuscript.module.css"
 
@@ -55,7 +56,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error.response.data.msg}`)
+        setErrorMsg(`${errorMsgHelper(error)}`)
       })
   }
 
@@ -90,7 +91,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error.response.data.msg}`)
+        setErrorMsg(`${errorMsgHelper(error)}`)
       })
   }
 

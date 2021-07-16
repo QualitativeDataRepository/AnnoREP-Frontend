@@ -5,6 +5,7 @@ import { Button, Form, Loading, InlineNotification } from "carbon-components-rea
 import { useRouter } from "next/router"
 
 import { IDataset } from "../../../types/dataverse"
+import { errorMsgHelper } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiSettings.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
@@ -35,7 +36,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
       })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error.response.data.message}`)
+        setErrorMsg(`${errorMsgHelper(error)}`)
       })
   }
   return (

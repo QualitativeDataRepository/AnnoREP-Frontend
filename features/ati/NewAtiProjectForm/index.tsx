@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/router"
 
 import { IDataset } from "../../../types/dataverse"
+import { errorMsgHelper } from "../../../utils/httpRequestUtils"
 
 export interface NewAtiProjectFormProps {
   /**List of Dataverse datasets */
@@ -65,7 +66,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error.response.data.msg}`)
+        setErrorMsg(`${errorMsgHelper(error)}`)
       })
   }
   //TODO: is ownerId=1 justified?
