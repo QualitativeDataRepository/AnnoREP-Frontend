@@ -42,21 +42,21 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   const [mId, setMId] = useState(manuscriptId)
   const mIdRef = useRef("")
 
-  const onDelete: FormEventHandler<HTMLFormElement> = (e) => {
+  const onDelete: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const id = mId as string
     setIsLoading(true)
     setErrorMsg("")
-    axios.delete(`/api/delete-file/${id}`).then(
-      () => {
+    await axios
+      .delete(`/api/delete-file/${id}`)
+      .then(() => {
         setIsLoading(false)
         setMId("")
-      },
-      (error) => {
+      })
+      .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error}`)
-      }
-    )
+        setErrorMsg(`${error.response.data.msg}`)
+      })
   }
 
   const onUpload: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -68,7 +68,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     formData.append("manuscript", target.manuscript.files[0])
     setIsLoading(true)
     setErrorMsg("")
-    axios({
+    await axios({
       method: "POST",
       url: `/api/datasets/${datasetId}/manuscript`,
       data: formData,
@@ -76,31 +76,21 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         "Content-Type": "multipart/form-data",
       },
     })
-      .then(
-        ({ data }) => {
-          const newManuscriptId = data.files[0].dataFile.id
-          mIdRef.current = newManuscriptId
-          return axios({
-            method: "PUT",
-            url: `/api/arcore/${newManuscriptId}`,
-          })
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
-        }
-      )
-      .then(
-        () => {
-          setIsLoading(false)
-          setMId(mIdRef.current)
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
-        }
-      )
+      .then(({ data }) => {
+        const newManuscriptId = data.files[0].dataFile.id
+        mIdRef.current = newManuscriptId
+        return axios({
+          method: "PUT",
+          url: `/api/arcore/${newManuscriptId}`,
+        })
+      })
+      .then(() => {
+        setIsLoading(false)
+        setMId(mIdRef.current)
+      })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error}`)
+        setErrorMsg(`${error.response.data.msg}`)
       })
   }
 

@@ -18,34 +18,24 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string>("")
-  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     setErrorMsg("")
-    axios
+    await axios
       .put(`/api/datasets/${dataset.id}/annorep/delete`)
-      .then(
-        () => {
-          if (manuscriptId) {
-            return axios.delete(`/api/delete-file/${manuscriptId}`)
-          }
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
+      .then(() => {
+        if (manuscriptId) {
+          return axios.delete(`/api/delete-file/${manuscriptId}`)
         }
-      )
-      .then(
-        () => {
-          setIsLoading(false)
-          router.push("/")
-        },
-        (error) => {
-          throw new Error(`${error.message}`)
-        }
-      )
+      })
+      .then(() => {
+        setIsLoading(false)
+        router.push("/")
+      })
       .catch((error) => {
         setIsLoading(false)
-        setErrorMsg(`${error}`)
+        setErrorMsg(`${error.response.data.message}`)
       })
   }
   return (
