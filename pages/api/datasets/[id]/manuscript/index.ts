@@ -54,8 +54,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
           res.status(status).json(data)
         } catch (e) {
-          res.status(400).json({
-            msg: `Failed to add manuscript to dataset ${id}. ${e}`,
+          res.status(e.response.status).json({
+            msg: `Failed to add manuscript to dataset ${id}. ${e.resonse.data.message}`,
           })
         }
       })
