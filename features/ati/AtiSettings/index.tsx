@@ -31,7 +31,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
           }
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .then(
@@ -40,7 +40,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
           router.push("/")
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .catch((error) => {

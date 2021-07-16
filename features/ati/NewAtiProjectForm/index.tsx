@@ -61,7 +61,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
           })
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .then(
@@ -70,7 +70,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
           router.push(`/ati/${target.dataset.value}`)
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .catch((error) => {

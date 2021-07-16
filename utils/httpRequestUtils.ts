@@ -1,5 +1,5 @@
 export const errorWrapper = (reason: string) => (error: any) => {
-  throw new Error(`${reason}. ${error}`)
+  throw new Error(`${reason}. ${error.message}`)
 }
 
 export const requestWrapper = (

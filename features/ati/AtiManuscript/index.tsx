@@ -86,7 +86,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           })
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .then(
@@ -95,7 +95,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           setMId(mIdRef.current)
         },
         (error) => {
-          throw new Error(`${error}`)
+          throw new Error(`${error.message}`)
         }
       )
       .catch((error) => {
