@@ -10,10 +10,3 @@
 .listcontainer {
   padding-left: 16px;
 }
-
-.buttoncontainer {
-  display: grid;
-  grid-template-columns: auto auto;
-  justify-content: start;
-  column-gap: 8px;
-}

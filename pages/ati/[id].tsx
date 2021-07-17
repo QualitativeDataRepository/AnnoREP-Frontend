@@ -83,6 +83,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     }
   }
+  //TODO: create a prop for arcore/source-manuscript-id/pdf
+  //to pass along to AtiPublishManuscript, for user to download
   return {
     props: {
       isLoggedIn: session ? true : false,

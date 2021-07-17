@@ -22,14 +22,9 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const { manuscript, datasources } = atiProjectDetails
   return (
     <div className={layoutStyles.maxwidth}>
-      <div className={styles.buttoncontainer}>
-        <Button kind="tertiary" size="field">
-          Download project bundle
-        </Button>
-        <Button kind="tertiary" size="field">
-          Publish project
-        </Button>
-      </div>
+      <Button kind="tertiary" size="field">
+        Download project bundle
+      </Button>
       <section aria-label="about" className={styles.section}>
         <h2 className={styles.header}>About</h2>
         <p>
