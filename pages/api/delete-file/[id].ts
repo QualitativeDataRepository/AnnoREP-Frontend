@@ -1,6 +1,7 @@
 import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "DELETE") {
@@ -19,9 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         res.status(status).json(data)
       } catch (e) {
-        res
-          .status(e.response.status)
-          .json({ message: `Failed to delete file ${id}. ${e.response.data.message}` })
+        const { status, message } = getResponseFromError(e, `Deleting file ${id}`)
+        res.status(status).json({ message })
       }
     } else {
       res.status(401).json({ message: "Unauthorized! Please login." })

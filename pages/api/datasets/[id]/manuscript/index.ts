@@ -10,6 +10,7 @@ import {
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../../../../constants/dataverse"
+import { getResponseFromError } from "../../../../../utils/httpRequestUtils"
 
 export const config = {
   api: {
@@ -54,9 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
           res.status(status).json(data)
         } catch (e) {
-          res.status(e.response.status).json({
-            message: `Failed to add manuscript to dataset ${id}. ${e.resonse.data.message}`,
-          })
+          const { status, message } = getResponseFromError(e, `Adding manuscript to dataset ${id}`)
+          res.status(status).json({ message })
         }
       })
     } else {

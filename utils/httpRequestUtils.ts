@@ -1,28 +1,35 @@
-export const errorWrapper = (reason: string) => (error: any) => {
-  throw new Error(`${reason}. ${error.message}`)
-}
+import axios, { AxiosError } from "axios"
+import { AnnoRepResponse } from "../types/http"
 
-export const requestWrapper = (
-  successStatus: number,
-  status: number,
-  req: Promise<any>,
-  failure: string
-) => {
-  if (status === successStatus) {
-    return req
+export const getResponseFromError = (
+  e: Error | AxiosError,
+  requestDesc?: string
+): AnnoRepResponse => {
+  if (axios.isAxiosError(e)) {
+    const requestInfo = requestDesc || `${e.config.method} ${e.config.url}`
+    let failureMessage = `${requestInfo} failed.`
+    if (e.response) {
+      const additional =
+        e.response.data.message || `HTTP ${e.response.status} ${e.response.statusText}`
+      failureMessage = `${additional}. ${failureMessage}`
+    }
+    return {
+      status: e.response?.status || 400,
+      message: failureMessage,
+    }
   } else {
-    throw new Error(`Request status: ${status}. ${failure}`)
+    return {
+      status: 400,
+      message: `${e.message}${requestDesc ? ` ${requestDesc} failed.` : ""}`,
+    }
   }
 }
 
-export const errorMsgHelper = (error: any) => {
-  if (error.response) {
-    return error.response.data.message
-  } else if (error.request) {
-    return error.request
-  } else if (error.message) {
-    return error.message
+export const getMessageFromError = (e: Error | AxiosError): string => {
+  if (axios.isAxiosError(e)) {
+    //All internal api endpoints returns a body with message field.
+    return e.response?.data.message
   } else {
-    return `${error}`
+    return e.message
   }
 }

@@ -3,13 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
 import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
-import { errorWrapper, requestWrapper } from "../../../utils/httpRequestUtils"
-
-const FAILURE_MSGS = [
-  "Unable to create manuscript PDF and annotation files",
-  "Unable to get annotation JSON file",
-  "Unable to send annotation to Hypothesis server",
-]
+import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "PUT") {
@@ -24,18 +18,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
         },
       })
-      createPdfAnn
-        .then(({ status }) => {
-          const getAnn = axios({
+      await createPdfAnn
+        .then(() => {
+          return axios({
             method: "GET",
             url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}/ann`,
             headers: {
               [DATAVERSE_HEADER_NAME]: dataverseApiToken,
             },
           })
-          return requestWrapper(200, status, getAnn, FAILURE_MSGS[0])
-        }, errorWrapper(FAILURE_MSGS[0]))
-        .then(({ status, data }) => {
+        })
+        .then(({ data }) => {
           const sendAnns: AxiosPromise<any>[] = data.map((annotation: any) => {
             return axios({
               method: "POST",
@@ -50,27 +43,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               },
             })
           })
-          const sendAllAnns = Promise.all(sendAnns)
-          return requestWrapper(200, status, sendAllAnns, FAILURE_MSGS[1])
-        }, errorWrapper(FAILURE_MSGS[1]))
+          return Promise.all(sendAnns)
+        })
         .then((sendAllAnnsResult) => {
-          const data = []
-          for (let i = 0; i < sendAllAnnsResult.length; i++) {
-            if (sendAllAnnsResult[i].status !== 200) {
-              throw new Error(`Request status: ${sendAllAnnsResult[i].status}. ${FAILURE_MSGS[2]}.`)
-            } else {
-              data.push(sendAllAnnsResult[i].data)
-            }
-          }
-          res.status(200).json(data)
-        }, errorWrapper(FAILURE_MSGS[2]))
+          res.status(200).json(sendAllAnnsResult)
+        })
         .catch((e) => {
-          res.status(400).json(e)
+          const { status, message } = getResponseFromError(
+            e,
+            `Extracting annotations from source manuscript ${id} and sending annotations to Hypothes.is server`
+          )
+          res.status(status).json({ message })
         })
     } else {
-      res.status(401).json({ msg: "Unauthorized. Please login. " })
+      res.status(401).json({ message: "Unauthorized. Please login. " })
     }
   } else {
-    res.status(405).json({ msg: `${req.method} method is not allowed.` })
+    res.status(405).json({ message: `${req.method} method is not allowed.` })
   }
 }

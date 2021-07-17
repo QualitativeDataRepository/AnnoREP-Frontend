@@ -7,6 +7,7 @@ import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
 } from "../../../../../constants/dataverse"
+import { getResponseFromError } from "../../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "PUT") {
@@ -27,9 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         res.status(status).json(data)
       } catch (e) {
-        res.status(e.response.status).json({
-          message: `Failed to delete ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}. ${e.response.data.message}`,
-        })
+        const { status, message } = getResponseFromError(
+          e,
+          `Deleting ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}`
+        )
+        res.status(status).json({ message })
       }
     } else {
       res.status(401).json({ message: "Unauthorized. Please login." })
