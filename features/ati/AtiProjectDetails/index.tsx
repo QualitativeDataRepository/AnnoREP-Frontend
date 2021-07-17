@@ -4,6 +4,7 @@ import { Tabs, Tab } from "carbon-components-react"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import AtiSummary from "../AtiSummary"
 import AtiManuscript from "../AtiManuscript"
+import AtiPublishManuscript from "../AtiPublishManuscript"
 import AtiSettings from "../AtiSettings"
 
 interface ATIProjectDetailsProps {
@@ -27,6 +28,9 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
             datasources={atiProjectDetails.datasources}
             serverUrl={serverUrl}
           />
+        </Tab>
+        <Tab id="publish-manuscript" label="Publish manuscript">
+          <AtiPublishManuscript manuscriptId={atiProjectDetails.manuscript.id} />
         </Tab>
         <Tab id="settings" label="Settings">
           <AtiSettings
