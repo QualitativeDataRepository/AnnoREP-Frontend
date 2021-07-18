@@ -6,7 +6,7 @@ import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "PUT") {
+  if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
