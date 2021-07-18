@@ -12,7 +12,7 @@ export interface IDatasource {
   uri: string
 }
 
-interface IManuscript {
+export interface IManuscript {
   id: string
   name: string
 }
