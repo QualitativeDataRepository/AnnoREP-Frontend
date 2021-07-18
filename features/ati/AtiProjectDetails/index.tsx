@@ -29,8 +29,8 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
             serverUrl={serverUrl}
           />
         </Tab>
-        <Tab id="publish-manuscript" label="Publish manuscript">
-          <AtiPublishManuscript manuscriptId={atiProjectDetails.manuscript.id} />
+        <Tab id="export-annotations" label="Export annotations">
+          <AtiPublishManuscript manuscript={atiProjectDetails.manuscript} />
         </Tab>
         <Tab id="settings" label="Settings">
           <AtiSettings
