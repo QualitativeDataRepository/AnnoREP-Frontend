@@ -2,8 +2,8 @@ import axios, { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
-import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
-import { getResponseFromError } from "../../../utils/httpRequestUtils"
+import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
+import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "PUT") {
