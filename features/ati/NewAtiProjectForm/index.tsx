@@ -112,7 +112,12 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
               aria-required={true}
             >
               {datasets.map((dataset) => (
-                <SelectItem key={dataset.id} text={dataset.title} value={dataset.id} />
+                <SelectItem
+                  id={dataset.id}
+                  key={dataset.id}
+                  text={dataset.title}
+                  value={dataset.id}
+                />
               ))}
             </Select>
           </div>
