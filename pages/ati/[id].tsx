@@ -40,51 +40,52 @@ export default Ati
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const datasetId = context?.params?.id
-  let atiProjectDetails
+  let atiProjectDetails = null
   if (session && datasetId) {
-    const { status, data } = await axios.get(
-      `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`,
-      {
-        headers: {
-          [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
-        },
-      }
-    )
-    if (status === 200 && data.status === "OK") {
-      const latest = data.data.latestVersion
-      const metadataFields = latest.metadataBlocks.citation.fields
-      const manuscript = latest.files.find(
-        (file: any) =>
-          file.directoryLabel === ANNOREP_METADATA_VALUE &&
-          file.description === SOURCE_MANUSCRIPT_TAG
+    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+    try {
+      const { status, data } = await axios.get(
+        `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`,
+        {
+          headers: {
+            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+          },
+        }
       )
-      const datasources = latest.files.filter((file: any) => file.categories.includes("Data"))
-      atiProjectDetails = {
-        dataset: {
-          id: latest.datasetId,
-          doi: latest.datasetPersistentId,
-          title: metadataFields.find((field: any) => field.typeName === "title").value, //TODO: multiple titles
-          version: latest.versionNumber
-            ? `${latest.versionNumber}.${latest.versionMinorNumber}`
-            : latest.versionState,
-          status: latest.versionState, //TODO: get publication status from dv api
-        },
-        manuscript: {
-          id: manuscript?.dataFile.id || "",
-          name: manuscript?.dataFile.filename || "",
-        },
-        datasources: datasources.map((file: any) => {
-          return {
-            id: `${file.dataFile.id}`,
-            name: file.dataFile.filename,
-            uri: `${process.env.DATAVERSE_SERVER_URL}/file.xhtml?fileId=${file.dataFile.id}`,
-          }
-        }),
+      if (status === 200 && data.status === "OK") {
+        const latest = data.data.latestVersion
+        const metadataFields = latest.metadataBlocks.citation.fields
+        const manuscript = latest.files.find(
+          (file: any) =>
+            file.directoryLabel === ANNOREP_METADATA_VALUE &&
+            file.description === SOURCE_MANUSCRIPT_TAG
+        )
+        const datasources = latest.files.filter((file: any) => file.categories.includes("Data"))
+        atiProjectDetails = {
+          dataset: {
+            id: latest.datasetId,
+            doi: latest.datasetPersistentId,
+            title: metadataFields.find((field: any) => field.typeName === "title").value, //TODO: multiple titles
+            version: latest.versionNumber
+              ? `${latest.versionNumber}.${latest.versionMinorNumber}`
+              : latest.versionState,
+            status: latest.versionState, //TODO: get publication status from dv api
+          },
+          manuscript: {
+            id: manuscript?.dataFile.id || "",
+            name: manuscript?.dataFile.filename || "",
+          },
+          datasources: datasources.map((file: any) => {
+            return {
+              id: `${file.dataFile.id}`,
+              name: file.dataFile.filename,
+              uri: `${process.env.DATAVERSE_SERVER_URL}/api/access/datafile/:persistentId?persistentId=${file.dataFile.persistentId}`,
+            }
+          }),
+        }
       }
-    }
+    } catch (e) {}
   }
-  //TODO: create a prop for arcore/source-manuscript-id/pdf
-  //to pass along to AtiPublishManuscript, for user to download
   return {
     props: {
       isLoggedIn: session ? true : false,
