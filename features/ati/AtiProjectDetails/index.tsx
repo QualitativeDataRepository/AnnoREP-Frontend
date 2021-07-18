@@ -1,11 +1,13 @@
 import { FC } from "react"
 
 import { Tabs, Tab } from "carbon-components-react"
-import { IATIProjectDetails } from "../../../types/dataverse"
-import AtiSummary from "../AtiSummary"
+
+import AtiExportAnnotations from "../AtiExportAnnotations"
 import AtiManuscript from "../AtiManuscript"
-import AtiPublishManuscript from "../AtiPublishManuscript"
 import AtiSettings from "../AtiSettings"
+import AtiSummary from "../AtiSummary"
+
+import { IATIProjectDetails } from "../../../types/dataverse"
 
 interface ATIProjectDetailsProps {
   serverUrl: string
@@ -30,7 +32,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
           />
         </Tab>
         <Tab id="export-annotations" label="Export annotations">
-          <AtiPublishManuscript manuscript={atiProjectDetails.manuscript} />
+          <AtiExportAnnotations manuscript={atiProjectDetails.manuscript} />
         </Tab>
         <Tab id="settings" label="Settings">
           <AtiSettings
