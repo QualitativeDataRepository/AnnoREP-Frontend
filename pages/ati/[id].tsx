@@ -60,7 +60,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             file.directoryLabel === ANNOREP_METADATA_VALUE &&
             file.description === SOURCE_MANUSCRIPT_TAG
         )
-        const datasources = latest.files.filter((file: any) => file.categories.includes("Data"))
+        const datasources = latest.files.filter(
+          (file: any) => file.categories === undefined || file.categories.includes("Data")
+        )
         atiProjectDetails = {
           dataset: {
             id: latest.datasetId,
