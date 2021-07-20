@@ -7,6 +7,7 @@ import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
 } from "../../../../../constants/dataverse"
+import { REQUEST_DESC_HEADER_NAME } from "../../../../../constants/http"
 import { getResponseFromError } from "../../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -14,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
+      const requestDesc = `Deleting ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}`
       try {
         const { status, data } = await axios({
           method: "PUT",
@@ -24,14 +26,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           headers: {
             "Content-type": "application/json-ld", //TODO: change ld+json?
             [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+            [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })
         res.status(status).json(data)
       } catch (e) {
-        const { status, message } = getResponseFromError(
-          e,
-          `Deleting ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}`
-        )
+        const { status, message } = getResponseFromError(e, requestDesc)
         res.status(status).json({ message })
       }
     } else {

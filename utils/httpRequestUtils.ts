@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios"
+import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
 import { AnnoRepResponse } from "../types/http"
 
 export const getResponseFromError = (
@@ -6,7 +7,8 @@ export const getResponseFromError = (
   requestDesc?: string
 ): AnnoRepResponse => {
   if (axios.isAxiosError(e)) {
-    const requestInfo = requestDesc || `${e.config.method} ${e.config.url}`
+    const requestInfo =
+      e.config.headers[REQUEST_DESC_HEADER_NAME] || `${e.config.method} ${e.config.url}`
     let failureMessage = `${requestInfo} failed.`
     if (e.response) {
       const additional =

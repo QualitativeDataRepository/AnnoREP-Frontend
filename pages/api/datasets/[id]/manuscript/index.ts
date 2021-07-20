@@ -10,6 +10,7 @@ import {
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../../../../constants/dataverse"
+import { REQUEST_DESC_HEADER_NAME } from "../../../../../constants/http"
 import { getResponseFromError } from "../../../../../utils/httpRequestUtils"
 
 export const config = {
@@ -24,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session) {
       const { id } = req.query
       const { dataverseApiToken } = session
+      const requestDesc = `Adding manuscript to dataset ${id}`
       const form = formidable({ multiples: false })
       form.parse(req, async (err, _, files) => {
         const manuscript = files.manuscript as formidable.File
@@ -51,11 +53,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             headers: {
               "Content-Type": `${addManuscriptForm.getHeaders()["content-type"]}`,
               [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+              [REQUEST_DESC_HEADER_NAME]: requestDesc,
             },
           })
           res.status(status).json(data)
         } catch (e) {
-          const { status, message } = getResponseFromError(e, `Adding manuscript to dataset ${id}`)
+          const { status, message } = getResponseFromError(e, requestDesc)
           res.status(status).json({ message })
         }
       })
