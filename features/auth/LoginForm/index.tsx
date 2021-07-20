@@ -59,6 +59,7 @@ const LoginForm: FC<LoginFormProps> = ({
         <div className="ar--form-item">
           <TextInput
             id="dataverse-api-token"
+            name="dataverseApiToken"
             labelText={
               <div>
                 Dataverse <abbr>API</abbr> token
@@ -91,7 +92,8 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Dataverse API token"
             size="xl"
-            type="password"
+            type="text"
+            autoComplete="on"
             value={dataverseApiToken}
             onChange={onDataverseApiTokenChange}
           />
@@ -99,6 +101,7 @@ const LoginForm: FC<LoginFormProps> = ({
         <div className="ar--form-item">
           <TextInput
             id="hypothesis-api-token"
+            name="hypothesisApiToken"
             labelText={
               <div>
                 Hypothes.is <abbr>API</abbr> token
@@ -131,7 +134,8 @@ const LoginForm: FC<LoginFormProps> = ({
             aria-required={true}
             placeholder="Enter your Hypothes.is API token"
             size="xl"
-            type="password"
+            type="text"
+            autoComplete="on"
             value={hypothesisApiToken}
             onChange={onHypothesisApiTokenChange}
           />
