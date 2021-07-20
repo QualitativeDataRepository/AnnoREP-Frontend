@@ -37,8 +37,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               method: "POST",
               url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
               data: JSON.stringify({
-                ...annotation,
                 uri: `${process.env.NEXTAUTH_URL}/manuscript/${id}`,
+                document: annotation.document,
+                text: annotation.text,
+                target: annotation.target,
               }),
               headers: {
                 Authorization: `Bearer ${hypothesisApiToken}`,
