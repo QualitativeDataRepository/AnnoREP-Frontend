@@ -12,7 +12,9 @@ export const getResponseFromError = (
     let failureMessage = `${requestInfo} failed.`
     if (e.response) {
       const additional =
-        e.response.data.message || `HTTP ${e.response.status} ${e.response.statusText}`
+        e.response.data.message ||
+        e.response.data.reason ||
+        `HTTP ${e.response.status} ${e.response.statusText}`
       failureMessage = `${additional}. ${failureMessage}`
     }
     return {
