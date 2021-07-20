@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
 import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
+import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -16,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}`,
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          [REQUEST_DESC_HEADER_NAME]: `Extracting annotations from source manuscript ${id}`,
         },
       })
       await createPdfAnn
@@ -25,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}/ann`,
             headers: {
               [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+              [REQUEST_DESC_HEADER_NAME]: `Getting annotations from source manuscript ${id}`,
             },
           })
         })
@@ -40,6 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               headers: {
                 Authorization: `Bearer ${hypothesisApiToken}`,
                 "Content-type": "application/json",
+                [REQUEST_DESC_HEADER_NAME]: `Sending annotations from source manuscript ${id} to Hypothes.is server`,
               },
             })
           })
