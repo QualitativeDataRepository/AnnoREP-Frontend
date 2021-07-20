@@ -54,7 +54,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
         })
       })
       .then(({ data }) => {
-        const manuscriptId = data.files[0].dataFile.id
+        const manuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
           url: `/api/arcore/${manuscriptId}`,
