@@ -101,7 +101,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       if (status === 200) {
-        //TODO: find success status
         manuscript = Buffer.from(data, "binary").toString("base64")
       }
     } catch (error) {
