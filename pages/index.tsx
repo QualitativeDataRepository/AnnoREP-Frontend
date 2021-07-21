@@ -36,7 +36,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
             {atiProjects.map(({ id, title, version, status }) => (
               <AtiProject key={id} id={id} title={title} version={version} status={status} />
             ))}
-            {atiProjects.length === 0 && <div>No current ati projects</div>}
+            {atiProjects.length === 0 && <div>No current ATI projects</div>}
           </div>
         ) : (
           <div className={styles.callout}>

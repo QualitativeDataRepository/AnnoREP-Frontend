@@ -1,6 +1,7 @@
 import { FC } from "react"
 
 import axios from "axios"
+import { InlineNotification } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
 
@@ -34,7 +35,12 @@ const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, canExportAnnotations, atiPro
           canExportAnnotations={canExportAnnotations}
         />
       ) : (
-        "You don't have access to this ATI."
+        <InlineNotification
+          hideCloseButton
+          kind="error"
+          subtitle={<span>{"You don't have access to this ATI project."}</span>}
+          title="Unauthorized!"
+        />
       )}
     </Layout>
   )

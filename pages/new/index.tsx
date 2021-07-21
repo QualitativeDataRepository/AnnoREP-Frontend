@@ -1,6 +1,7 @@
 import { FC } from "react"
 
 import axios from "axios"
+import { InlineNotification } from "carbon-components-react"
 import { getSession } from "next-auth/client"
 import { GetServerSideProps } from "next"
 import qs from "qs"
@@ -23,7 +24,12 @@ const NewAti: FC<NewAtiProps> = ({ isLoggedIn, datasets, serverUrl }) => {
       {isLoggedIn ? (
         <NewAtiProjectForm datasets={datasets} serverUrl={serverUrl} />
       ) : (
-        <div>Login to create a new ATI project.</div>
+        <InlineNotification
+          hideCloseButton
+          kind="info"
+          subtitle={<span>{"Login to create a new ATI project."}</span>}
+          title="Unauthorized!"
+        />
       )}
     </Layout>
   )

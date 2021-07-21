@@ -1,6 +1,7 @@
 import { FC, useState } from "react"
 
 import axios from "axios"
+import { InlineNotification } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import Head from "next/head"
 import { getSession } from "next-auth/client"
@@ -44,10 +45,17 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript }) => {
         )}
       </SizeMe>
     )
-  } else if (isLoggedIn) {
-    content = "You don't have access to this manuscript."
   } else {
-    content = "Unauthorized. Please login."
+    content = (
+      <InlineNotification
+        hideCloseButton
+        kind="error"
+        subtitle={
+          <span>{isLoggedIn ? "You don't have access to this manuscript." : "Please login."}</span>
+        }
+        title="Unauthorized!"
+      />
+    )
   }
 
   return (
