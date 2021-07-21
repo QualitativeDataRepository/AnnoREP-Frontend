@@ -16,10 +16,11 @@ import {
 interface AtiProps {
   isLoggedIn: boolean
   serverUrl: string
+  canExportAnnotations: boolean
   atiProjectDetails?: IATIProjectDetails
 }
 
-const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, atiProjectDetails }) => {
+const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, canExportAnnotations, atiProjectDetails }) => {
   return (
     <Layout
       isLoggedIn={isLoggedIn}
@@ -27,7 +28,11 @@ const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, atiProjectDetails }) => {
       isFullWidth={true}
     >
       {atiProjectDetails ? (
-        <ATIProjectDetails serverUrl={serverUrl} atiProjectDetails={atiProjectDetails} />
+        <ATIProjectDetails
+          serverUrl={serverUrl}
+          atiProjectDetails={atiProjectDetails}
+          canExportAnnotations={canExportAnnotations}
+        />
       ) : (
         "You don't have access to this ATI."
       )}
@@ -41,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const datasetId = context?.params?.id
   let atiProjectDetails = null
+  let canExportAnnotations = false
   if (session && datasetId) {
     /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
     try {
@@ -87,12 +93,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
       }
     } catch (e) {}
+
+    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+    try {
+      const { data } = await axios({
+        method: "GET",
+        url: `${process.env.HYPOTHESIS_SERVER_URL}/api/profile`,
+        headers: {
+          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
+        },
+      })
+      if (data.userid !== null) {
+        canExportAnnotations = true
+      }
+    } catch (error) {}
   }
   return {
     props: {
       isLoggedIn: session ? true : false,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
       atiProjectDetails,
+      canExportAnnotations,
     },
   }
 }

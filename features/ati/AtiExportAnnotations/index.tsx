@@ -8,6 +8,7 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 interface AtiExportAnnotationstProps {
   manuscript: IManuscript
+  canExportAnnotations: boolean
 }
 //TODO: get arcore/source-manuscript-id/pdf, so user can upload it to publish destination
 //api call to get most recent annoations from hypo, using user hypo api token
@@ -15,7 +16,10 @@ interface AtiExportAnnotationstProps {
 //ui has to link to publish dataset
 //ui has download arcore/source-manuscript-id/pdf,
 //ui has input to enter new manuscript url
-const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ manuscript }) => {
+const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
+  manuscript,
+  canExportAnnotations,
+}) => {
   const [downloadUrl, setDownloadUrl] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
@@ -69,6 +73,18 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ manuscript }) =>
       setFormMsg(`${getMessageFromError(e)}`)
     }
   }
+
+  if (!canExportAnnotations) {
+    return (
+      <InlineNotification
+        hideCloseButton
+        kind="error"
+        subtitle={<span>{"AnnoRep's Hypothes.is API token is invalid."}</span>}
+        title="Error"
+      />
+    )
+  }
+
   return (
     <>
       {isLoading && <Loading description="Export annotations" />}

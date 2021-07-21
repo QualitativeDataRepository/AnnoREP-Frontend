@@ -12,9 +12,14 @@ import { IATIProjectDetails } from "../../../types/dataverse"
 interface ATIProjectDetailsProps {
   serverUrl: string
   atiProjectDetails: IATIProjectDetails
+  canExportAnnotations: boolean
 }
 
-const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDetails }) => {
+const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
+  serverUrl,
+  atiProjectDetails,
+  canExportAnnotations,
+}) => {
   return (
     <>
       <h1>{atiProjectDetails.dataset.title}</h1>
@@ -32,7 +37,10 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({ serverUrl, atiProjectDe
           />
         </Tab>
         <Tab id="export-annotations" label="Export annotations">
-          <AtiExportAnnotations manuscript={atiProjectDetails.manuscript} />
+          <AtiExportAnnotations
+            manuscript={atiProjectDetails.manuscript}
+            canExportAnnotations={canExportAnnotations}
+          />
         </Tab>
         <Tab id="settings" label="Settings">
           <AtiSettings
