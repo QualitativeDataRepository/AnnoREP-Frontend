@@ -12,13 +12,15 @@ import { SizeMe } from "react-sizeme"
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 import { DATAVERSE_HEADER_NAME } from "../../constants/dataverse"
+import { getResponseFromError } from "../../utils/httpRequestUtils"
 
 interface ManuscriptProps {
   isLoggedIn: boolean
   manuscript: string
+  errorMsg: string
 }
 
-const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript }) => {
+const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) => {
   const [numPages, setNumPages] = useState(1)
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -45,11 +47,20 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript }) => {
         )}
       </SizeMe>
     )
-  } else {
+  } else if (errorMsg) {
     content = (
       <InlineNotification
         hideCloseButton
         kind="error"
+        subtitle={<span>{errorMsg}</span>}
+        title="Error!"
+      />
+    )
+  } else {
+    content = (
+      <InlineNotification
+        hideCloseButton
+        kind="info"
         subtitle={
           <span>{isLoggedIn ? "You don't have access to this manuscript." : "Please login."}</span>
         }
@@ -77,8 +88,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const id = context?.params?.id
   let manuscript = null
+  let errorMsg = null
   if (session && id) {
-    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
     try {
       const { status, data } = await axios({
         method: "GET",
@@ -93,12 +104,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         //TODO: find success status
         manuscript = Buffer.from(data, "binary").toString("base64")
       }
-    } catch (error) {}
+    } catch (error) {
+      const { message } = getResponseFromError(error)
+      errorMsg = message
+    }
   }
   return {
     props: {
       isLoggedIn: session ? true : false,
       manuscript,
+      errorMsg,
     },
   }
 }
