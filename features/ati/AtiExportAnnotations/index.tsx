@@ -1,11 +1,12 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState, FormEventHandler } from "react"
 
 import axios from "axios"
-import { Link, TextInput, Form, Button } from "carbon-components-react"
+import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carbon-components-react"
 
 import { IManuscript } from "../../../types/dataverse"
+import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
-interface AtiPublishManuscriptProps {
+interface AtiExportAnnotationstProps {
   manuscript: IManuscript
 }
 //TODO: get arcore/source-manuscript-id/pdf, so user can upload it to publish destination
@@ -14,8 +15,11 @@ interface AtiPublishManuscriptProps {
 //ui has to link to publish dataset
 //ui has download arcore/source-manuscript-id/pdf,
 //ui has input to enter new manuscript url
-const AtiPublishManuscript: FC<AtiPublishManuscriptProps> = ({ manuscript }) => {
+const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ manuscript }) => {
   const [downloadUrl, setDownloadUrl] = useState<string>("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [hasError, setHasError] = useState<boolean>(false)
+  const [formMsg, setFormMsg] = useState<string>("")
   useEffect(() => {
     let url = ""
     const getFile = async () => {
@@ -37,19 +41,61 @@ const AtiPublishManuscript: FC<AtiPublishManuscriptProps> = ({ manuscript }) => 
       }
     }
   }, [manuscript.id])
+
+  const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
+    const target = e.target as typeof e.target & {
+      destinationUrl: { value: string }
+    }
+    try {
+      setIsLoading(true)
+      setFormMsg("")
+      const { data } = await axios.post(
+        `/api/export-annotations/${manuscript.id}`,
+        JSON.stringify({
+          destinationUrl: target.destinationUrl.value,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      setHasError(false)
+      setFormMsg(`${data.message}`)
+    } catch (e) {
+      setIsLoading(false)
+      setHasError(true)
+      setFormMsg(`${getMessageFromError(e)}`)
+    }
+  }
   return (
     <>
-      <h2>Export Hypothes.is annotations</h2>
-      {downloadUrl && (
-        <Link href={downloadUrl} download={`IngestPDF ${manuscript.name}`}>
-          Download manuscript
-        </Link>
-      )}
+      {isLoading && <Loading description="Export annotations" />}
       <div className="ar--form-container">
-        <Form>
+        <Form onSubmit={onSumbit}>
+          <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
+          {downloadUrl && (
+            <div className="ar--form-desc">
+              <Link href={downloadUrl} download={`IngestPDF ${manuscript.name}`}>
+                Download manuscript
+              </Link>
+            </div>
+          )}
+          {formMsg && (
+            <div className="ar--form-item">
+              <InlineNotification
+                hideCloseButton
+                kind={hasError ? "error" : "success"}
+                subtitle={<span>{formMsg}</span>}
+                title={hasError ? "Error" : "Success"}
+              />
+            </div>
+          )}
           <div className="ar--form-item">
             <TextInput
               id="destination-url"
+              name="destinationUrl"
               type="url"
               labelText="Destination URL"
               helperText="Enter the URL of where you want to export the annotations of your manuscript"
@@ -67,4 +113,4 @@ const AtiPublishManuscript: FC<AtiPublishManuscriptProps> = ({ manuscript }) => 
   )
 }
 
-export default AtiPublishManuscript
+export default AtiExportAnnotations
