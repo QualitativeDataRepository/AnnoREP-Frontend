@@ -81,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           dataset: {
             id: latest.datasetId,
             doi: latest.datasetPersistentId,
-            title: metadataFields.find((field: any) => field.typeName === "title").value, //TODO: multiple titles
+            title: metadataFields.find((field: any) => field.typeName === "title").value,
             version: latest.versionNumber
               ? `${latest.versionNumber}.${latest.versionMinorNumber}`
               : latest.versionState,
