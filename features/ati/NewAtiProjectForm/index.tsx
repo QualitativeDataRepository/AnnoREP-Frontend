@@ -109,12 +109,18 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
           <div className="ar--form-item">
             <Select
               name="dataset"
+              defaultValue=""
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               id="dataverse-dataset"
               labelText="Link to a Dataverse dataset"
               required={true}
               aria-required={true}
             >
+              <SelectItem
+                id="placeholder-item"
+                text={datasets.length ? "Choose a dataset" : "Please create a dataset"}
+                value=""
+              />
               {datasets.map((dataset) => (
                 <SelectItem
                   id={dataset.id}
