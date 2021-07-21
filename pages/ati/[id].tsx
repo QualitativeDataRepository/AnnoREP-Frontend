@@ -12,6 +12,8 @@ import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
+  VersionState,
+  PublicationStatus,
 } from "../../constants/dataverse"
 
 interface AtiProps {
@@ -83,7 +85,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             version: latest.versionNumber
               ? `${latest.versionNumber}.${latest.versionMinorNumber}`
               : latest.versionState,
-            status: latest.versionState, //TODO: get publication status from dv api
+            status:
+              latest.versionState === VersionState.Released
+                ? PublicationStatus.Published
+                : PublicationStatus.Unpublished,
           },
           manuscript: {
             id: manuscript?.dataFile.id || "",

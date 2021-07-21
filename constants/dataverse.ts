@@ -7,3 +7,13 @@ export const KIND_OF_DATA_NAME = "kindOfData"
 export const ANNOREP_METADATA_FIELD = `http://rdf-vocabulary.ddialliance.org/discovery#${KIND_OF_DATA_NAME}`
 
 export const ANNOREP_METADATA_VALUE = "AnnoRep"
+
+export enum PublicationStatus {
+  Published = "Published",
+  Unpublished = "Unpublished",
+}
+
+export enum VersionState {
+  Draft = "DRAFT",
+  Released = "RELEASED",
+}
