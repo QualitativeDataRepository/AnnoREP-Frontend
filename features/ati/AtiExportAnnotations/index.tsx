@@ -65,6 +65,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
           },
         }
       )
+      setIsLoading(false)
       setHasError(false)
       setFormMsg(`${data.message}`)
     } catch (e) {
