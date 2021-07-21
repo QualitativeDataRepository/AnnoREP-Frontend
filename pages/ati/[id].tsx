@@ -98,7 +98,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             return {
               id: `${file.dataFile.id}`,
               name: file.dataFile.filename,
-              uri: `${process.env.DATAVERSE_SERVER_URL}/api/access/datafile/:persistentId?persistentId=${file.dataFile.persistentId}`,
+              uri: `${process.env.DATAVERSE_SERVER_URL}/file.xhtml?persistentId?persistentId=${file.dataFile.persistentId}`,
             }
           }),
         }
