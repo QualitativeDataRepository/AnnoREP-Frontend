@@ -6,6 +6,8 @@ import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carb
 import { IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
+import layoutStyles from "../../components/Layout/Layout.module.css"
+
 interface AtiExportAnnotationstProps {
   manuscript: IManuscript
   canExportAnnotations: boolean
@@ -89,7 +91,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   return (
     <>
       {isLoading && <Loading description="Export annotations" />}
-      <div className="ar--form-container">
+      <div className={layoutStyles.maxwidth}>
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
           {downloadUrl && (
