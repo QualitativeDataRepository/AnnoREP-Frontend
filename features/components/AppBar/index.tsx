@@ -15,12 +15,12 @@ interface AppBarProps {
 const AppBar: FC<AppBarProps> = ({ isLoggedIn }) => {
   const handleLougout = () => signOut()
   return (
-    <div className={styles.container}>
+    <nav className={styles.container}>
       <Link href="/">
         <div className={styles.logolink}>AnnoREP</div>
       </Link>
       {isLoggedIn ? <LogoutLink handleLogout={handleLougout} /> : <LoginLink />}
-    </div>
+    </nav>
   )
 }
 
