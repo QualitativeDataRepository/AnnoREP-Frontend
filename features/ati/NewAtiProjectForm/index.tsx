@@ -35,6 +35,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       dataset: { value: string }
       manuscript: { files: FileList }
     }
+    if (target.manuscript.files.length === 0) {
+      setErrorMsg("Please upload a manuscript file.")
+      return
+    }
     const formData = new FormData()
     formData.append("manuscript", target.manuscript.files[0])
     setIsLoading(true)
