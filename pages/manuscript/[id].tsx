@@ -13,6 +13,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 
 import { DATAVERSE_HEADER_NAME } from "../../constants/dataverse"
 import { getResponseFromError } from "../../utils/httpRequestUtils"
+import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
 
 interface ManuscriptProps {
   isLoggedIn: boolean
@@ -97,6 +98,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         responseType: "arraybuffer",
         headers: {
           [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+          [REQUEST_DESC_HEADER_NAME]: `Getting ingest PDF file from source manuscript ${id}`,
           Accept: "application/pdf",
         },
       })
