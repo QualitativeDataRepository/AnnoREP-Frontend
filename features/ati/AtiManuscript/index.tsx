@@ -3,17 +3,17 @@ import { FC, FormEventHandler, useState, useRef } from "react"
 import axios from "axios"
 import {
   Button,
-  TooltipIcon,
   Form,
   FileUploader,
   Link,
   Loading,
   InlineNotification,
   Modal,
+  CopyButton,
 } from "carbon-components-react"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
-import { Copy32, Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
+import { Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
 
 import { IDatasource } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -38,7 +38,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   const [modalIsOpen, setModalIsopen] = useState<boolean>(false)
   const openModal = () => setModalIsopen(true)
   const closeModal = () => setModalIsopen(false)
-  const [copiedUri, setCopiedUri] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string>("")
   const [mId, setMId] = useState(manuscriptId)
@@ -161,7 +160,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         >
           Modify datasources
         </Link>
-        <div className={styles.infotext}>{`${copiedUri} ${copiedUri ? "copied!" : ""}`}</div>
         {datasources.length === 0 && (
           <div className={styles.infotext}>No datasources found for this project.</div>
         )}
@@ -170,10 +168,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             <Link target="_blank" rel="noopener noreferrer" size="lg" href={uri}>
               {name}
             </Link>
-            <CopyToClipboard key={id} text={uri} onCopy={() => setCopiedUri(uri)}>
-              <TooltipIcon direction="top" align="end" tooltipText="Copy URL">
-                <Copy32 />
-              </TooltipIcon>
+            <CopyToClipboard key={id} text={uri}>
+              <CopyButton
+                feedback="Copied!"
+                feedbackTimeout={3000}
+                iconDescription="Copy URL to clipboard"
+              />
             </CopyToClipboard>
           </div>
         ))}
