@@ -145,7 +145,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         className={styles.modal}
         open={modalIsOpen}
         modalLabel="Datasources"
-        modalHeading="Copy datasources URL"
+        modalHeading="Copy datasource URL"
         passiveModal={true}
         size="sm"
         hasScrollingContent={true}
@@ -165,10 +165,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         )}
         {datasources.map(({ id, name, uri }) => (
           <div key={id} className={styles.datasource}>
-            <div>
-              <div className={styles.name}>{name}</div>
-              <span className={styles.uri}>{uri}</span>
-            </div>
+            <Link target="_blank" rel="noopener noreferrer" size="lg" href={uri}>
+              {name}
+            </Link>
             <CopyToClipboard key={id} text={uri} onCopy={() => setCopiedUri(uri)}>
               <TooltipIcon direction="top" align="end" tooltipText="Copy URL">
                 <Copy32 />
