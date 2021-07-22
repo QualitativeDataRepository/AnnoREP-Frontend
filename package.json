@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "@carbon/icons-react": "^10.33.0",
-    "@fluentui/react": "^8.20.2",
     "@prisma/client": "^2.27.0",
     "@types/carbon-components-react": "^7.34.0",
     "@types/carbon__icons-react": "^10.31.0",
