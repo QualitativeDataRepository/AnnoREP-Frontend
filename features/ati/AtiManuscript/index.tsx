@@ -142,13 +142,14 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         </Form>
       </div>
       <Modal
-        className={styles.modal}
+        className="ar--datasource-modal"
         open={modalIsOpen}
         modalLabel="Datasources"
         modalHeading="Copy datasource URL"
         passiveModal={true}
-        size="sm"
+        size="xs"
         hasScrollingContent={true}
+        preventCloseOnClickOutside={true}
         onRequestClose={closeModal}
       >
         <Link

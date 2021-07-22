@@ -39,3 +39,19 @@ a {
 .ar--secondary-text {
   color: #525252;
 }
+
+.ar--datasource-modal {
+  background-color: transparent !important;
+  justify-content: start !important;
+  width: 100vw !important;
+}
+
+.ar--datasource-modal > .bx--modal-container {
+  width: 100% !important;
+}
+
+@media screen and (min-width: 42rem) {
+  .ar--datasource-modal {
+    width: 320px !important;
+  }
+}
