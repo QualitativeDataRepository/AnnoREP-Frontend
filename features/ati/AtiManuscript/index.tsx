@@ -143,6 +143,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       </div>
       <Modal
         className="ar--datasource-modal"
+        aria-label="Datasources"
         open={modalIsOpen}
         modalLabel="Datasources"
         modalHeading="Copy datasource URL"
