@@ -34,3 +34,11 @@
   align-items: center;
   margin-bottom: 16px;
 }
+
+.modal {
+  justify-content: start !important;
+}
+
+.modal > .bx--modal-container {
+  height: 100% !important;
+}

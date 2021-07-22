@@ -9,9 +9,8 @@ import {
   Link,
   Loading,
   InlineNotification,
+  Modal,
 } from "carbon-components-react"
-import { Panel, PanelType } from "@fluentui/react"
-import { useBoolean } from "@fluentui/react-hooks"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Copy32, Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
@@ -36,7 +35,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   datasources,
   serverUrl,
 }) => {
-  const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false)
+  const [modalIsOpen, setModalIsopen] = useState<boolean>(false)
+  const openModal = () => setModalIsopen(true)
+  const closeModal = () => setModalIsopen(false)
   const [copiedUri, setCopiedUri] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string>("")
@@ -99,6 +100,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     <>
       {isLoading && <Loading description="Uploading manuscript" />}
       <div className={styles.container}>
+        <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openModal}>
+          Datasources
+        </Button>
         <Form encType="multipart/form-data" onSubmit={mId ? onDelete : onUpload}>
           {errorMsg && (
             <div className="ar--form-item">
@@ -136,18 +140,16 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             </>
           )}
         </Form>
-        <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openPanel}>
-          Datasources
-        </Button>
       </div>
-      <Panel
-        type={PanelType.customNear}
-        customWidth={"300px"}
-        headerText="Datasources"
-        isBlocking={false}
-        isOpen={isOpen}
-        onDismiss={dismissPanel}
-        closeButtonAriaLabel="Close"
+      <Modal
+        className={styles.modal}
+        open={modalIsOpen}
+        modalLabel="Datasources"
+        modalHeading="Copy datasources URL"
+        passiveModal={true}
+        size="sm"
+        hasScrollingContent={true}
+        onRequestClose={closeModal}
       >
         <Link
           href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
@@ -168,13 +170,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
               <span className={styles.uri}>{uri}</span>
             </div>
             <CopyToClipboard key={id} text={uri} onCopy={() => setCopiedUri(uri)}>
-              <TooltipIcon direction="top" align="end" tooltipText="Copy URI">
+              <TooltipIcon direction="top" align="end" tooltipText="Copy URL">
                 <Copy32 />
               </TooltipIcon>
             </CopyToClipboard>
           </div>
         ))}
-      </Panel>
+      </Modal>
       {mId && (
         <iframe
           className={styles.iframe}
