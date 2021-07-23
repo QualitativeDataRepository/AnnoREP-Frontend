@@ -23,7 +23,12 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
       try {
         const { data } = await axios.get(`/api/datasets/${id}`)
-        const blob = new Blob([data.file])
+        const arrayBuffer = new ArrayBuffer(data.file.data.length)
+        const view = new Uint8Array(arrayBuffer)
+        for (let i = 0; i < data.file.data.length; i++) {
+          view[i] = data.file.data[i]
+        }
+        const blob = new Blob([arrayBuffer])
         url = URL.createObjectURL(blob)
         setDownloadUrl(url)
       } catch (e) {}
@@ -57,7 +62,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
         {downloadUrl && (
           <div>
-            <Link href={downloadUrl} download={`${title} bundle`} size="lg">
+            <Link href={downloadUrl} download={`${title} files.zip`} size="lg">
               Download project bundle
             </Link>
           </div>
