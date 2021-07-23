@@ -1,6 +1,7 @@
-import { FC } from "react"
+import { FC, useState, useEffect } from "react"
 
-import { UnorderedList, ListItem, Button, Link } from "carbon-components-react"
+import axios from "axios"
+import { UnorderedList, ListItem, Link } from "carbon-components-react"
 
 import { IATIProjectDetails } from "../../../types/dataverse"
 
@@ -12,23 +13,38 @@ interface ATISummaryProps {
   atiProjectDetails: IATIProjectDetails
 }
 
-//api/access/dataset/id dl bundle
-//update annotations first then use api
-//https://github.com/QualitativeDataRepository/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L1088
-//layout the doi link
-
 const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
-  const { doi, title, status, version } = atiProjectDetails.dataset
+  const { id, doi, title, status, version } = atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
+  const [downloadUrl, setDownloadUrl] = useState<string>("")
+  useEffect(() => {
+    let url = ""
+    const getFile = async () => {
+      /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+      try {
+        const { data } = await axios.get(`/api/datasets/${id}`)
+        const blob = new Blob([data.file])
+        url = URL.createObjectURL(blob)
+        setDownloadUrl(url)
+      } catch (e) {}
+    }
+    if (id) {
+      getFile()
+    }
+
+    return () => {
+      if (url) {
+        URL.revokeObjectURL(url)
+      }
+    }
+  }, [id])
+
   return (
     <div className={layoutStyles.maxwidth}>
-      <Button kind="tertiary" size="field">
-        Download project bundle
-      </Button>
       <section aria-label="about" className={styles.section}>
         <h2 className={styles.header}>About</h2>
         <p>
-          Project Title:{" "}
+          Project title:{" "}
           <Link
             href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
             target="_blank"
@@ -39,6 +55,13 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
           </Link>
         </p>
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
+        {downloadUrl && (
+          <div>
+            <Link href={downloadUrl} download={`${title} bundle`} size="lg">
+              Download project bundle
+            </Link>
+          </div>
+        )}
       </section>
       <section aria-label="manuscript" className={styles.section}>
         <h2 className={styles.header}>Manuscript</h2>
