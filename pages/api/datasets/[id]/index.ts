@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Accept: "application/zip",
           },
         })
-        res.status(status).json({ file: data })
+        res.status(status).send(data)
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
         res.status(status).json({ message })
