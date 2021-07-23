@@ -27,7 +27,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
       try {
         const { data } = await axios.get(`/api/arcore/${manuscript.id}/pdf`)
-        const blob = new Blob([data])
+        const blob = new Blob([data.file])
         url = URL.createObjectURL(blob)
         setDownloadUrl(url)
       } catch (e) {}
