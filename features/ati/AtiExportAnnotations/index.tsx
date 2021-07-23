@@ -48,28 +48,36 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     const target = e.target as typeof e.target & {
       destinationUrl: { value: string }
     }
-    try {
-      setIsLoading(true)
-      setFormMsg("")
-      const { data } = await axios.post(
-        `/api/export-annotations/${manuscript.id}`,
-        JSON.stringify({
-          destinationUrl: target.destinationUrl.value,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      setIsLoading(false)
-      setHasError(false)
-      setFormMsg(`${data.message}`)
-    } catch (e) {
-      setIsLoading(false)
-      setHasError(true)
-      setFormMsg(`${getMessageFromError(e)}`)
-    }
+
+    setIsLoading(true)
+    setHasError(false)
+    setFormMsg("")
+    await axios
+      .get(`/api/hypothesis/${manuscript.id}/download-annotations`)
+      .then(({ data }) => {
+        return axios.post(
+          `/api/hypothesis/${manuscript.id}/export-annotations`,
+          JSON.stringify({
+            destinationUrl: target.destinationUrl.value,
+            annotations: data.annotations,
+          }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      })
+      .then(({ data }) => {
+        setIsLoading(false)
+        setHasError(false)
+        setFormMsg(`${data.message}`)
+      })
+      .catch((e) => {
+        setIsLoading(false)
+        setHasError(true)
+        setFormMsg(`${getMessageFromError(e)}`)
+      })
   }
 
   if (!canExportAnnotations) {
