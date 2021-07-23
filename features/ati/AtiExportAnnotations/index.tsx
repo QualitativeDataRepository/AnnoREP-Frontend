@@ -17,31 +17,20 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   canExportAnnotations,
 }) => {
-  const [downloadUrl, setDownloadUrl] = useState<string>("")
+  const [downloadStream, setDownloadStream] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
   const [formMsg, setFormMsg] = useState<string>("")
   useEffect(() => {
-    let url = ""
     const getFile = async () => {
       /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
       try {
-        const { data } = await axios.get(`/api/arcore/${manuscript.id}/pdf`, {
-          responseType: "arraybuffer",
-        })
-        const blob = new Blob([data])
-        url = URL.createObjectURL(blob)
-        setDownloadUrl(url)
+        const { data } = await axios.get(`/api/arcore/${manuscript.id}/pdf`)
+        setDownloadStream(data)
       } catch (e) {}
     }
     if (manuscript.id) {
       getFile()
-    }
-
-    return () => {
-      if (url) {
-        URL.revokeObjectURL(url)
-      }
     }
   }, [manuscript.id])
 
@@ -99,9 +88,12 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       <div className={layoutStyles.maxwidth}>
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
-          {downloadUrl && (
+          {downloadStream && (
             <div className="ar--form-desc">
-              <Link href={downloadUrl} download={`IngestPDF ${manuscript.name}`}>
+              <Link
+                href={`data:application/pdf;base64,${downloadStream}`}
+                download={`ingest_manuscript.pdf`}
+              >
                 Download manuscript
               </Link>
             </div>

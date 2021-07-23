@@ -24,7 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Accept: "application/zip",
           },
         })
-        res.status(status).send(data)
+        const file = Buffer.from(data, "binary").toString("base64")
+        res.status(status).send(file)
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
         res.status(status).json({ message })

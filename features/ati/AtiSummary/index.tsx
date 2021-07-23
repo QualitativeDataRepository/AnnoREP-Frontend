@@ -17,26 +17,17 @@ interface ATISummaryProps {
 const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const { id, doi, title, status, version } = atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
-  const [downloadUrl, setDownloadUrl] = useState<string>("")
+  const [downloadstream, setDownloadStream] = useState<string>("")
   useEffect(() => {
-    let url = ""
     const getFile = async () => {
       /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
       try {
-        const { data } = await axios.get(`/api/datasets/${id}`, { responseType: "arraybuffer" })
-        const blob = new Blob([data])
-        url = URL.createObjectURL(blob)
-        setDownloadUrl(url)
+        const { data } = await axios.get(`/api/datasets/${id}`)
+        setDownloadStream(data)
       } catch (e) {}
     }
     if (id) {
       getFile()
-    }
-
-    return () => {
-      if (url) {
-        URL.revokeObjectURL(url)
-      }
     }
   }, [id])
 
@@ -56,11 +47,11 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
           </Link>
         </p>
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
-        {downloadUrl && (
+        {downloadstream && (
           <div className={styles.download}>
             <Link
-              href={downloadUrl}
-              download={`${title} files.zip`}
+              href={`data:application/zip;base64,${downloadstream}`}
+              download={`dataverse_files.zip`}
               size="lg"
               renderIcon={Download16}
             >
