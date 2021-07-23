@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react"
 
 import axios from "axios"
 import { UnorderedList, ListItem, Link } from "carbon-components-react"
+import { Download16 } from "@carbon/icons-react"
 
 import { IATIProjectDetails } from "../../../types/dataverse"
 
@@ -61,8 +62,13 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
         </p>
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
         {downloadUrl && (
-          <div>
-            <Link href={downloadUrl} download={`${title} files.zip`} size="lg">
+          <div className={styles.download}>
+            <Link
+              href={downloadUrl}
+              download={`${title} files.zip`}
+              size="lg"
+              renderIcon={Download16}
+            >
               Download project bundle
             </Link>
           </div>
