@@ -106,7 +106,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         manuscript = Buffer.from(data, "binary").toString("base64")
       }
     } catch (error) {
-      const { message } = getResponseFromError(error)
+      const { status, message } = getResponseFromError(error)
+      console.error(status, message)
       errorMsg = message
     }
   }

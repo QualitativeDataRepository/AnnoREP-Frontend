@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(status).json(data)
       } catch (e) {
         const { status, message } = getResponseFromError(e, `Deleting file ${id}`)
+        console.error(status, message)
         res.status(status).json({ message })
       }
     } else {

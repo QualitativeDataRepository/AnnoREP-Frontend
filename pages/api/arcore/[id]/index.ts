@@ -59,6 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             e,
             `Extracting annotations from source manuscript ${id} and sending annotations to Hypothes.is server`
           )
+          console.error(status, message)
           res.status(status).json({ message })
         })
     } else {
