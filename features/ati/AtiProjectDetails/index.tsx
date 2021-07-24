@@ -7,6 +7,7 @@ import AtiManuscript from "../AtiManuscript"
 import AtiSettings from "../AtiSettings"
 import AtiSummary from "../AtiSummary"
 
+import { AtiTab } from "../../../constants/ati"
 import { IATIProjectDetails } from "../../../types/dataverse"
 
 interface ATIProjectDetailsProps {
@@ -24,10 +25,10 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
     <>
       <h1>{atiProjectDetails.dataset.title}</h1>
       <Tabs>
-        <Tab id="summary" label="Summary">
+        <Tab {...AtiTab.summary}>
           <AtiSummary serverUrl={serverUrl} atiProjectDetails={atiProjectDetails} />
         </Tab>
-        <Tab id="manuscript" label="Manuscript">
+        <Tab {...AtiTab.manuscript}>
           <AtiManuscript
             datasetId={atiProjectDetails.dataset.id}
             doi={atiProjectDetails.dataset.doi}
@@ -36,13 +37,13 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
             serverUrl={serverUrl}
           />
         </Tab>
-        <Tab id="export-annotations" label="Export annotations">
+        <Tab {...AtiTab.exportAnnotations}>
           <AtiExportAnnotations
             manuscript={atiProjectDetails.manuscript}
             canExportAnnotations={canExportAnnotations}
           />
         </Tab>
-        <Tab id="settings" label="Settings">
+        <Tab {...AtiTab.settings}>
           <AtiSettings
             dataset={atiProjectDetails.dataset}
             manuscriptId={atiProjectDetails.manuscript.id}
