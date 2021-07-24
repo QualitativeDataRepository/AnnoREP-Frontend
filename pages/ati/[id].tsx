@@ -7,12 +7,14 @@ import { getSession } from "next-auth/client"
 
 import Layout from "../../features/components/Layout"
 import ATIProjectDetails from "../../features/ati/AtiProjectDetails"
-import { IATIProjectDetails } from "../../types/dataverse"
+
+import { AtiTab, IAtiTab, tabs } from "../../constants/ati"
 import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../constants/dataverse"
+import { IATIProjectDetails } from "../../types/dataverse"
 import { createAtiProjectDetails } from "../../utils/dataverseUtils"
 import { getResponseFromError } from "../../utils/httpRequestUtils"
 
@@ -20,10 +22,17 @@ interface AtiProps {
   isLoggedIn: boolean
   serverUrl: string
   canExportAnnotations: boolean
+  atiTab: IAtiTab
   atiProjectDetails?: IATIProjectDetails
 }
 
-const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, canExportAnnotations, atiProjectDetails }) => {
+const Ati: FC<AtiProps> = ({
+  isLoggedIn,
+  serverUrl,
+  canExportAnnotations,
+  atiProjectDetails,
+  atiTab,
+}) => {
   return (
     <Layout
       isLoggedIn={isLoggedIn}
@@ -35,6 +44,7 @@ const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, canExportAnnotations, atiPro
           serverUrl={serverUrl}
           atiProjectDetails={atiProjectDetails}
           canExportAnnotations={canExportAnnotations}
+          atiTab={atiTab}
         />
       ) : (
         <InlineNotification
@@ -131,6 +141,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           ? createAtiProjectDetails(responses[0], datasetZip, ingestPdf)
           : null,
       canExportAnnotations,
+      atiTab:
+        tabs.findIndex((tab) => tab === context.query.atiTab) > -1
+          ? context.query.atiTab
+          : AtiTab.summary.id,
     },
   }
 }
