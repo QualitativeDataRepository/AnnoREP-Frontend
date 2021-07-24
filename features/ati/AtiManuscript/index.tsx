@@ -1,4 +1,4 @@
-import { FC, FormEventHandler, useState, useRef } from "react"
+import { FC, FormEventHandler, useState } from "react"
 
 import axios from "axios"
 import {
@@ -14,6 +14,7 @@ import {
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
+import { useRouter } from "next/router"
 
 import { IDatasource } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -35,24 +36,23 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   datasources,
   serverUrl,
 }) => {
+  const router = useRouter()
   const [modalIsOpen, setModalIsopen] = useState<boolean>(false)
   const openModal = () => setModalIsopen(true)
   const closeModal = () => setModalIsopen(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string>("")
-  const [mId, setMId] = useState(manuscriptId)
-  const mIdRef = useRef("")
 
   const onDelete: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-    const id = mId as string
+    const id = manuscriptId as string
     setIsLoading(true)
     setErrorMsg("")
     await axios
       .delete(`/api/delete-file/${id}`)
       .then(() => {
         setIsLoading(false)
-        setMId("")
+        router.reload()
       })
       .catch((error) => {
         setIsLoading(false)
@@ -79,7 +79,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     })
       .then(({ data }) => {
         const newManuscriptId = data.files[0].dataFile.id
-        mIdRef.current = newManuscriptId
         return axios({
           method: "PUT",
           url: `/api/arcore/${newManuscriptId}`,
@@ -87,7 +86,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
       .then(() => {
         setIsLoading(false)
-        setMId(mIdRef.current)
+        router.reload()
       })
       .catch((error) => {
         setIsLoading(false)
@@ -102,7 +101,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openModal}>
           Datasources
         </Button>
-        <Form encType="multipart/form-data" onSubmit={mId ? onDelete : onUpload}>
+        <Form encType="multipart/form-data" onSubmit={manuscriptId ? onDelete : onUpload}>
           {errorMsg && (
             <div className="ar--form-item">
               <InlineNotification
@@ -113,7 +112,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
               />
             </div>
           )}
-          {mId ? (
+          {manuscriptId ? (
             <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
               Delete manuscript
             </Button>
@@ -178,12 +177,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           </div>
         ))}
       </Modal>
-      {mId && (
+      {manuscriptId && (
         <iframe
           className={styles.iframe}
-          id={`manuscript__${mId}`}
+          id={`manuscript__${manuscriptId}`}
           title="manuscript"
-          src={`/manuscript/${mId}`}
+          src={`/manuscript/${manuscriptId}`}
           width="100%"
         />
       )}
