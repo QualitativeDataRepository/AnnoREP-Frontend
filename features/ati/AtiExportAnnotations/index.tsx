@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, FormEventHandler } from "react"
+import { FC, useState, FormEventHandler } from "react"
 
 import axios from "axios"
 import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carbon-components-react"
@@ -17,22 +17,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   canExportAnnotations,
 }) => {
-  const [downloadStream, setDownloadStream] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
   const [formMsg, setFormMsg] = useState<string>("")
-  useEffect(() => {
-    const getFile = async () => {
-      /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
-      try {
-        const { data } = await axios.get(`/api/arcore/${manuscript.id}/pdf`)
-        setDownloadStream(data)
-      } catch (e) {}
-    }
-    if (manuscript.id) {
-      getFile()
-    }
-  }, [manuscript.id])
 
   const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -88,10 +75,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       <div className={layoutStyles.maxwidth}>
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
-          {downloadStream && (
+          {manuscript.ingest && (
             <div className="ar--form-desc">
               <Link
-                href={`data:application/pdf;base64,${downloadStream}`}
+                href={`data:application/pdf;base64,${manuscript.ingest}`}
                 download={`ingest_manuscript.pdf`}
               >
                 Download manuscript

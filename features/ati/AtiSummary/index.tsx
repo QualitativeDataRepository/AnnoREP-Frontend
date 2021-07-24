@@ -1,6 +1,5 @@
-import { FC, useState, useEffect } from "react"
+import { FC } from "react"
 
-import axios from "axios"
 import { UnorderedList, ListItem, Link } from "carbon-components-react"
 import { Download16 } from "@carbon/icons-react"
 
@@ -15,21 +14,8 @@ interface ATISummaryProps {
 }
 
 const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
-  const { id, doi, title, status, version } = atiProjectDetails.dataset
+  const { doi, title, status, version, zip } = atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
-  const [downloadstream, setDownloadStream] = useState<string>("")
-  useEffect(() => {
-    const getFile = async () => {
-      /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
-      try {
-        const { data } = await axios.get(`/api/datasets/${id}`)
-        setDownloadStream(data)
-      } catch (e) {}
-    }
-    if (id) {
-      getFile()
-    }
-  }, [id])
 
   return (
     <div className={layoutStyles.maxwidth}>
@@ -47,15 +33,15 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
           </Link>
         </p>
         <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
-        {downloadstream && (
+        {zip && (
           <div className={styles.download}>
             <Link
-              href={`data:application/zip;base64,${downloadstream}`}
+              href={`data:application/zip;base64,${zip}`}
               download={`dataverse_files.zip`}
               size="lg"
               renderIcon={Download16}
             >
-              Download project bundle
+              Download project
             </Link>
           </div>
         )}

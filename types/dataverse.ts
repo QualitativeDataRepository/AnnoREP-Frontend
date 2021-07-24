@@ -4,6 +4,7 @@ export interface IDataset {
   title: string
   status?: string
   version?: string
+  zip?: string
 }
 
 export interface IDatasource {
@@ -15,6 +16,7 @@ export interface IDatasource {
 export interface IManuscript {
   id: string
   name: string
+  ingest?: string
 }
 
 export interface IATIProjectDetails {

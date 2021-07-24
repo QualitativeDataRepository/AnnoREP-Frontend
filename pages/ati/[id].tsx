@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import { InlineNotification } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
@@ -12,9 +12,9 @@ import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
-  VersionState,
-  PublicationStatus,
 } from "../../constants/dataverse"
+import { createAtiProjectDetails } from "../../utils/dataverseUtils"
+import { getResponseFromError } from "../../utils/httpRequestUtils"
 
 interface AtiProps {
   isLoggedIn: boolean
@@ -53,77 +53,83 @@ export default Ati
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const datasetId = context?.params?.id
-  let atiProjectDetails = null
   let canExportAnnotations = false
+  const responses: AxiosResponse<any>[] = []
+  let datasetZip = ""
+  let ingestPdf = ""
   if (session && datasetId) {
-    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
-    try {
-      const { status, data } = await axios.get(
-        `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`,
-        {
-          headers: {
-            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
-          },
+    const { dataverseApiToken } = session
+    await Promise.all([
+      //Get the dataset json
+      axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
+        headers: {
+          [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          Accept: "application/json",
+        },
+      }),
+      //Get the dataset zip
+      axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
+        responseType: "arraybuffer",
+        headers: {
+          [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          Accept: "application/zip",
+        },
+      }),
+      //Is the qdr hypothesis api token valid?
+      axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
+        headers: {
+          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
+        },
+      }),
+    ])
+      .then((axiosResponses) => {
+        //Add dataset json
+        responses.push(axiosResponses[0])
+        //Get the dataset zip
+        datasetZip = Buffer.from(axiosResponses[1].data, "binary").toString("base64")
+        if (axiosResponses[2].data.userid !== null) {
+          //The qdr hypothesis api token is valid
+          canExportAnnotations = true
         }
-      )
-      if (status === 200 && data.status === "OK") {
-        const latest = data.data.latestVersion
-        const metadataFields = latest.metadataBlocks.citation.fields
+        const latest = axiosResponses[0].data.data.latestVersion
         const manuscript = latest.files.find(
           (file: any) =>
             file.directoryLabel === ANNOREP_METADATA_VALUE &&
             file.description === SOURCE_MANUSCRIPT_TAG
         )
-        const datasources = latest.files.filter(
-          (file: any) => file.categories === undefined || file.categories.includes("Data")
-        )
-        atiProjectDetails = {
-          dataset: {
-            id: latest.datasetId,
-            doi: latest.datasetPersistentId,
-            title: metadataFields.find((field: any) => field.typeName === "title").value,
-            version: latest.versionNumber
-              ? `${latest.versionNumber}.${latest.versionMinorNumber}`
-              : latest.versionState,
-            status:
-              latest.versionState === VersionState.Released
-                ? PublicationStatus.Published
-                : PublicationStatus.Unpublished,
-          },
-          manuscript: {
-            id: manuscript?.dataFile.id || "",
-            name: manuscript?.dataFile.filename || "",
-          },
-          datasources: datasources.map((file: any) => {
-            return {
-              id: `${file.dataFile.id}`,
-              name: file.dataFile.filename,
-              uri: `${process.env.DATAVERSE_SERVER_URL}/file.xhtml?persistentId=${file.dataFile.persistentId}`,
+        if (manuscript.dataFile.id) {
+          //Get the ingest pdf
+          return axios.get(
+            `${process.env.ARCORE_SERVER_URL}/api/documents/${manuscript.dataFile.id}/pdf`,
+            {
+              responseType: "arraybuffer",
+              headers: {
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                Accept: "application/pdf",
+              },
             }
-          }),
+          )
         }
-      }
-    } catch (e) {}
-
-    /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
-    try {
-      const { data } = await axios({
-        method: "GET",
-        url: `${process.env.HYPOTHESIS_SERVER_URL}/api/profile`,
-        headers: {
-          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
-        },
       })
-      if (data.userid !== null) {
-        canExportAnnotations = true
-      }
-    } catch (error) {}
+      .then((ingestPdfResponse) => {
+        if (ingestPdfResponse) {
+          ingestPdf = Buffer.from(ingestPdfResponse.data, "binary").toString("base64")
+        }
+      })
+      .catch((e) => {
+        const { status, message } = getResponseFromError(e)
+        console.error(status, message)
+      })
   }
+
   return {
     props: {
       isLoggedIn: session ? true : false,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
-      atiProjectDetails,
+      atiProjectDetails:
+        responses.length === 1
+          ? createAtiProjectDetails(responses[0], datasetZip, ingestPdf)
+          : null,
       canExportAnnotations,
     },
   }
