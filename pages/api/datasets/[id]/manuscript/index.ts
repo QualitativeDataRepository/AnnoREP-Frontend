@@ -39,6 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           addManuscriptForm.append(
             "jsonData",
             JSON.stringify({
+              mimeType: manuscript.type,
               label: manuscript.name,
               description: SOURCE_MANUSCRIPT_TAG,
               directoryLabel: `${ANNOREP_METADATA_VALUE}`,
