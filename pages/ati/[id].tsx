@@ -14,6 +14,7 @@ import {
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../constants/dataverse"
+import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
 import { IATIProjectDetails } from "../../types/dataverse"
 import { createAtiProjectDetails } from "../../utils/dataverseUtils"
 import { getResponseFromError } from "../../utils/httpRequestUtils"
@@ -74,6 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          [REQUEST_DESC_HEADER_NAME]: `Getting JSON for dataset ${datasetId}`,
           Accept: "application/json",
         },
       }),
@@ -82,6 +84,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         responseType: "arraybuffer",
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
           Accept: "application/zip",
         },
       }),

@@ -16,6 +16,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
+import { ManuscriptMimeType } from "../../../constants/arcore"
 import { IDatasource } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
@@ -65,6 +66,14 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     const target = e.target as typeof e.target & {
       manuscript: { files: FileList }
     }
+    if (target.manuscript.files.length === 0) {
+      setErrorMsg("Please upload a manuscript file.")
+      return
+    }
+    if (!(target.manuscript.files[0].type in ManuscriptMimeType)) {
+      setErrorMsg(`${target.manuscript.files[0].type} is not a supported file type.`)
+      return
+    }
     const formData = new FormData()
     formData.append("manuscript", target.manuscript.files[0])
     setIsLoading(true)
@@ -101,44 +110,43 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openModal}>
           Datasources
         </Button>
-        <Form encType="multipart/form-data" onSubmit={manuscriptId ? onDelete : onUpload}>
-          {errorMsg && (
-            <div className="ar--form-item">
-              <InlineNotification
-                hideCloseButton
-                kind="error"
-                subtitle={<span>{errorMsg}</span>}
-                title="Error"
-              />
-            </div>
-          )}
-          {manuscriptId ? (
+        {manuscriptId && (
+          <Form onSubmit={onDelete}>
             <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
               Delete manuscript
             </Button>
-          ) : (
-            <>
-              <div className="ar--form-item">
-                <FileUploader
-                  aria-required={true}
-                  accept={[".docx, .pdf"]}
-                  buttonKind="tertiary"
-                  buttonLabel="Add file"
-                  filenameStatus="edit"
-                  iconDescription="Clear file"
-                  labelDescription="Supported file types are .docx and .pdf."
-                  labelTitle="Upload manuscript"
-                  name="manuscript"
-                  size="small"
-                />
-              </div>
-              <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
-                Upload manuscript
-              </Button>
-            </>
-          )}
-        </Form>
+          </Form>
+        )}
       </div>
+      {errorMsg && (
+        <InlineNotification
+          hideCloseButton
+          kind="error"
+          subtitle={<span>{errorMsg}</span>}
+          title="Error"
+        />
+      )}
+      {!manuscriptId && (
+        <Form onSubmit={onUpload}>
+          <div className="ar--form-item">
+            <FileUploader
+              aria-required={true}
+              accept={[".docx, .pdf"]}
+              buttonKind="tertiary"
+              buttonLabel="Add file"
+              filenameStatus="edit"
+              iconDescription="Clear file"
+              labelDescription="Supported file types are .docx and .pdf"
+              labelTitle="Upload manuscript"
+              name="manuscript"
+              size="small"
+            />
+          </div>
+          <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
+            Upload manuscript
+          </Button>
+        </Form>
+      )}
       <Modal
         className="ar--datasource-modal"
         aria-label="Datasources"
