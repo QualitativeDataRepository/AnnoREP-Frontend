@@ -14,6 +14,7 @@ import {
 } from "carbon-components-react"
 import { useRouter } from "next/router"
 
+import { ManuscriptMimeType } from "../../../constants/arcore"
 import { IDataset } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
@@ -37,6 +38,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     }
     if (target.manuscript.files.length === 0) {
       setErrorMsg("Please upload a manuscript file.")
+      return
+    }
+    if (!(target.manuscript.files[0].type in ManuscriptMimeType)) {
+      setErrorMsg(`${target.manuscript.files[0].type} is not a supported file type.`)
       return
     }
     const formData = new FormData()
