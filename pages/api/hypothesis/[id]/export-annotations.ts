@@ -10,11 +10,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const { destinationUrl: url, annotations } = JSON.parse(req.body)
+      const { destinationUrl: url, annotations } = req.body
       const requestDesc = `Exporting annotations from source manuscript ${id} to ${url}`
       const { hypothesisApiToken } = session
       try {
         const copyAnns: AxiosPromise<any>[] = annotations.map((annotation: any) => {
+          annotation.target.forEach((element: any) => {
+            element.source = url
+          })
           return axios({
             method: "POST",
             url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
