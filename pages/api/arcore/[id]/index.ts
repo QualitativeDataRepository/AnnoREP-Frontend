@@ -32,12 +32,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         })
         .then(({ data }) => {
+          const uri = `${process.env.NEXTAUTH_URL}/manuscript/${id}`
           const sendAnns: AxiosPromise<any>[] = data.map((annotation: any) => {
+            annotation.target.forEach((element: any) => {
+              element.source = uri
+            })
             return axios({
               method: "POST",
               url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
               data: JSON.stringify({
-                uri: `${process.env.NEXTAUTH_URL}/manuscript/${id}`,
+                uri: uri,
                 document: annotation.document,
                 text: annotation.text,
                 target: annotation.target,
@@ -52,7 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return Promise.all(sendAnns)
         })
         .then((sendAllAnnsResult) => {
-          res.status(200).json(sendAllAnnsResult)
+          const sentAnnotations = sendAllAnnsResult.map(({ data }) => data)
+          res.status(200).json(sentAnnotations)
         })
         .catch((e) => {
           const { status, message } = getResponseFromError(
