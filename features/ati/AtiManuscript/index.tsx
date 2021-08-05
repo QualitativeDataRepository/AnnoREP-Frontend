@@ -16,8 +16,9 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
-import { ManuscriptMimeType } from "../../../constants/arcore"
+import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
 import { IDatasource } from "../../../types/dataverse"
+import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiManuscript.module.css"
@@ -70,12 +71,25 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       setErrorMsg("Please upload a manuscript file.")
       return
     }
-    if (!(target.manuscript.files[0].type in ManuscriptMimeType)) {
-      setErrorMsg(`${target.manuscript.files[0].type} is not a supported file type.`)
+    const firstFourBytes = await target.manuscript.files[0].slice(0, 4).arrayBuffer()
+    const firstFourBytesView = new Int8Array(firstFourBytes)
+    const mimeType = target.manuscript.files[0].type
+      ? target.manuscript.files[0].type
+      : getMimeType(firstFourBytesView)
+    const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
+    if (!acceptedMimeTypes.includes(mimeType)) {
+      const msg = target.manuscript.files[0].type
+        ? `${target.manuscript.files[0].type} is not a supported file type.`
+        : "Unable to determine the file type of the uploaded file."
+      setErrorMsg(msg)
       return
     }
+    let manuscript = target.manuscript.files[0]
+    if (target.manuscript.files[0].type === "") {
+      manuscript = new File([manuscript], manuscript.name, { type: mimeType })
+    }
     const formData = new FormData()
-    formData.append("manuscript", target.manuscript.files[0])
+    formData.append("manuscript", manuscript)
     setIsLoading(true)
     setErrorMsg("")
     await axios({
@@ -87,7 +101,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       },
     })
       .then(({ data }) => {
-        const newManuscriptId = data.files[0].dataFile.id
+        const newManuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
           url: `/api/arcore/${newManuscriptId}`,
@@ -131,7 +145,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           <div className="ar--form-item">
             <FileUploader
               aria-required={true}
-              accept={[".docx, .pdf"]}
+              accept={[
+                ManuscriptFileExtension.docx,
+                ManuscriptFileExtension.pdf,
+                ManuscriptMimeType.docx,
+                ManuscriptMimeType.pdf,
+              ]}
               buttonKind="tertiary"
               buttonLabel="Add file"
               filenameStatus="edit"
