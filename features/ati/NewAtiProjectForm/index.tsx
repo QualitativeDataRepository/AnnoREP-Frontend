@@ -14,8 +14,9 @@ import {
 } from "carbon-components-react"
 import { useRouter } from "next/router"
 
-import { ManuscriptMimeType } from "../../../constants/arcore"
+import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
 import { IDataset } from "../../../types/dataverse"
+import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 export interface NewAtiProjectFormProps {
@@ -40,12 +41,25 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       setErrorMsg("Please upload a manuscript file.")
       return
     }
-    if (!(target.manuscript.files[0].type in ManuscriptMimeType)) {
-      setErrorMsg(`${target.manuscript.files[0].type} is not a supported file type.`)
+    const firstFourBytes = await target.manuscript.files[0].slice(0, 4).arrayBuffer()
+    const firstFourBytesView = new Int8Array(firstFourBytes)
+    const mimeType = target.manuscript.files[0].type
+      ? target.manuscript.files[0].type
+      : getMimeType(firstFourBytesView)
+    const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
+    if (!acceptedMimeTypes.includes(mimeType)) {
+      const msg = target.manuscript.files[0].type
+        ? `${target.manuscript.files[0].type} is not a supported file type.`
+        : "Unable to determine the file type of the uploaded file."
+      setErrorMsg(msg)
       return
     }
+    let manuscript = target.manuscript.files[0]
+    if (target.manuscript.files[0].type === "") {
+      manuscript = new File([manuscript], manuscript.name, { type: mimeType })
+    }
     const formData = new FormData()
-    formData.append("manuscript", target.manuscript.files[0])
+    formData.append("manuscript", manuscript)
     setIsLoading(true)
     setErrorMsg("")
     await axios({
@@ -139,7 +153,12 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
           <div className="ar--form-item">
             <FileUploader
               aria-required={true}
-              accept={[".docx, .pdf"]}
+              accept={[
+                ManuscriptFileExtension.docx,
+                ManuscriptFileExtension.pdf,
+                ManuscriptMimeType.docx,
+                ManuscriptMimeType.pdf,
+              ]}
               buttonKind="tertiary"
               buttonLabel="Add file"
               filenameStatus="edit"
