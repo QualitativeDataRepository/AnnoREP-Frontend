@@ -35,7 +35,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
           const addManuscriptForm = new FormData()
-          addManuscriptForm.append("file", fs.createReadStream(manuscript.path))
+          addManuscriptForm.append("file", fs.createReadStream(manuscript.path), {
+            filename: manuscript.name as string,
+            contentType: manuscript.type as string,
+          })
           addManuscriptForm.append(
             "jsonData",
             JSON.stringify({
