@@ -23,49 +23,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
-      const { id } = req.query
-      const { dataverseApiToken } = session
-      const requestDesc = `Adding manuscript to dataset ${id}`
-      const form = formidable({ multiples: false })
-      form.parse(req, async (err, _, files) => {
-        const manuscript = files.manuscript as formidable.File
-        if (err) {
-          res.status(400).json({ message: `Failed to parse form data. ${err}` })
-        }
+      return new Promise<void>((resolve) => {
+        const { id } = req.query
+        const { dataverseApiToken } = session
+        const requestDesc = `Adding manuscript to dataset ${id}`
+        const form = formidable({ multiples: false })
+        form.parse(req, async (err, _, files) => {
+          const manuscript = files.manuscript as formidable.File
+          if (err) {
+            res.status(400).json({ message: `Failed to parse form data. ${err}` })
+            resolve()
+          }
 
-        try {
-          const addManuscriptForm = new FormData()
-          addManuscriptForm.append("file", fs.createReadStream(manuscript.path), {
-            filename: manuscript.name as string,
-            contentType: manuscript.type as string,
-          })
-          addManuscriptForm.append(
-            "jsonData",
-            JSON.stringify({
-              mimeType: manuscript.type,
-              label: manuscript.name,
-              description: SOURCE_MANUSCRIPT_TAG,
-              directoryLabel: `${ANNOREP_METADATA_VALUE}`,
-              categories: [SOURCE_MANUSCRIPT_TAG],
-              restrict: true,
+          try {
+            const addManuscriptForm = new FormData()
+            addManuscriptForm.append("file", fs.createReadStream(manuscript.path), {
+              filename: manuscript.name as string,
+              contentType: manuscript.type as string,
             })
-          )
-          const { status, data } = await axios({
-            method: "POST",
-            url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/add`,
-            data: addManuscriptForm,
-            headers: {
-              "Content-Type": `${addManuscriptForm.getHeaders()["content-type"]}`,
-              [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-              [REQUEST_DESC_HEADER_NAME]: requestDesc,
-            },
-          })
-          res.status(status).json(data)
-        } catch (e) {
-          const { status, message } = getResponseFromError(e, requestDesc)
-          console.error(status, message)
-          res.status(status).json({ message })
-        }
+            addManuscriptForm.append(
+              "jsonData",
+              JSON.stringify({
+                mimeType: manuscript.type,
+                label: manuscript.name,
+                description: SOURCE_MANUSCRIPT_TAG,
+                directoryLabel: `${ANNOREP_METADATA_VALUE}`,
+                categories: [SOURCE_MANUSCRIPT_TAG],
+                restrict: true,
+              })
+            )
+            const { status, data } = await axios({
+              method: "POST",
+              url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/add`,
+              data: addManuscriptForm,
+              headers: {
+                "Content-Type": `${addManuscriptForm.getHeaders()["content-type"]}`,
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [REQUEST_DESC_HEADER_NAME]: requestDesc,
+              },
+            })
+            res.status(status).json(data)
+            resolve()
+          } catch (e) {
+            const { status, message } = getResponseFromError(e, requestDesc)
+            console.error(status, message)
+            res.status(status).json({ message })
+            return resolve()
+          }
+        })
       })
     } else {
       res.status(401).json({ message: "Unauthorized. Please login." })
