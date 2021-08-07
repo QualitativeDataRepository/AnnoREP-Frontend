@@ -41,7 +41,7 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
                 key={`page_${index + 1}`}
                 pageNumber={index + 1}
                 width={size.width as number}
-                renderMode="svg"
+                renderMode="canvas"
               />
             ))}
           </Document>

@@ -55,3 +55,17 @@ a {
     width: 320px !important;
   }
 }
+
+
+.react-pdf__Page__textContent span {
+  color: transparent;
+	opacity: 0.25;
+}
+
+.react-pdf__Page__textContent span::selection {
+	background-color: blue;
+}
+
+.react-pdf__Document {
+	line-height: initial;
+}
