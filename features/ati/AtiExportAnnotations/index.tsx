@@ -1,4 +1,4 @@
-import { FC, useState, FormEventHandler } from "react"
+import { FC, useState, FormEventHandler, useEffect } from "react"
 
 import axios from "axios"
 import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carbon-components-react"
@@ -6,6 +6,7 @@ import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carb
 import { IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
+import styles from "./AtiExportAnnotations.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface AtiExportAnnotationstProps {
@@ -20,6 +21,21 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
   const [formMsg, setFormMsg] = useState<string>("")
+  const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
+
+  useEffect(() => {
+    const getAnnotationsJson = async () => {
+      const { data } = await axios.get(`/api/hypothesis/${manuscript.id}/download-annotations`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      const jsonStrs = data.annotations.map((annotation: any) => JSON.stringify(annotation))
+      const arrayStr = encodeURIComponent(`[${jsonStrs.join(",")}]`)
+      setAnnotationsJsonStr(arrayStr)
+    }
+    getAnnotationsJson()
+  }, [manuscript.id])
 
   const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -76,12 +92,18 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
           {manuscript.ingest && (
-            <div className="ar--form-desc">
+            <div className={`${styles.downloadContainer} ar--form-desc`}>
               <Link
                 href={`data:application/pdf;base64,${manuscript.ingest}`}
                 download={`ingest_manuscript.pdf`}
               >
                 Download manuscript
+              </Link>
+              <Link
+                href={`data:application/json;charset=utf-8,${annotationsJsonStr}`}
+                download={`annotations.json`}
+              >
+                Download annotations
               </Link>
             </div>
           )}
