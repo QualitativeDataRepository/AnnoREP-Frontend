@@ -1,7 +1,14 @@
 import { FC, useState, FormEventHandler, useEffect } from "react"
 
 import axios from "axios"
-import { Link, TextInput, Form, Button, InlineNotification, Loading } from "carbon-components-react"
+import {
+  Link,
+  TextInput,
+  Form,
+  Button,
+  InlineNotification,
+  InlineLoadingStatus,
+} from "carbon-components-react"
 
 import { IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -18,9 +25,8 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   canExportAnnotations,
 }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [hasError, setHasError] = useState<boolean>(false)
-  const [formMsg, setFormMsg] = useState<string>("")
+  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
+  const [taskDesc, setTaskDesc] = useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
 
   useEffect(() => {
@@ -43,12 +49,12 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       destinationUrl: { value: string }
     }
 
-    setIsLoading(true)
-    setHasError(false)
-    setFormMsg("")
+    setTaskStatus("active")
+    setTaskDesc("Downloading annotations...")
     await axios
       .get(`/api/hypothesis/${manuscript.id}/download-annotations`)
       .then(({ data }) => {
+        setTaskDesc("Exporting annotations...")
         return axios.post(
           `/api/hypothesis/${manuscript.id}/export-annotations`,
           JSON.stringify({
@@ -63,14 +69,12 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         )
       })
       .then(({ data }) => {
-        setIsLoading(false)
-        setHasError(false)
-        setFormMsg(`${data.message}`)
+        setTaskStatus("finished")
+        setTaskDesc(`${data.message}`)
       })
       .catch((e) => {
-        setIsLoading(false)
-        setHasError(true)
-        setFormMsg(`${getMessageFromError(e)}`)
+        setTaskStatus("error")
+        setTaskDesc(`${getMessageFromError(e)}`)
       })
   }
 
@@ -88,7 +92,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
   return (
     <>
-      {isLoading && <Loading description="Export annotations" />}
       <div className={layoutStyles.maxwidth}>
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
@@ -108,14 +111,22 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               </Link>
             </div>
           )}
-          {formMsg && (
+          {taskStatus !== "inactive" && (
             <div className="ar--form-item">
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={hasError ? "error" : "success"}
-                subtitle={<span>{formMsg}</span>}
-                title={hasError ? "Error!" : "Success!"}
+                kind={
+                  taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
+                }
+                subtitle={<span>{taskDesc}</span>}
+                title={
+                  taskStatus === "active"
+                    ? "Status"
+                    : taskStatus === "finished"
+                    ? "Success!"
+                    : "Error!"
+                }
               />
             </div>
           )}
