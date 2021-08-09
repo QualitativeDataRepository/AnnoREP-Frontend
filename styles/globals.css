@@ -42,12 +42,14 @@ a {
 
 .ar--datasource-modal {
   background-color: transparent !important;
-  justify-content: start !important;
+  justify-content: flex-start !important;
   width: 100vw !important;
 }
 
 .ar--datasource-modal > .bx--modal-container {
   width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
 }
 
 @media screen and (min-width: 42rem) {
