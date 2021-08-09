@@ -6,7 +6,7 @@ import { getSession } from "next-auth/client"
 import qs from "qs"
 
 import { Add16 } from "@carbon/icons-react"
-import { Link } from "carbon-components-react"
+import { InlineNotification, Link } from "carbon-components-react"
 
 import AtiProject from "../features/ati/AtiProject"
 import Layout from "../features/components/Layout"
@@ -36,7 +36,15 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
             {atiProjects.map(({ id, title, version, status }) => (
               <AtiProject key={id} id={id} title={title} version={version} status={status} />
             ))}
-            {atiProjects.length === 0 && <div>No current ATI projects</div>}
+            {atiProjects.length === 0 && (
+              <InlineNotification
+                hideCloseButton
+                lowContrast
+                kind="info"
+                subtitle={<span>No current ATI projects.</span>}
+                title="Info"
+              />
+            )}
           </div>
         ) : (
           <div className={styles.callout}>
