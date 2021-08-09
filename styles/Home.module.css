@@ -43,16 +43,17 @@
 }
 
 .titleContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: start;
+  align-items: start;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
 @media (min-width: 42rem) {
   .titleContainer {
-    flex-direction: row;
+    grid-template-columns: auto auto;
     justify-content: space-between;
     align-items: center;
   }
