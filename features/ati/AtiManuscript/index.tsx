@@ -6,10 +6,10 @@ import {
   Form,
   FileUploader,
   Link,
-  Loading,
   InlineNotification,
   Modal,
   CopyButton,
+  InlineLoadingStatus,
 } from "carbon-components-react"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
@@ -42,23 +42,24 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   const [modalIsOpen, setModalIsopen] = useState<boolean>(false)
   const openModal = () => setModalIsopen(true)
   const closeModal = () => setModalIsopen(false)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [errorMsg, setErrorMsg] = useState<string>("")
+  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
+  const [taskDesc, setTaskDesc] = useState<string>("")
 
   const onDelete: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const id = manuscriptId as string
-    setIsLoading(true)
-    setErrorMsg("")
+    setTaskStatus("active")
+    setTaskDesc("Deleting manuscript...")
     await axios
       .delete(`/api/delete-file/${id}`)
       .then(() => {
-        setIsLoading(false)
+        setTaskStatus("finished")
+        setTaskDesc(`Deleted manuscript ${manuscriptId}.`)
         router.reload()
       })
       .catch((error) => {
-        setIsLoading(false)
-        setErrorMsg(`${getMessageFromError(error)}`)
+        setTaskStatus("error")
+        setTaskDesc(`${getMessageFromError(error)}`)
       })
   }
 
@@ -68,7 +69,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       manuscript: { files: FileList }
     }
     if (target.manuscript.files.length === 0) {
-      setErrorMsg("Please upload a manuscript file.")
+      setTaskStatus("error")
+      setTaskDesc("Please upload a manuscript file.")
       return
     }
     const firstFourBytes = await target.manuscript.files[0].slice(0, 4).arrayBuffer()
@@ -81,7 +83,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       const msg = target.manuscript.files[0].type
         ? `${target.manuscript.files[0].type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
-      setErrorMsg(msg)
+      setTaskStatus("error")
+      setTaskDesc(msg)
       return
     }
     let manuscript = target.manuscript.files[0]
@@ -90,8 +93,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     }
     const formData = new FormData()
     formData.append("manuscript", manuscript)
-    setIsLoading(true)
-    setErrorMsg("")
+    setTaskStatus("active")
+    setTaskDesc(`Uploading ${manuscript.name}...`)
     await axios({
       method: "POST",
       url: `/api/datasets/${datasetId}/manuscript`,
@@ -101,6 +104,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       },
     })
       .then(({ data }) => {
+        setTaskDesc("Extracting annotations...")
         const newManuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
@@ -108,18 +112,18 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         })
       })
       .then(() => {
-        setIsLoading(false)
+        setTaskStatus("finished")
+        setTaskDesc(`Uploaded ${manuscript.name}.`)
         router.reload()
       })
       .catch((error) => {
-        setIsLoading(false)
-        setErrorMsg(`${getMessageFromError(error)}`)
+        setTaskStatus("error")
+        setTaskDesc(`${getMessageFromError(error)}`)
       })
   }
 
   return (
     <>
-      {isLoading && <Loading description="Uploading manuscript" />}
       <div className={styles.container}>
         <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openModal}>
           Datasources
@@ -137,13 +141,20 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           </Form>
         )}
       </div>
-      {errorMsg && (
-        <InlineNotification
-          hideCloseButton
-          kind="error"
-          subtitle={<span>{errorMsg}</span>}
-          title="Error"
-        />
+      {taskStatus !== "inactive" && (
+        <div className="ar--form-item">
+          <InlineNotification
+            hideCloseButton
+            lowContrast
+            kind={
+              taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
+            }
+            subtitle={<span>{taskDesc}</span>}
+            title={
+              taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
+            }
+          />
+        </div>
       )}
       {!manuscriptId && (
         <Form onSubmit={onUpload}>
