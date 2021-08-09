@@ -208,7 +208,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           Modify datasources
         </Link>
         {datasources.length === 0 && (
-          <div className={styles.infotext}>No datasources found for this project.</div>
+          <InlineNotification
+            hideCloseButton
+            lowContrast
+            kind="info"
+            subtitle={<span>No datasources found for this project.</span>}
+            title="Not Found!"
+          />
         )}
         {datasources.map(({ id, name, uri }) => (
           <div key={id} className={styles.datasource}>

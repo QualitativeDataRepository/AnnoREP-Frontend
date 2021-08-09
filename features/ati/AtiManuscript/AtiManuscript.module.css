@@ -2,13 +2,6 @@
   min-height: 100vh;
 }
 
-.infotext {
-  margin-top: 24px;
-  color: red;
-  font-weight: 500;
-  font-size: 1rem;
-}
-
 .datasource {
   padding-top: 24px;
   display: flex;
