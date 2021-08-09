@@ -13,7 +13,7 @@ import {
 } from "carbon-components-react"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
-import { Popup16, TrashCan16, Upload16 } from "@carbon/icons-react"
+import { Popup16, TrashCan16, Upload16, Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
@@ -125,7 +125,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           Datasources
         </Button>
         {manuscriptId && (
-          <Form onSubmit={onDelete}>
+          <Link target="_blank" href={`/manuscript/${manuscriptId}`} renderIcon={Launch16}>
+            Preview manuscript
+          </Link>
+        )}
+        {manuscriptId && (
+          <Form onSubmit={onDelete} className={styles.deleteManuscript}>
             <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
               Delete manuscript
             </Button>
