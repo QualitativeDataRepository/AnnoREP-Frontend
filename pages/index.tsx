@@ -27,7 +27,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
       <div>
         {isLoggedIn ? (
           <div>
-            <div className={styles.titlecontainer}>
+            <div className={styles.titleContainer}>
               <h1>ATI Projects</h1>
               <Link href="/new" renderIcon={Add16}>
                 New ATI Project
