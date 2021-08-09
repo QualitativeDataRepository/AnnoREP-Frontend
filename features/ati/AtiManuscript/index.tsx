@@ -124,14 +124,20 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
 
   return (
     <>
-      <div className={styles.container}>
-        <Button kind="ghost" size="md" renderIcon={Popup16} onClick={openModal}>
+      <div className={styles.buttonContainer}>
+        <Button kind="ghost" size="sm" renderIcon={Popup16} onClick={openModal}>
           Datasources
         </Button>
         {manuscriptId && (
-          <Link target="_blank" href={`/manuscript/${manuscriptId}`} renderIcon={Launch16}>
+          <Button
+            target="_blank"
+            kind="ghost"
+            size="sm"
+            href={`/manuscript/${manuscriptId}`}
+            renderIcon={Launch16}
+          >
             Preview manuscript
-          </Link>
+          </Button>
         )}
         {manuscriptId && (
           <Form onSubmit={onDelete} className={styles.deleteManuscript}>
@@ -189,7 +195,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         modalLabel="Datasources"
         modalHeading="Copy datasource URL"
         passiveModal={true}
-        size="xs"
         hasScrollingContent={true}
         preventCloseOnClickOutside={true}
         onRequestClose={closeModal}

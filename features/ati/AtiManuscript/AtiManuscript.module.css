@@ -17,15 +17,23 @@
   align-items: center;
 }
 
-.container {
+.buttonContainer {
   display: grid;
-  grid-template-columns: auto auto 1fr;
-  column-gap: 8px;
+  grid-template-columns: none;
+  gap: 8px;
   justify-content: start;
-  align-items: center;
+  align-items: start;
   margin-bottom: 16px;
 }
 
-.deleteManuscript {
-  justify-self: end;
+@media (min-width: 42rem) {
+  .buttonContainer {
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 0px;
+  }
+
+  .deleteManuscript {
+    justify-self: end;
+  }
 }
