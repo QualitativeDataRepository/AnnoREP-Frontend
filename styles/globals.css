@@ -52,10 +52,8 @@ a {
   max-height: 100% !important;
 }
 
-@media screen and (min-width: 42rem) {
-  .ar--datasource-modal {
-    width: 320px !important;
-  }
+.bx--tab-content {
+  padding: 1rem 0;
 }
 
 .react-pdf__Page__textContent span {
@@ -76,4 +74,14 @@ a {
 
 .hypothesis-highlight::selection {
   background-color: blue;
+}
+
+@media screen and (min-width: 42rem) {
+  .ar--datasource-modal {
+    width: 320px !important;
+  }
+
+  .bx--tab-content {
+    padding: 1rem;
+  }
 }
