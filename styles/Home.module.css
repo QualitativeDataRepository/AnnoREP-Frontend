@@ -44,7 +44,7 @@
 
 .titleContainer {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto;
   justify-content: start;
   align-items: start;
   gap: 16px;

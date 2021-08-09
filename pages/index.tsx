@@ -6,7 +6,7 @@ import { getSession } from "next-auth/client"
 import qs from "qs"
 
 import { Add16 } from "@carbon/icons-react"
-import { InlineNotification, Link } from "carbon-components-react"
+import { InlineNotification, Button } from "carbon-components-react"
 
 import AtiProject from "../features/ati/AtiProject"
 import Layout from "../features/components/Layout"
@@ -29,9 +29,9 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
           <div>
             <div className={styles.titleContainer}>
               <h1>ATI Projects</h1>
-              <Link href="/new" renderIcon={Add16}>
+              <Button href="/new" kind="primary" size="sm" renderIcon={Add16}>
                 New ATI Project
-              </Link>
+              </Button>
             </div>
             {atiProjects.map(({ id, title, version, status }) => (
               <AtiProject key={id} id={id} title={title} version={version} status={status} />
@@ -55,9 +55,9 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
               other annotation-based workflows.
             </p>
             <div>
-              <Link href="/new" renderIcon={Add16} size="lg">
+              <Button href="/new" kind="primary" size="sm" renderIcon={Add16}>
                 New ATI Project
-              </Link>
+              </Button>
             </div>
           </div>
         )}
