@@ -26,6 +26,7 @@ const NewAti: FC<NewAtiProps> = ({ isLoggedIn, datasets, serverUrl }) => {
       ) : (
         <InlineNotification
           hideCloseButton
+          lowContrast
           kind="info"
           subtitle={<span>{"Login to create a new ATI project."}</span>}
           title="Unauthorized!"

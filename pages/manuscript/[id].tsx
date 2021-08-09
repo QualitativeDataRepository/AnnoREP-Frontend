@@ -52,6 +52,7 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
     content = (
       <InlineNotification
         hideCloseButton
+        lowContrast
         kind="error"
         subtitle={<span>{errorMsg}</span>}
         title="Error!"
@@ -61,6 +62,7 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
     content = (
       <InlineNotification
         hideCloseButton
+        lowContrast
         kind="info"
         subtitle={
           <span>{isLoggedIn ? "You don't have access to this manuscript." : "Please login."}</span>

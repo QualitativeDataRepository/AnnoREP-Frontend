@@ -78,9 +78,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     return (
       <InlineNotification
         hideCloseButton
+        lowContrast
         kind="error"
-        subtitle={<span>{"AnnoRep's Hypothes.is API token is invalid."}</span>}
-        title="Error"
+        subtitle={<span>{"AnnoREP's Hypothes.is API token is invalid."}</span>}
+        title="Error!"
       />
     )
   }
@@ -111,9 +112,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             <div className="ar--form-item">
               <InlineNotification
                 hideCloseButton
+                lowContrast
                 kind={hasError ? "error" : "success"}
                 subtitle={<span>{formMsg}</span>}
-                title={hasError ? "Error" : "Success"}
+                title={hasError ? "Error!" : "Success!"}
               />
             </div>
           )}

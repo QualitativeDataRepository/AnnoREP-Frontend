@@ -56,9 +56,10 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
             <div className="ar--form-item">
               <InlineNotification
                 hideCloseButton
+                lowContrast
                 kind="error"
                 subtitle={<span>{errorMsg}</span>}
-                title="Error"
+                title="Error!"
               />
             </div>
           )}

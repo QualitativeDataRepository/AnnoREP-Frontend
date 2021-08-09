@@ -50,6 +50,7 @@ const Ati: FC<AtiProps> = ({
       ) : (
         <InlineNotification
           hideCloseButton
+          lowContrast
           kind="error"
           subtitle={<span>{"You don't have access to this ATI project."}</span>}
           title="Unauthorized!"
