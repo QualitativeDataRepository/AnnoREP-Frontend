@@ -13,10 +13,10 @@
   padding: 24px;
 }
 
-.maxwidth {
+.maxWidth {
   max-width: 1280px;
 }
 
-.fullmaxwidth {
+.fullMaxWidth {
   max-width: 100%;
 }

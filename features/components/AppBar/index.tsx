@@ -17,7 +17,7 @@ const AppBar: FC<AppBarProps> = ({ isLoggedIn }) => {
   return (
     <nav className={styles.container}>
       <Link href="/">
-        <div className={styles.logolink}>AnnoREP</div>
+        <div className={styles.logoLink}>AnnoREP</div>
       </Link>
       {isLoggedIn ? <LogoutLink handleLogout={handleLougout} /> : <LoginLink />}
     </nav>

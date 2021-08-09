@@ -18,7 +18,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const { manuscript, datasources } = atiProjectDetails
 
   return (
-    <div className={layoutStyles.maxwidth}>
+    <div className={layoutStyles.maxWidth}>
       <section aria-label="about" className={styles.section}>
         <h2 className={styles.header}>About</h2>
         <p>
@@ -52,7 +52,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       </section>
       <section aria-label="datasources" className={styles.section}>
         <h2 className={styles.header}>Datasources</h2>
-        <div className={styles.listcontainer}>
+        <div className={styles.listContainer}>
           <UnorderedList>
             {datasources.map(({ id, name }) => (
               <ListItem key={id}>{name}</ListItem>

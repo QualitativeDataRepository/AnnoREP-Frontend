@@ -44,9 +44,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
       })
   }
   return (
-    <div className={layoutStyles.maxwidth}>
+    <div className={layoutStyles.maxWidth}>
       <h2>Danger zone</h2>
-      <div className={styles.dangerzone}>
+      <div className={styles.dangerZone}>
         <Form onSubmit={onSubmit}>
           <div className={styles.title}>
             Delete <abbr>ATI</abbr> project

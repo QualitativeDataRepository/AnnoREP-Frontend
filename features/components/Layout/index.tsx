@@ -23,7 +23,7 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth }) =
       </Head>
       <div className={styles.container}>
         <AppBar isLoggedIn={isLoggedIn} />
-        <main className={`${styles.main} ${isFullWidth ? styles.fullmaxwidth : styles.maxwidth}`}>
+        <main className={`${styles.main} ${isFullWidth ? styles.fullMaxWidth : styles.maxWidth}`}>
           {children}
         </main>
       </div>

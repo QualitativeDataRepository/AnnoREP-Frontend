@@ -18,7 +18,7 @@ export interface AtiProjectProps {
 /**A summary view of an ati project */
 const AtiProject: FC<AtiProjectProps> = ({ id, title, version, status }) => {
   return (
-    <section aria-label={title} className={styles.atiproject}>
+    <section aria-label={title} className={styles.atiProject}>
       <h2>
         <Link href={`/ati/${id}`}>
           <a className="bx--link bx--link--lg" href={`/ati/${id}`}>

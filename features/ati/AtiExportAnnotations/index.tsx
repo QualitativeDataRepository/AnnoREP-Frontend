@@ -92,7 +92,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
   return (
     <>
-      <div className={layoutStyles.maxwidth}>
+      <div className={layoutStyles.maxWidth}>
         <Form onSubmit={onSumbit}>
           <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
           {manuscript.ingest && (
