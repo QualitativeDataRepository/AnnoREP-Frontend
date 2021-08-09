@@ -73,7 +73,7 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
   return (
     <>
       <Head>
-        <title>Manuscript</title>
+        <title>AnnoREP - Manuscript</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <script src="https://hypothes.is/embed.js" async></script>
