@@ -9,8 +9,8 @@ import {
   Select,
   SelectItem,
   Link,
-  Loading,
   InlineNotification,
+  InlineLoadingStatus,
 } from "carbon-components-react"
 import { useRouter } from "next/router"
 
@@ -29,8 +29,8 @@ export interface NewAtiProjectFormProps {
 /**Form to create a new ATI project */
 const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) => {
   const router = useRouter()
-  const [errorMsg, setErrorMsg] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
+  const [taskDesc, setTaskDesc] = useState<string>("")
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
@@ -38,7 +38,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       manuscript: { files: FileList }
     }
     if (target.manuscript.files.length === 0) {
-      setErrorMsg("Please upload a manuscript file.")
+      setTaskStatus("error")
+      setTaskDesc("Please upload a manuscript file.")
       return
     }
     const firstFourBytes = await target.manuscript.files[0].slice(0, 4).arrayBuffer()
@@ -51,7 +52,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       const msg = target.manuscript.files[0].type
         ? `${target.manuscript.files[0].type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
-      setErrorMsg(msg)
+      setTaskStatus("error")
+      setTaskDesc(msg)
       return
     }
     let manuscript = target.manuscript.files[0]
@@ -60,13 +62,14 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     }
     const formData = new FormData()
     formData.append("manuscript", manuscript)
-    setIsLoading(true)
-    setErrorMsg("")
+    setTaskStatus("active")
+    setTaskDesc("Creating ATI project...")
     await axios({
       method: "PUT",
       url: `/api/datasets/${target.dataset.value}/annorep`,
     })
       .then(() => {
+        setTaskDesc("Uploading manuscript...")
         return axios({
           method: "POST",
           url: `/api/datasets/${target.dataset.value}/manuscript`,
@@ -77,6 +80,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
         })
       })
       .then(({ data }) => {
+        setTaskDesc("Extracting annotations...")
         const manuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
@@ -84,18 +88,18 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
         })
       })
       .then(() => {
-        setIsLoading(false)
+        setTaskStatus("finished")
+        setTaskDesc(`Created ATI project for dataset ${target.dataset.value}.`)
         router.push(`/ati/${target.dataset.value}`)
       })
       .catch((error) => {
-        setIsLoading(false)
-        setErrorMsg(`${getMessageFromError(error)}`)
+        setTaskStatus("error")
+        setTaskDesc(`${getMessageFromError(error)}`)
       })
   }
   //TODO: is ownerId=1 justified?
   return (
     <>
-      {isLoading && <Loading description="Creating ATI project" />}
       <div className="ar--form-container">
         <Form encType="multipart/form-data" onSubmit={onSubmit}>
           <h1 className="ar--form-title">
@@ -115,13 +119,22 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
               Create dataset
             </Link>
           </div>
-          {errorMsg && (
+          {taskStatus !== "inactive" && (
             <div className="ar--form-item">
               <InlineNotification
                 hideCloseButton
-                kind="error"
-                subtitle={<span>{errorMsg}</span>}
-                title="Error"
+                lowContrast
+                kind={
+                  taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
+                }
+                subtitle={<span>{taskDesc}</span>}
+                title={
+                  taskStatus === "active"
+                    ? "Status"
+                    : taskStatus === "finished"
+                    ? "Success!"
+                    : "Error!"
+                }
               />
             </div>
           )}
