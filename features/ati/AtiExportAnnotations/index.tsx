@@ -40,7 +40,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       const arrayStr = encodeURIComponent(`[${jsonStrs.join(",")}]`)
       setAnnotationsJsonStr(arrayStr)
     }
-    getAnnotationsJson()
+    if (manuscript.id) {
+      getAnnotationsJson()
+    }
   }, [manuscript.id])
 
   const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -103,12 +105,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               >
                 Download manuscript
               </Link>
-              <Link
-                href={`data:application/json;charset=utf-8,${annotationsJsonStr}`}
-                download={`annotations.json`}
-              >
-                Download annotations
-              </Link>
+              {manuscript.id && (
+                <Link
+                  href={`data:application/json;charset=utf-8,${annotationsJsonStr}`}
+                  download={`annotations.json`}
+                >
+                  Download annotations
+                </Link>
+              )}
             </div>
           )}
           {taskStatus !== "inactive" && (
