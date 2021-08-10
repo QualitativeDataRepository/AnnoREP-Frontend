@@ -1,6 +1,7 @@
 import { FC, FormEventHandler, useState } from "react"
 
 import axios from "axios"
+import { TrashCan16 } from "@carbon/icons-react"
 import { Button, Form, InlineNotification, InlineLoadingStatus } from "carbon-components-react"
 import { useRouter } from "next/router"
 
@@ -74,7 +75,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
               />
             </div>
           )}
-          <Button type="submit" kind="danger" size="sm">
+          <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
             Delete
           </Button>
         </Form>
