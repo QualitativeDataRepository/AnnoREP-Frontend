@@ -1,6 +1,7 @@
 import { FC } from "react"
 
 import { Tabs, Tab } from "carbon-components-react"
+import { useRouter } from "next/router"
 
 import AtiExportAnnotations from "../AtiExportAnnotations"
 import AtiManuscript from "../AtiManuscript"
@@ -9,7 +10,8 @@ import AtiSummary from "../AtiSummary"
 
 import { AtiTab, IAtiTab, tabs } from "../../../constants/ati"
 import { IATIProjectDetails } from "../../../types/dataverse"
-import { useRouter } from "next/router"
+
+import styles from "./AtiProjectDetails.module.css"
 
 interface ATIProjectDetailsProps {
   serverUrl: string
@@ -38,7 +40,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
   return (
     <>
       <h1>{atiProjectDetails.dataset.title}</h1>
-      <Tabs selected={selectedTab} onSelectionChange={onSelectionChange}>
+      <Tabs className={styles.tabs} selected={selectedTab} onSelectionChange={onSelectionChange}>
         <Tab {...AtiTab.summary}>
           <AtiSummary serverUrl={serverUrl} atiProjectDetails={atiProjectDetails} />
         </Tab>
