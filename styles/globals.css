@@ -52,8 +52,9 @@ a {
   max-height: 100% !important;
 }
 
-.bx--tab-content {
-  padding: 1rem 0;
+.bx--inline-notification {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .react-pdf__Page__textContent span {
@@ -79,9 +80,5 @@ a {
 @media screen and (min-width: 42rem) {
   .ar--datasource-modal {
     width: 320px !important;
-  }
-
-  .bx--tab-content {
-    padding: 1rem;
   }
 }
