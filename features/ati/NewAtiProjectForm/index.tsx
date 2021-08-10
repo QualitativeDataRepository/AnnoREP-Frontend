@@ -2,6 +2,7 @@ import React, { FC, FormEventHandler, useState } from "react"
 
 import FormData from "form-data"
 import axios from "axios"
+import { Add16 } from "@carbon/icons-react"
 import {
   Button,
   Form,
@@ -182,7 +183,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
               size="small"
             />
           </div>
-          <Button className="ar--form-submit-btn" type="submit">
+          <Button className="ar--form-submit-btn" type="submit" renderIcon={Add16}>
             Create project
           </Button>
         </Form>
