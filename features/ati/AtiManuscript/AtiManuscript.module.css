@@ -10,13 +10,22 @@
   align-items: center;
 }
 
+.blackButton > svg {
+  color: black;
+}
+
 .buttonContainer {
   display: grid;
-  grid-template-columns: none;
-  gap: 8px;
+  grid-template-columns: auto auto 1fr;
+  gap: 0px;
   justify-content: start;
-  align-items: start;
+  align-items: center;
   margin-bottom: 16px;
+  background-color: whitesmoke;
+}
+
+.deleteManuscript {
+  justify-self: end;
 }
 
 .datasourceModal {
@@ -32,16 +41,6 @@
 }
 
 @media (min-width: 42rem) {
-  .buttonContainer {
-    grid-template-columns: auto auto 1fr;
-    align-items: center;
-    gap: 0px;
-  }
-
-  .deleteManuscript {
-    justify-self: end;
-  }
-
   .datasourceModal {
     width: 320px;
   }

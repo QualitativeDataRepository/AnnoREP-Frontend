@@ -13,7 +13,7 @@ import {
 } from "carbon-components-react"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
-import { Document16, TrashCan16, Upload16, Launch16 } from "@carbon/icons-react"
+import { Document20, TrashCan20, Upload16, Launch20 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
@@ -125,24 +125,46 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   return (
     <>
       <div className={styles.buttonContainer}>
-        <Button kind="ghost" size="sm" renderIcon={Document16} onClick={openModal}>
-          Datasources
+        <Button
+          className={styles.blackButton}
+          kind="ghost"
+          size="md"
+          hasIconOnly
+          iconDescription="Show datasources"
+          tooltipPosition="top"
+          tooltipAlignment="start"
+          onClick={openModal}
+        >
+          <Document20 />
         </Button>
         {manuscriptId && (
           <Button
+            className={styles.blackButton}
+            as="a"
             target="_blank"
             kind="ghost"
-            size="sm"
+            size="md"
             href={`/manuscript/${manuscriptId}`}
-            renderIcon={Launch16}
+            hasIconOnly
+            iconDescription="Preview manuscript"
+            tooltipPosition="top"
+            tooltipAlignment="start"
           >
-            Preview manuscript
+            <Launch20 />
           </Button>
         )}
         {manuscriptId && (
           <Form onSubmit={onDelete} className={styles.deleteManuscript}>
-            <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
-              Delete manuscript
+            <Button
+              type="submit"
+              kind="danger"
+              size="md"
+              hasIconOnly
+              iconDescription="Delete manuscript"
+              tooltipPosition="top"
+              tooltipAlignment="end"
+            >
+              <TrashCan20 />
             </Button>
           </Form>
         )}
