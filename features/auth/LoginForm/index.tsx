@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FC, FormEventHandler } from "react"
 
+import { Login16 } from "@carbon/icons-react"
 import { Button, Form, TextInput, Link } from "carbon-components-react"
 
 export interface LoginFormProps {
@@ -143,7 +144,7 @@ const LoginForm: FC<LoginFormProps> = ({
             onChange={onHypothesisApiTokenChange}
           />
         </div>
-        <Button className="ar--form-submit-btn" type="submit">
+        <Button className="ar--form-submit-btn" type="submit" renderIcon={Login16}>
           Login
         </Button>
       </Form>
