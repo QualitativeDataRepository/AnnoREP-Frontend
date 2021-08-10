@@ -5,6 +5,8 @@ import { Button, Form, TextInput, Link } from "carbon-components-react"
 export interface LoginFormProps {
   /**The dataverse server url */
   dataverseServerUrl: string
+  /**The dataverse site url */
+  dataverseSiteUrl: string
   /**The dataverse api token */
   dataverseApiToken: string
   /**Is the dataverse api token valid? */
@@ -28,6 +30,7 @@ export interface LoginFormProps {
 /** Login Form */
 const LoginForm: FC<LoginFormProps> = ({
   dataverseServerUrl,
+  dataverseSiteUrl,
   dataverseApiToken,
   dataverseApiTokenIsInvalid,
   dataverseApiTokenInvalidText,
@@ -69,7 +72,7 @@ const LoginForm: FC<LoginFormProps> = ({
               <div>
                 <Link
                   size="sm"
-                  href={`${dataverseServerUrl}/user/login`}
+                  href={`${dataverseSiteUrl}/user/login`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

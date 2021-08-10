@@ -14,6 +14,7 @@ export const Default = Template.bind({})
 export const Valid = Template.bind({})
 Valid.args = {
   dataverseServerUrl: "https://dv.dev-aws.qdr.org",
+  dataverseSiteUrl: "https://dev-aws.qdr.org",
   dataverseApiToken: "123",
   dataverseApiTokenIsInvalid: false,
   hypothesisApiToken: "123",
@@ -23,6 +24,7 @@ Valid.args = {
 export const Invalid = Template.bind({})
 Invalid.args = {
   dataverseServerUrl: "https://dv.dev-aws.qdr.org",
+  dataverseSiteUrl: "https://dev-aws.qdr.org",
   dataverseApiToken: "123",
   dataverseApiTokenIsInvalid: true,
   dataverseApiTokenInvalidText: "A valid Dataverse API token is required.",
