@@ -13,7 +13,7 @@ import {
 } from "carbon-components-react"
 import FormData from "form-data"
 import { CopyToClipboard } from "react-copy-to-clipboard"
-import { Popup16, TrashCan16, Upload16, Launch16 } from "@carbon/icons-react"
+import { Document16, TrashCan16, Upload16, Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
@@ -125,7 +125,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   return (
     <>
       <div className={styles.buttonContainer}>
-        <Button kind="ghost" size="sm" renderIcon={Popup16} onClick={openModal}>
+        <Button kind="ghost" size="sm" renderIcon={Document16} onClick={openModal}>
           Datasources
         </Button>
         {manuscriptId && (
