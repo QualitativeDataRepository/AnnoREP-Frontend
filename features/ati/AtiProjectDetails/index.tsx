@@ -49,6 +49,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
             datasetId={atiProjectDetails.dataset.id}
             doi={atiProjectDetails.dataset.doi}
             manuscriptId={atiProjectDetails.manuscript.id}
+            manuscriptName={atiProjectDetails.manuscript.name}
             datasources={atiProjectDetails.datasources}
             serverUrl={serverUrl}
           />

@@ -29,12 +29,14 @@ interface AtiManuscriptProps {
   datasources: IDatasource[]
   serverUrl: string
   manuscriptId?: string
+  manuscriptName?: string
 }
 
 const AtiManuscript: FC<AtiManuscriptProps> = ({
   datasetId,
   doi,
   manuscriptId,
+  manuscriptName,
   datasources,
   serverUrl,
 }) => {
@@ -54,7 +56,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       .delete(`/api/delete-file/${id}`)
       .then(() => {
         setTaskStatus("finished")
-        setTaskDesc(`Deleted manuscript ${manuscriptId}.`)
+        setTaskDesc(`Deleted ${manuscriptName}.`)
         router.reload()
       })
       .catch((error) => {
@@ -104,7 +106,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       },
     })
       .then(({ data }) => {
-        setTaskDesc("Extracting annotations...")
+        setTaskDesc(`Extracting annotations from ${manuscript.name}...`)
         const newManuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
