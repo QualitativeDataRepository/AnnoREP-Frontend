@@ -28,7 +28,7 @@ const NewAti: FC<NewAtiProps> = ({ isLoggedIn, datasets, serverUrl }) => {
           hideCloseButton
           lowContrast
           kind="info"
-          subtitle={<span>{"Login to create a new ATI project."}</span>}
+          subtitle={<span>{"Please login to create a new ATI project."}</span>}
           title="Unauthorized!"
         />
       )}
