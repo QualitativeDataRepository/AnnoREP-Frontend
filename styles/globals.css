@@ -40,18 +40,6 @@ a {
   color: #525252;
 }
 
-.ar--datasource-modal {
-  background-color: transparent !important;
-  justify-content: flex-start !important;
-  width: 100vw !important;
-}
-
-.ar--datasource-modal > .bx--modal-container {
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 100% !important;
-}
-
 .bx--inline-notification {
   width: 100% !important;
   max-width: 100% !important;
@@ -75,10 +63,4 @@ a {
 
 .hypothesis-highlight::selection {
   background-color: blue;
-}
-
-@media screen and (min-width: 42rem) {
-  .ar--datasource-modal {
-    width: 320px !important;
-  }
 }

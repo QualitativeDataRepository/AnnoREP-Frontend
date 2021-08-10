@@ -189,7 +189,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         </Form>
       )}
       <Modal
-        className="ar--datasource-modal"
+        className={styles.datasourceModal}
         aria-label="Datasources"
         open={modalIsOpen}
         modalLabel="Datasources"
