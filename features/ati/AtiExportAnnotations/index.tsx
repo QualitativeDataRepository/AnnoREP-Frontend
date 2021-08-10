@@ -1,6 +1,7 @@
 import { FC, useState, FormEventHandler, useEffect } from "react"
 
 import axios from "axios"
+import { Export16 } from "@carbon/icons-react"
 import {
   Link,
   TextInput,
@@ -146,7 +147,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               size="xl"
             />
           </div>
-          <Button className="ar--form-submit-btn" type="submit">
+          <Button className="ar--form-submit-btn" type="submit" renderIcon={Export16}>
             Export annotations
           </Button>
         </Form>
