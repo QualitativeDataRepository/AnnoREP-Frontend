@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         await Promise.all(copyAnns)
         res.status(200).json({
-          message: `Exported ${annotations.length} annotations from source manuscript ${id} to ${url}.`,
+          totalExported: annotations.length,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)

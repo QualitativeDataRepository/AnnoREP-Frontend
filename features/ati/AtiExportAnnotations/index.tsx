@@ -73,7 +73,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       })
       .then(({ data }) => {
         setTaskStatus("finished")
-        setTaskDesc(`${data.message}`)
+        setTaskDesc(
+          `Exported ${data.totalExported} annotation(s) from ${manuscript.name} to ${target.destinationUrl.value}.`
+        )
       })
       .catch((e) => {
         setTaskStatus("error")
