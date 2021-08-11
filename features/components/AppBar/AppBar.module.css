@@ -1,5 +1,5 @@
 .container {
-  background-color: whitesmoke;
+  border-bottom: 1px solid #dbdbdb;
   padding: 16px;
   width: 100%;
   display: flex;
