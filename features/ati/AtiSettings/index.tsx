@@ -5,7 +5,7 @@ import { TrashCan16 } from "@carbon/icons-react"
 import { Button, Form, InlineNotification, InlineLoadingStatus } from "carbon-components-react"
 import { useRouter } from "next/router"
 
-import { IDataset } from "../../../types/dataverse"
+import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiSettings.module.css"
@@ -13,10 +13,10 @@ import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface AtiSettingsProps {
   dataset: IDataset
-  manuscriptId: string
+  manuscript: IManuscript
 }
 
-const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
+const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
   const router = useRouter()
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
@@ -27,16 +27,16 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscriptId }) => {
     await axios
       .put(`/api/datasets/${dataset.id}/annorep/delete`)
       .then(() => {
-        if (manuscriptId) {
-          setTaskDesc("Deleting manuscript...")
-          return axios.delete(`/api/delete-file/${manuscriptId}`)
+        if (manuscript.id) {
+          setTaskDesc(`Deleting manuscript ${manuscript.name}...`)
+          return axios.delete(`/api/delete-file/${manuscript.id}`)
         } else {
           return Promise.resolve<any>("Skip!")
         }
       })
       .then(() => {
         setTaskStatus("finished")
-        setTaskDesc("Deleted ATI project.")
+        setTaskDesc(`Deleted ATI project from dataset ${dataset.title}.`)
         router.push("/")
       })
       .catch((error) => {

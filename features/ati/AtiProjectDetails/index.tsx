@@ -63,7 +63,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
         <Tab {...AtiTab.settings}>
           <AtiSettings
             dataset={atiProjectDetails.dataset}
-            manuscriptId={atiProjectDetails.manuscript.id}
+            manuscript={atiProjectDetails.manuscript}
           />
         </Tab>
       </Tabs>
