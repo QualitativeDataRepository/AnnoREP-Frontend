@@ -236,7 +236,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             hideCloseButton
             lowContrast
             kind="info"
-            subtitle={<span>No datasources found for this project.</span>}
+            subtitle={<span>No datasource(s) found.</span>}
             title="Not Found!"
           />
         )}

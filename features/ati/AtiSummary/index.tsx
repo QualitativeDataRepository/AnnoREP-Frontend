@@ -52,13 +52,17 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       </section>
       <section aria-label="datasources" className={styles.section}>
         <h2 className={styles.header}>Datasources</h2>
-        <div className={styles.listContainer}>
-          <UnorderedList>
-            {datasources.map(({ id, name }) => (
-              <ListItem key={id}>{name}</ListItem>
-            ))}
-          </UnorderedList>
-        </div>
+        {datasources.length === 0 ? (
+          <p>No datasource(s) found.</p>
+        ) : (
+          <div className={styles.listContainer}>
+            <UnorderedList>
+              {datasources.map(({ id, name }) => (
+                <ListItem key={id}>{name}</ListItem>
+              ))}
+            </UnorderedList>
+          </div>
+        )}
       </section>
     </div>
   )
