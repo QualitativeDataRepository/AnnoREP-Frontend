@@ -15,6 +15,7 @@ import styles from "./AtiProjectDetails.module.css"
 
 interface ATIProjectDetailsProps {
   serverUrl: string
+  siteUrl: string
   atiProjectDetails: IATIProjectDetails
   canExportAnnotations: boolean
   atiTab: IAtiTab
@@ -22,6 +23,7 @@ interface ATIProjectDetailsProps {
 
 const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
   serverUrl,
+  siteUrl,
   atiProjectDetails,
   canExportAnnotations,
   atiTab,
@@ -59,6 +61,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
             <AtiExportAnnotations
               manuscript={atiProjectDetails.manuscript}
               canExportAnnotations={canExportAnnotations}
+              dataverseSiteUrl={siteUrl}
             />
           ) : (
             <InlineNotification

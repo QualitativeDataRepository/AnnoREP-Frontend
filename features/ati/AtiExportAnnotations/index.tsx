@@ -20,11 +20,13 @@ import layoutStyles from "../../components/Layout/Layout.module.css"
 interface AtiExportAnnotationstProps {
   manuscript: IManuscript
   canExportAnnotations: boolean
+  dataverseSiteUrl: string
 }
 
 const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   canExportAnnotations,
+  dataverseSiteUrl,
 }) => {
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
@@ -89,6 +91,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         hideCloseButton
         lowContrast
         kind="error"
+        actions={
+          <Button
+            as="a"
+            href={`${dataverseSiteUrl}/content/contact`}
+            target="_blank"
+            rel="noopener noreferrer"
+            kind="ghost"
+          >
+            Report
+          </Button>
+        }
         subtitle={<span>{"AnnoREP's Hypothes.is API token is invalid."}</span>}
         title="Error!"
       />

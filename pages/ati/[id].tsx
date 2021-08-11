@@ -22,6 +22,7 @@ import { getResponseFromError } from "../../utils/httpRequestUtils"
 interface AtiProps {
   isLoggedIn: boolean
   serverUrl: string
+  siteUrl: string
   canExportAnnotations: boolean
   atiTab: IAtiTab
   atiProjectDetails?: IATIProjectDetails
@@ -30,6 +31,7 @@ interface AtiProps {
 const Ati: FC<AtiProps> = ({
   isLoggedIn,
   serverUrl,
+  siteUrl,
   canExportAnnotations,
   atiProjectDetails,
   atiTab,
@@ -43,6 +45,7 @@ const Ati: FC<AtiProps> = ({
       {atiProjectDetails ? (
         <ATIProjectDetails
           serverUrl={serverUrl}
+          siteUrl={siteUrl}
           atiProjectDetails={atiProjectDetails}
           canExportAnnotations={canExportAnnotations}
           atiTab={atiTab}
@@ -160,6 +163,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       isLoggedIn: session ? true : false,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
+      siteUrl: process.env.DATAVERSE_SITE_URL,
       atiProjectDetails:
         responses.length === 1
           ? createAtiProjectDetails(responses[0], datasetZip, ingestPdf)
