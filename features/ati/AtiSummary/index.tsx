@@ -48,7 +48,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       </section>
       <section aria-label="manuscript" className={styles.section}>
         <h2 className={styles.header}>Manuscript</h2>
-        <p>{manuscript.name}</p>
+        <p>{manuscript.name || "No manuscript found."}</p>
       </section>
       <section aria-label="datasources" className={styles.section}>
         <h2 className={styles.header}>Datasources</h2>
