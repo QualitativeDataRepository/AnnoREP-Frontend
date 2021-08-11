@@ -14,7 +14,7 @@ import {
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../constants/dataverse"
-import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
+import { REQUEST_DESC_HEADER_NAME, SKIP_RESPONSE } from "../../constants/http"
 import { IATIProjectDetails } from "../../types/dataverse"
 import { createAtiProjectDetails } from "../../utils/dataverseUtils"
 import { getResponseFromError } from "../../utils/httpRequestUtils"
@@ -71,63 +71,83 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let ingestPdf = ""
   if (session && datasetId) {
     const { dataverseApiToken } = session
-    await Promise.all([
-      //Get the dataset json
-      axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
+    try {
+      //Is the qdr hypothesis api token valid?
+      const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
+        headers: {
+          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
+        },
+      })
+      if (data.userid !== null) {
+        //The qdr hypothesis api token is valid
+        canExportAnnotations = true
+      }
+    } catch (e) {
+      const { status, message } = getResponseFromError(e)
+      console.error(status, message)
+    }
+    //Get the dataset json
+    await axios
+      .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
           [REQUEST_DESC_HEADER_NAME]: `Getting JSON for dataset ${datasetId}`,
           Accept: "application/json",
         },
-      }),
-      //Get the dataset zip
-      axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
-        responseType: "arraybuffer",
-        headers: {
-          [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-          [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
-          Accept: "application/zip",
-        },
-      }),
-      //Is the qdr hypothesis api token valid?
-      axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
-        headers: {
-          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
-        },
-      }),
-    ])
-      .then((axiosResponses) => {
+      })
+      .then((datasetJsonResponse) => {
         //Add dataset json
-        responses.push(axiosResponses[0])
-        //Get the dataset zip
-        datasetZip = Buffer.from(axiosResponses[1].data, "binary").toString("base64")
-        if (axiosResponses[2].data.userid !== null) {
-          //The qdr hypothesis api token is valid
-          canExportAnnotations = true
-        }
-        const latest = axiosResponses[0].data.data.latestVersion
+        responses.push(datasetJsonResponse)
+
+        const latest = datasetJsonResponse.data.data.latestVersion
         const manuscript = latest.files.find(
           (file: any) =>
             file.directoryLabel === ANNOREP_METADATA_VALUE &&
             file.description === SOURCE_MANUSCRIPT_TAG
         )
-        if (manuscript.dataFile.id) {
+        const promises: Promise<AxiosResponse<any> | any>[] = []
+        if (manuscript && manuscript.dataFile.id) {
           //Get the ingest pdf
-          return axios.get(
-            `${process.env.ARCORE_SERVER_URL}/api/documents/${manuscript.dataFile.id}/pdf`,
-            {
+          promises.push(
+            axios.get(
+              `${process.env.ARCORE_SERVER_URL}/api/documents/${manuscript.dataFile.id}/pdf`,
+              {
+                responseType: "arraybuffer",
+                headers: {
+                  [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                  Accept: "application/pdf",
+                },
+              }
+            )
+          )
+        } else {
+          promises.push(Promise.resolve(SKIP_RESPONSE))
+        }
+
+        if (latest.files.length > 0) {
+          //Get the dataset zip
+          promises.push(
+            axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
               responseType: "arraybuffer",
               headers: {
                 [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-                Accept: "application/pdf",
+                [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
+                Accept: "application/zip",
               },
-            }
+            })
           )
+        } else {
+          promises.push(Promise.resolve(SKIP_RESPONSE))
         }
+
+        return Promise.all(promises)
       })
-      .then((ingestPdfResponse) => {
-        if (ingestPdfResponse) {
-          ingestPdf = Buffer.from(ingestPdfResponse.data, "binary").toString("base64")
+      .then((responses) => {
+        if (responses[0] !== SKIP_RESPONSE) {
+          ingestPdf = Buffer.from(responses[0].data, "binary").toString("base64")
+        }
+        if (responses[1] !== SKIP_RESPONSE) {
+          datasetZip = Buffer.from(responses[1].data, "binary").toString("base64")
         }
       })
       .catch((e) => {
