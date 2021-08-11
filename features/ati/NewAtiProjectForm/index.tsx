@@ -35,7 +35,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
-      dataset: { value: string }
+      dataset: { value: string; selectedIndex: number }
       manuscript: { files: FileList }
     }
     if (target.manuscript.files.length === 0) {
@@ -70,7 +70,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       url: `/api/datasets/${target.dataset.value}/annorep`,
     })
       .then(() => {
-        setTaskDesc("Uploading manuscript...")
+        setTaskDesc(`Uploading ${manuscript.name}...`)
         return axios({
           method: "POST",
           url: `/api/datasets/${target.dataset.value}/manuscript`,
@@ -81,7 +81,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
         })
       })
       .then(({ data }) => {
-        setTaskDesc("Extracting annotations...")
+        setTaskDesc(`Extracting annotations from ${manuscript.name}...`)
         const manuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
@@ -90,7 +90,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       })
       .then(() => {
         setTaskStatus("finished")
-        setTaskDesc(`Created ATI project for dataset ${target.dataset.value}.`)
+        // - 1 because there is an empty placeholder option
+        setTaskDesc(
+          `Created ATI project for dataset ${datasets[target.dataset.selectedIndex - 1].title}.`
+        )
         router.push(`/ati/${target.dataset.value}`)
       })
       .catch((error) => {
