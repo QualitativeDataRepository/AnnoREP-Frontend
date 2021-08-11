@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { Tabs, Tab } from "carbon-components-react"
+import { Tabs, Tab, InlineNotification } from "carbon-components-react"
 import { useRouter } from "next/router"
 
 import AtiExportAnnotations from "../AtiExportAnnotations"
@@ -55,10 +55,20 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
           />
         </Tab>
         <Tab {...AtiTab.exportAnnotations}>
-          <AtiExportAnnotations
-            manuscript={atiProjectDetails.manuscript}
-            canExportAnnotations={canExportAnnotations}
-          />
+          {atiProjectDetails.manuscript.id ? (
+            <AtiExportAnnotations
+              manuscript={atiProjectDetails.manuscript}
+              canExportAnnotations={canExportAnnotations}
+            />
+          ) : (
+            <InlineNotification
+              hideCloseButton
+              lowContrast
+              kind="info"
+              subtitle={<span>This project has no annotations to export.</span>}
+              title="No manuscript found!"
+            />
+          )}
         </Tab>
         <Tab {...AtiTab.settings}>
           <AtiSettings
