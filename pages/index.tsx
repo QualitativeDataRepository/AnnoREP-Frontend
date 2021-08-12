@@ -43,7 +43,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
           </div>
         ) : (
           <div className={styles.callout}>
-            <h1>AnnoREP</h1>
+            <h1>About</h1>
             <p>
               AnnoREP is an open-source, web-based tool that will help facilitate{" "}
               <a href={"https://qdr.syr.edu/ati"}>Annotation for Transprent Inquiry (ATI)</a> and

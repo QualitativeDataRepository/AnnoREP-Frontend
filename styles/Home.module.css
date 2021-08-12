@@ -1,17 +1,12 @@
 .callout {
   display: grid;
-  grid-template-columns: auto;
-  justify-content: center;
-  align-items: center;
   row-gap: 8px;
+  max-width: 32rem;
+  margin: auto;
 }
 
 .callout p {
   font-size: 1rem;
-}
-
-.callout * {
-  text-align: center;
 }
 
 .loggedInContainer {
