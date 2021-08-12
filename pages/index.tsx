@@ -8,7 +8,7 @@ import qs from "qs"
 import { Add16 } from "@carbon/icons-react"
 import { InlineNotification, Button } from "carbon-components-react"
 
-import AtiProject from "../features/ati/AtiProject"
+import AtiProjects from "../features/ati/AtiProjects"
 import Layout from "../features/components/Layout"
 
 import { IAtiProject } from "../types/ati"
@@ -33,10 +33,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
                 New ATI Project
               </Button>
             </div>
-            {atiProjects.map(({ id, title, version, status }) => (
-              <AtiProject key={id} id={id} title={title} version={version} status={status} />
-            ))}
-            {atiProjects.length === 0 && (
+            {atiProjects.length === 0 ? (
               <InlineNotification
                 hideCloseButton
                 lowContrast
@@ -44,6 +41,8 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
                 subtitle={<span>No current ATI projects.</span>}
                 title="Info"
               />
+            ) : (
+              <AtiProjects atiProjects={atiProjects} />
             )}
           </div>
         ) : (
