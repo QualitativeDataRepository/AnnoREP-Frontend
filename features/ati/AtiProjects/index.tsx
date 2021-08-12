@@ -2,6 +2,7 @@ import { FC, useState } from "react"
 
 import { Add16 } from "@carbon/icons-react"
 import { PaginationNav, Button } from "carbon-components-react"
+import Link from "next/link"
 
 import AtiProject from "../AtiProject"
 
@@ -31,9 +32,11 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects }) => {
   return (
     <>
       <div className={styles.paginationDesc}>
-        <Button href="/new" kind="primary" size="sm" renderIcon={Add16}>
-          New ATI Project
-        </Button>
+        <Link href="/new">
+          <Button kind="primary" size="sm" renderIcon={Add16}>
+            New ATI Project
+          </Button>
+        </Link>
         <div>{`${currentFirst} to ${currentLast} of ${atiProjects.length} project(s)`}</div>
       </div>
       {activeAtiProjects.map(({ id, title, version, status }) => (

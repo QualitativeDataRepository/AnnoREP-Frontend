@@ -2,6 +2,7 @@ import { FC } from "react"
 
 import axios from "axios"
 import { GetServerSideProps } from "next"
+import Link from "next/link"
 import { getSession } from "next-auth/client"
 import qs from "qs"
 
@@ -49,9 +50,11 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
               other annotation-based workflows.
             </p>
             <div>
-              <Button href="/new" kind="primary" size="sm" renderIcon={Add16}>
-                New ATI Project
-              </Button>
+              <Link href="/new">
+                <Button kind="primary" size="sm" renderIcon={Add16}>
+                  New ATI Project
+                </Button>
+              </Link>
             </div>
           </div>
         )}
