@@ -10,7 +10,7 @@
 .main {
   flex: 1;
   width: 100%;
-  padding: 24px;
+  padding: 8px;
 }
 
 .maxWidth {
@@ -19,4 +19,10 @@
 
 .fullMaxWidth {
   max-width: 100%;
+}
+
+@media (min-width: 42rem) {
+  .main {
+    padding: 24px;
+  }
 }
