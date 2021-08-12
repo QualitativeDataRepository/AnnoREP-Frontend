@@ -33,7 +33,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects }) => {
     <>
       <div className={styles.paginationDesc}>
         <Link href="/new">
-          <Button kind="primary" size="sm" renderIcon={Add16}>
+          <Button as="a" href="/new" kind="primary" size="sm" renderIcon={Add16}>
             New ATI Project
           </Button>
         </Link>

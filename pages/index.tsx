@@ -51,7 +51,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
             </p>
             <div>
               <Link href="/new">
-                <Button kind="primary" size="sm" renderIcon={Add16}>
+                <Button as="a" href="/new" kind="primary" size="sm" renderIcon={Add16}>
                   New ATI Project
                 </Button>
               </Link>
