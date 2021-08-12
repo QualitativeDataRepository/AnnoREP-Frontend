@@ -24,15 +24,10 @@ interface HomeProps {
 const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
   return (
     <Layout isLoggedIn={isLoggedIn} title="AnnoREP">
-      <div>
+      <>
         {isLoggedIn ? (
-          <div>
-            <div className={styles.titleContainer}>
-              <h1>ATI Projects</h1>
-              <Button href="/new" kind="primary" size="sm" renderIcon={Add16}>
-                New ATI Project
-              </Button>
-            </div>
+          <div className={styles.loggedInContainer}>
+            <h1>ATI Projects</h1>
             {atiProjects.length === 0 ? (
               <InlineNotification
                 hideCloseButton
@@ -60,7 +55,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
             </div>
           </div>
         )}
-      </div>
+      </>
     </Layout>
   )
 }

@@ -1,17 +1,26 @@
-.pageContainer {
+.paginationDesc {
   display: grid;
   grid-template-columns: 1fr;
-  row-gap: 16px;
+  background-color: whitesmoke;
 }
 
-.currentPageDesc {
+.paginationDesc > div {
+  padding: 16px;
   font-size: 1rem;
 }
 
 @media (min-width: 42rem) {
-  .pageContainer {
+  .paginationDesc {
     grid-template-columns: auto auto;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .paginationDesc > a {
+    order: 1;
+  }
+
+  .paginationDesc > div {
+    padding: 0px 0px 0px 16px;
   }
 }
