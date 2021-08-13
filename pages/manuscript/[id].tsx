@@ -51,6 +51,7 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
                 pageNumber={index + 1}
                 width={size.width as number}
                 renderMode="canvas"
+                renderAnnotationLayer={false}
               />
             ))}
           </Document>
