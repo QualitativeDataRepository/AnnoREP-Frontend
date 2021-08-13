@@ -22,7 +22,7 @@ interface ManuscriptProps {
 }
 
 const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) => {
-  const [numPages, setNumPages] = useState(1)
+  const [numPages, setNumPages] = useState<number>(0)
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)
@@ -35,6 +35,15 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
           <Document
             file={`data:application/pdf;base64,${manuscript}`}
             onLoadSuccess={onDocumentLoadSuccess}
+            loading={
+              <InlineNotification
+                hideCloseButton
+                lowContrast
+                kind="info"
+                subtitle={<span>Loading manuscript...</span>}
+                title="Status"
+              />
+            }
           >
             {Array.from({ length: numPages }, (_, index) => (
               <Page
