@@ -5,16 +5,14 @@ import {
   Button,
   Form,
   FileUploader,
-  Link,
   InlineNotification,
-  Modal,
-  CopyButton,
   InlineLoadingStatus,
 } from "carbon-components-react"
 import FormData from "form-data"
-import { CopyToClipboard } from "react-copy-to-clipboard"
 import { Document20, TrashCan20, Upload16, Launch20 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
+
+import DatasourceModal from "./DatasourceModal"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
 import { IDatasource } from "../../../types/dataverse"
@@ -212,49 +210,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           </Button>
         </Form>
       )}
-      <Modal
-        className={styles.datasourceModal}
-        aria-label="Datasources"
+      <DatasourceModal
+        datasources={datasources}
+        serverUrl={serverUrl}
+        datasetDoi={doi}
         open={modalIsOpen}
-        modalLabel="Datasources"
-        modalHeading="Copy datasource URL"
-        passiveModal={true}
-        hasScrollingContent={true}
-        preventCloseOnClickOutside={true}
-        onRequestClose={closeModal}
-      >
-        <Link
-          href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          size="lg"
-        >
-          Modify datasources
-        </Link>
-        {datasources.length === 0 && (
-          <InlineNotification
-            hideCloseButton
-            lowContrast
-            kind="info"
-            subtitle={<span>No datasource(s) found.</span>}
-            title="Not Found!"
-          />
-        )}
-        {datasources.map(({ id, name, uri }) => (
-          <div key={id} className={styles.datasource}>
-            <Link target="_blank" rel="noopener noreferrer" size="lg" href={uri}>
-              {name}
-            </Link>
-            <CopyToClipboard key={id} text={uri}>
-              <CopyButton
-                feedback="Copied!"
-                feedbackTimeout={3000}
-                iconDescription="Copy URL to clipboard"
-              />
-            </CopyToClipboard>
-          </div>
-        ))}
-      </Modal>
+        closeModal={closeModal}
+      />
       {manuscriptId && (
         <iframe
           className={styles.iframe}
