@@ -4,6 +4,7 @@ import axios from "axios"
 import { InlineNotification } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import Head from "next/head"
+import Link from "next/link"
 import { getSession } from "next-auth/client"
 
 import { Document, Page, pdfjs } from "react-pdf"
@@ -73,9 +74,15 @@ const Manuscript: FC<ManuscriptProps> = ({ isLoggedIn, manuscript, errorMsg }) =
       <InlineNotification
         hideCloseButton
         lowContrast
-        kind="info"
+        kind="error"
         subtitle={
-          <span>{isLoggedIn ? "You don't have access to this manuscript." : "Please login."}</span>
+          isLoggedIn ? (
+            <span>{"You don't have access to this manuscript."}</span>
+          ) : (
+            <div>
+              Please <Link href="/auth/login">login</Link>.
+            </div>
+          )
         }
         title="Unauthorized!"
       />
