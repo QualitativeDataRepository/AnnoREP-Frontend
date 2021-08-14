@@ -27,6 +27,8 @@ export function createAtiProjectDetails(
       id: latest.datasetId,
       doi: latest.datasetPersistentId,
       title: metadataFields.find((field: any) => field.typeName === "title").value,
+      description: metadataFields.find((field: any) => field.typeName === "dsDescription").value[0]
+        .dsDescriptionValue.value,
       version: latest.versionNumber
         ? `${latest.versionNumber}.${latest.versionMinorNumber}`
         : latest.versionState,

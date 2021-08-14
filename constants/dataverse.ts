@@ -17,3 +17,6 @@ export enum VersionState {
   Draft = "DRAFT",
   Released = "RELEASED",
 }
+
+//The number of results to return per request.
+export const NUMBER_OF_ATI_PROJECTS_PER_PAGE = 10

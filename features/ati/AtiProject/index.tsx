@@ -9,6 +9,8 @@ export interface AtiProjectProps {
   id: string
   /**The title of the ati project */
   title: string
+  /**The description of the ati project */
+  description: string
   /**The version of the ati project */
   version: string
   /**The status of the ati project */
@@ -16,17 +18,18 @@ export interface AtiProjectProps {
 }
 
 /**A summary view of an ati project */
-const AtiProject: FC<AtiProjectProps> = ({ id, title, version, status }) => {
+const AtiProject: FC<AtiProjectProps> = ({ id, title, description, version, status }) => {
   return (
     <section aria-label={title} className={styles.atiProject}>
       <h2>
         <Link href={`/ati/${id}`}>
-          <a className="bx--link bx--link--lg" href={`/ati/${id}`}>
+          <a className="bx--link" href={`/ati/${id}`}>
             {title}
           </a>
         </Link>
       </h2>
-      <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
+      <p>{description}</p>
+      <p>{`Version ${version} • ${status}`}</p>
     </section>
   )
 }

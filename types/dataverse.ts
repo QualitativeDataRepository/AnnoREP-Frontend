@@ -2,6 +2,7 @@ export interface IDataset {
   id: string
   doi: string
   title: string
+  description?: string
   status?: string
   version?: string
   zip?: string

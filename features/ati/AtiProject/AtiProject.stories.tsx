@@ -13,6 +13,7 @@ export const Default = Template.bind({})
 Default.args = {
   id: "ati-project-id-1",
   title: "ATI Project Title",
+  description: "Test desc",
   version: "1.0.0",
   status: "Draft",
 }

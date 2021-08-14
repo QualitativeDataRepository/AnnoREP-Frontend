@@ -14,7 +14,7 @@ interface ATISummaryProps {
 }
 
 const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
-  const { doi, title, status, version, zip } = atiProjectDetails.dataset
+  const { doi, title, description, status, version, zip } = atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
 
   return (
@@ -32,7 +32,8 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
             {title}
           </Link>
         </p>
-        <span className="ar--secondary-text">{`Version ${version} • ${status}`}</span>
+        <p>{description}</p>
+        <p className={styles.secondaryText}>{`Version ${version} • ${status}`}</p>
         {zip && (
           <div className={styles.download}>
             <Link

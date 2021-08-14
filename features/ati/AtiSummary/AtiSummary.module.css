@@ -14,3 +14,8 @@
 .download {
   margin-top: 16px;
 }
+
+.secondaryText {
+  font-size: 0.875rem;
+  color: #525252;
+}

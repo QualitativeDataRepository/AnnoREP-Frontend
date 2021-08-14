@@ -3,3 +3,13 @@
   padding-top: 24px;
   border-bottom: 1px solid whitesmoke;
 }
+
+.atiProject > h2 > a {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.atiProject > p:last-of-type {
+  font-size: 0.875rem;
+  color: #525252;
+}

@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import AtiProject from "../AtiProject"
 
+import { NUMBER_OF_ATI_PROJECTS_PER_PAGE } from "../../../constants/dataverse"
 import { IAtiProject } from "../../../types/ati"
 
 import styles from "./AtiProjects.module.css"
@@ -13,8 +14,6 @@ import styles from "./AtiProjects.module.css"
 export interface AtiProjectsProps {
   atiProjects: IAtiProject[]
 }
-
-const NUMBER_OF_ATI_PROJECTS_PER_PAGE = 10
 
 const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects }) => {
   const [currentPage, setCurrentPage] = useState<number>(0)
@@ -39,8 +38,15 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects }) => {
         </Link>
         <div>{`${currentFirst} to ${currentLast} of ${atiProjects.length} project(s)`}</div>
       </div>
-      {activeAtiProjects.map(({ id, title, version, status }) => (
-        <AtiProject key={id} id={id} title={title} version={version} status={status} />
+      {activeAtiProjects.map(({ id, title, description, version, status }) => (
+        <AtiProject
+          key={id}
+          id={id}
+          title={title}
+          description={description}
+          version={version}
+          status={status}
+        />
       ))}
       {totalPages > 1 && (
         <PaginationNav

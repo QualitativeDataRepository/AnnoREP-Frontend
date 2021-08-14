@@ -4,7 +4,6 @@ import axios from "axios"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { getSession } from "next-auth/client"
-import qs from "qs"
 
 import { Add16 } from "@carbon/icons-react"
 import { InlineNotification, Button } from "carbon-components-react"
@@ -14,7 +13,13 @@ import Layout from "../features/components/Layout"
 
 import { IAtiProject } from "../types/ati"
 
-import { ANNOREP_METADATA_VALUE, KIND_OF_DATA_NAME } from "../constants/dataverse"
+import {
+  ANNOREP_METADATA_VALUE,
+  DATAVERSE_HEADER_NAME,
+  KIND_OF_DATA_NAME,
+  PublicationStatus,
+  VersionState,
+} from "../constants/dataverse"
 
 import styles from "../styles/Home.module.css"
 
@@ -69,51 +74,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const atiProjects: IAtiProject[] = []
   if (session) {
-    const { status, data } = await axios.get(
-      //TODO: change to X-Dataverse-key header later
-      `${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`,
-      {
-        params: {
-          key: session.dataverseApiToken,
-          dvobject_types: "Dataset",
-          published_states: ["Published", "Unpublished", "Draft", "In Review"],
-          mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
-          //role_ids: [5, 6, 7, 26, 27],
-        },
-        paramsSerializer: (params) => {
-          return qs.stringify(params, { indices: false })
-        },
-      }
-    )
-    if (status === 200 && data.success) {
+    const { status, data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/search`, {
+      params: {
+        q: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
+        type: "dataset",
+        sort: "date",
+        order: "desc",
+        per_page: 1000,
+        show_entity_ids: true,
+      },
+      headers: {
+        [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+      },
+    })
+    if (status === 200 && data.data.total_count > 0) {
       const items = data.data.items
-      const datasetDict: Record<string, any> = {}
       for (let i = 0; i < items.length; i++) {
-        const id = items[i].entity_id
-        if (datasetDict[id]) {
-          const foundDataset = datasetDict[id]
-          if (items[i].is_draft_state) {
-            datasetDict[id] = items[i]
-          } else {
-            const foundVersion = `${foundDataset.majorVersion}.${foundDataset.minorVersion}`
-            const version = `${items[i].majorVersion}.${items[i].minorVersion}`
-            if (!foundDataset.is_draft_state && foundVersion < version) {
-              datasetDict[id] = items[i]
-            }
-          }
-        } else {
-          datasetDict[id] = items[i]
-        }
-      }
-      const filteredDatasets = Object.values(datasetDict)
-      for (let i = 0; i < filteredDatasets.length; i++) {
         atiProjects.push({
-          id: filteredDatasets[i].entity_id,
-          title: filteredDatasets[i].name,
-          status: filteredDatasets[i].publication_statuses.join(", "),
-          version: filteredDatasets[i].majorVersion
-            ? `${filteredDatasets[i].majorVersion}.${filteredDatasets[i].minorVersion}`
-            : filteredDatasets[i].versionState,
+          id: items[i].entity_id,
+          title: items[i].name,
+          description: items[i].description,
+          status:
+            items[i].versionState === VersionState.Released
+              ? PublicationStatus.Published
+              : PublicationStatus.Unpublished,
+          version: items[i].majorVersion
+            ? `${items[i].majorVersion}.${items[i].minorVersion}`
+            : items[i].versionState,
         })
       }
     }
