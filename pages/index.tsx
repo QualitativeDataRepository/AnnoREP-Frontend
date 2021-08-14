@@ -17,6 +17,7 @@ import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
   KIND_OF_DATA_NAME,
+  NUMBER_OF_ATI_PROJECTS_PER_PAGE,
   PublicationStatus,
   VersionState,
 } from "../constants/dataverse"
@@ -26,8 +27,9 @@ import styles from "../styles/Home.module.css"
 interface HomeProps {
   isLoggedIn: boolean
   atiProjects: IAtiProject[]
+  totalCount: number
 }
-const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
+const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects, totalCount }) => {
   return (
     <Layout isLoggedIn={isLoggedIn} title="AnnoREP">
       <>
@@ -43,7 +45,7 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects }) => {
                 title="Info"
               />
             ) : (
-              <AtiProjects atiProjects={atiProjects} />
+              <AtiProjects atiProjects={atiProjects} totalCount={totalCount} />
             )}
           </div>
         ) : (
@@ -73,6 +75,7 @@ export default Home
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const atiProjects: IAtiProject[] = []
+  let totalCount = 0
   if (session) {
     const { status, data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/search`, {
       params: {
@@ -80,7 +83,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         type: "dataset",
         sort: "date",
         order: "desc",
-        per_page: 1000,
+        per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,
         show_entity_ids: true,
       },
       headers: {
@@ -88,6 +91,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     })
     if (status === 200 && data.data.total_count > 0) {
+      totalCount = data.data.total_count
       const items = data.data.items
       for (let i = 0; i < items.length; i++) {
         atiProjects.push({
@@ -106,6 +110,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
   return {
-    props: { isLoggedIn: session ? true : false, atiProjects },
+    props: { isLoggedIn: session ? true : false, atiProjects, totalCount },
   }
 }
