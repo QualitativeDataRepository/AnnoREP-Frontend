@@ -17,7 +17,7 @@ export const getTotalCount = (state: SearchState): number => state.totalCount
 export const getTotalPages = (state: SearchState): number =>
   Math.ceil(state.totalCount / state.perPage)
 
-export const getShowResultDesc = (state: SearchState) =>
+export const getShowResultDesc = (state: SearchState): boolean =>
   ["inactive", "finished"].includes(state.status) && state.currentTotal > 0
 
 export const getAtis = (state: SearchState): IAtiProject[] => {
