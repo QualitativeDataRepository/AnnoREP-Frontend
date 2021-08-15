@@ -24,7 +24,9 @@ export interface Action {
   payload?: any
 }
 
-export function searchReducer(state: SearchState, action: Action) {
+export const INITIAL_Q = "*"
+
+export function searchReducer(state: SearchState, action: Action): SearchState {
   switch (action.type) {
     case "SEARCH_INIT": {
       return { ...state, status: "active", error: "" } as SearchState

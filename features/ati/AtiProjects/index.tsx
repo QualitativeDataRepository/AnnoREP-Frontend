@@ -3,8 +3,8 @@ import React, { FC, FormEventHandler } from "react"
 import { PaginationNav, InlineNotification, Search, Form } from "carbon-components-react"
 
 import AtiProject from "../AtiProject"
+import { INITIAL_Q } from "./state"
 import useSearch from "./useSearch"
-
 import {
   getStart,
   getEnd,
@@ -38,7 +38,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
       return acc
     }, {} as Record<number, IAtiProject>),
     page: 0,
-    q: "*",
+    q: INITIAL_Q,
   })
   const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
