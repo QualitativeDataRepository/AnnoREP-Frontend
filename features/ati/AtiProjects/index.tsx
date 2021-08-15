@@ -88,25 +88,27 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
           size="lg"
         />
       </Form>
-      <div className={styles.searchResultDescContainer}>
-        <div>
-          {showResultDesc && (
-            <div
-              className={styles.searchResultDesc}
-            >{`${start} to ${end} of ${totalCount} project(s)`}</div>
-          )}
+      {atis.length > 0 && (
+        <div className={styles.searchResultDescContainer}>
+          <div>
+            {showResultDesc && (
+              <div
+                className={styles.searchResultDesc}
+              >{`${start} to ${end} of ${totalCount} project(s)`}</div>
+            )}
+          </div>
+          <Dropdown
+            ariaLabel="ATI sort options"
+            id="ati-sort-options"
+            label="Sort"
+            titleText="Sort"
+            items={SORT_ITEMS}
+            itemToString={(item) => SORT_LABEL[item]}
+            selectedItem={selectedSortIem}
+            onChange={onSort}
+          />
         </div>
-        <Dropdown
-          ariaLabel="ATI sort options"
-          id="ati-sort-options"
-          label="Sort"
-          titleText="Sort"
-          items={SORT_ITEMS}
-          itemToString={(item) => SORT_LABEL[item]}
-          selectedItem={selectedSortIem}
-          onChange={onSort}
-        />
-      </div>
+      )}
       {state.status !== "inactive" && (
         <InlineNotification
           lowContrast
