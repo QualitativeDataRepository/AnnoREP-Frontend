@@ -88,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       params: {
         q: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
         type: "dataset",
-        sort: "date",
+        sort: "score",
         order: "desc",
         per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,
         show_entity_ids: true,

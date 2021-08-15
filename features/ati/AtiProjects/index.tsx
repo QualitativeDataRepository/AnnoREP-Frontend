@@ -49,7 +49,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
     page: 0,
     q: INITIAL_Q,
     fetchQ: false,
-    sort: "date",
+    sort: "score",
     order: "desc",
   })
   const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })

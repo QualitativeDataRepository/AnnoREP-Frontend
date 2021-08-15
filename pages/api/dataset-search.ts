@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           params: {
             q: q || "*",
             type: "dataset",
-            sort: sort || "date",
+            sort: sort || "score",
             order: order || "desc",
             start: start,
             per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,

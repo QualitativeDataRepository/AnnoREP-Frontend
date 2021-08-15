@@ -10,7 +10,7 @@ export interface SearchState {
   page: number
   q: string
   fetchQ: boolean
-  sort: "name" | "date"
+  sort: "name" | "date" | "score"
   order: "asc" | "desc"
   error?: string
 }
