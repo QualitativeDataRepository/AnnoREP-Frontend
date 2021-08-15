@@ -35,7 +35,14 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects, totalCount }) => {
       <>
         {isLoggedIn ? (
           <div className={styles.loggedInContainer}>
-            <h1>ATI Projects</h1>
+            <div className={styles.titleContainer}>
+              <h1>ATI Projects</h1>
+              <Link href="/new">
+                <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add16}>
+                  New ATI Project
+                </Button>
+              </Link>
+            </div>
             {totalCount === 0 ? (
               <InlineNotification
                 hideCloseButton
