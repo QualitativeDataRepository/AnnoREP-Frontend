@@ -4,24 +4,18 @@ import { NotificationKind } from "carbon-components-react"
 
 import { SearchState } from "./state"
 
-import { SORT_SEPARATOR } from "./constants"
-import { NUMBER_OF_ATI_PROJECTS_PER_PAGE } from "../../../constants/dataverse"
 import { range } from "../../../utils/arrayUtils"
 import { IAtiProject } from "../../../types/ati"
 
-export const getStart = (state: SearchState): number =>
-  state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE + 1
+export const getStart = (state: SearchState): number => state.page * state.perPage + 1
 
 export const getEnd = (state: SearchState): number =>
-  Math.min(
-    state.totalCount,
-    state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE + NUMBER_OF_ATI_PROJECTS_PER_PAGE
-  )
+  Math.min(state.totalCount, state.page * state.perPage + state.perPage)
 
 export const getTotalCount = (state: SearchState): number => state.totalCount
 
 export const getTotalPages = (state: SearchState): number =>
-  Math.ceil(state.totalCount / NUMBER_OF_ATI_PROJECTS_PER_PAGE)
+  Math.ceil(state.totalCount / state.perPage)
 
 export const getShowResultDesc = (state: SearchState) =>
   ["inactive", "finished"].includes(state.status) && state.currentTotal > 0
@@ -31,11 +25,8 @@ export const getAtis = (state: SearchState): IAtiProject[] => {
     return []
   }
   const indices = range(
-    state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE,
-    Math.min(
-      state.totalCount,
-      state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE + NUMBER_OF_ATI_PROJECTS_PER_PAGE
-    ) - 1,
+    state.page * state.perPage,
+    Math.min(state.totalCount, state.page * state.perPage + state.perPage) - 1,
     1
   )
   const atis = indices.map((index) => state.atiProjects[index])
@@ -75,6 +66,3 @@ export const getInlineNotficationTitle = (state: SearchState): string => {
     return "Error!"
   }
 }
-
-export const getSelectedSortItem = (state: SearchState) =>
-  `${state.sort}${SORT_SEPARATOR}${state.order}`

@@ -1,7 +1,10 @@
 .atiProject {
   padding-bottom: 24px;
   padding-top: 24px;
-  border-bottom: 1px solid whitesmoke;
+  border-bottom: 1px solid #dfdfe7;
+  display: grid;
+  grid-template-columns: auto;
+  row-gap: 4px;
 }
 
 .atiProject > h2 > a {
@@ -9,7 +12,11 @@
   font-weight: 600;
 }
 
-.atiProject > p:last-of-type {
+.atiProject p {
   font-size: 0.875rem;
-  color: #525252;
+}
+
+.citation {
+  padding: 4px;
+  background-color: #dfdfe7;
 }

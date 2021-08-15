@@ -4,32 +4,30 @@ import axios from "axios"
 
 import { Action, searchReducer, SearchState } from "./state"
 
-import { NUMBER_OF_ATI_PROJECTS_PER_PAGE } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-
-//10 secs
-const TIMEOUT = 10000
 
 const useSearch = (inititalState: SearchState) => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
 
   //Change pages
   useEffect(() => {
-    const cursor = state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE
+    const cursor = state.page * state.perPage
     let didCancel = false
 
     const search = async () => {
       try {
         dispatch({ type: "SEARCH_INIT" })
-        const { data } = await axios.get(`/api/dataset-search`, {
+        const { data } = await axios.get(`/api/mydata-search`, {
           params: {
             q: state.q,
-            start: cursor,
+            //dataverse mydata selected_page starts at 1
+            selectedPage: state.page + 1,
+            isAnnoRep: true,
+            //pub status
           },
         })
         if (!didCancel) {
           dispatch({ type: "SEARCH_SUCCESS", payload: data })
-          setTimeout(() => dispatch({ type: "SEARCH_CLEAN_UP" }), TIMEOUT)
         }
       } catch (e) {
         if (!didCancel) {
@@ -54,19 +52,17 @@ const useSearch = (inititalState: SearchState) => {
     const search = async () => {
       try {
         dispatch({ type: "SEARCH_INIT" })
-        const { data } = await axios.get(`/api/dataset-search`, {
+        const { data } = await axios.get(`/api/mydata-search`, {
           params: {
             q: state.q,
-            sort: state.sort,
-            order: state.order,
-            start: 0,
+            //dataverse mydata selected_page starts at 1
+            selectedPage: 1,
+            isAnnoRep: true,
+            //pub status
           },
         })
         if (!didCancel) {
           dispatch({ type: "SEARCH_Q", payload: data })
-          if (data.responseCount > 0) {
-            setTimeout(() => dispatch({ type: "SEARCH_CLEAN_UP" }), TIMEOUT)
-          }
         }
       } catch (e) {
         if (!didCancel) {
@@ -79,7 +75,7 @@ const useSearch = (inititalState: SearchState) => {
       //Don't initially search q
       search()
     }
-  }, [state.q, state.fetchQ, state.sort, state.order])
+  }, [state.q, state.fetchQ])
 
   return [state, dispatch] as [SearchState, Dispatch<Action>]
 }

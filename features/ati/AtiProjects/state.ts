@@ -8,10 +8,9 @@ export interface SearchState {
   atiProjects: Record<number, IAtiProject>
   status: InlineLoadingStatus
   page: number
+  perPage: number
   q: string
   fetchQ: boolean
-  sort: "name" | "date" | "score"
-  order: "asc" | "desc"
   error?: string
 }
 
@@ -24,11 +23,8 @@ export interface Action {
     | "SEARCH_CLEAN_UP"
     | "SEARCH_Q"
     | "UPDATE_Q"
-    | "UPDATE_SORT"
   payload?: any
 }
-
-export const INITIAL_Q = "*"
 
 export function searchReducer(state: SearchState, action: Action): SearchState {
   switch (action.type) {
@@ -66,22 +62,11 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         page: 0,
       } as SearchState
     }
-    case "SEARCH_CLEAN_UP": {
-      return { ...state, status: "inactive" } as SearchState
-    }
     case "UPDATE_PAGE": {
       return { ...state, page: action.payload } as SearchState
     }
     case "UPDATE_Q": {
       return { ...state, q: action.payload, fetchQ: true } as SearchState
-    }
-    case "UPDATE_SORT": {
-      return {
-        ...state,
-        sort: action.payload.sort,
-        order: action.payload.order,
-        fetchQ: true,
-      } as SearchState
     }
     default: {
       return state

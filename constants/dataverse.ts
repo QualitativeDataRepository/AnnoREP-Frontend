@@ -18,5 +18,12 @@ export enum VersionState {
   Released = "RELEASED",
 }
 
-//The number of results to return per request.
-export const NUMBER_OF_ATI_PROJECTS_PER_PAGE = 10
+export const PUBLICATION_STATUSES = [
+  "Published",
+  "Unpublished",
+  "Draft",
+  "In Review",
+  "Deaccessioned",
+]
+
+export const DATASET_DV_TYPE = "Dataset"

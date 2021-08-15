@@ -1,35 +1,60 @@
 import React, { FC } from "react"
 
-import Link from "next/link"
+import NextLink from "next/link"
+
+import { Link } from "carbon-components-react"
 
 import styles from "./AtiProject.module.css"
 
 export interface AtiProjectProps {
-  /**The id of the ati project */
   id: string
-  /**The title of the ati project */
-  title: string
-  /**The description of the ati project */
+  name: string
   description: string
-  /**The version of the ati project */
-  version: string
-  /**The status of the ati project */
-  status: string
+  dataverseName: string
+  citationHtml: string
+  publicationStatuses: string[]
+  dateDisplay: string
+  userRoles: string[]
+  dataverseServerUrl: string
+  dataverse: string
 }
 
 /**A summary view of an ati project */
-const AtiProject: FC<AtiProjectProps> = ({ id, title, description, version, status }) => {
+const AtiProject: FC<AtiProjectProps> = ({
+  id,
+  name,
+  description,
+  dataverseName,
+  citationHtml,
+  //publicationStatuses,
+  dateDisplay,
+  //userRoles,
+  dataverseServerUrl,
+  dataverse,
+}) => {
   return (
-    <section aria-label={title} className={styles.atiProject}>
+    <section aria-label={name} className={styles.atiProject}>
       <h2>
-        <Link href={`/ati/${id}`}>
+        <NextLink href={`/ati/${id}`}>
           <a className="bx--link" href={`/ati/${id}`}>
-            {title}
+            {name}
           </a>
-        </Link>
+        </NextLink>
       </h2>
+      <p>
+        {dateDisplay} -{" "}
+        <Link
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`${dataverseServerUrl}/dataverse/${dataverse}`}
+        >
+          {dataverseName}
+        </Link>
+      </p>
+      <p className={styles.citation}>
+        <span dangerouslySetInnerHTML={{ __html: citationHtml }} />{" "}
+      </p>
       <p>{description}</p>
-      <p>{`Version ${version} • ${status}`}</p>
     </section>
   )
 }

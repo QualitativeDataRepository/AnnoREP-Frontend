@@ -4,6 +4,7 @@ import axios from "axios"
 import { GetServerSideProps } from "next"
 import Link from "next/link"
 import { getSession } from "next-auth/client"
+import qs from "qs"
 
 import { Add16 } from "@carbon/icons-react"
 import { InlineNotification, Button } from "carbon-components-react"
@@ -11,15 +12,15 @@ import { InlineNotification, Button } from "carbon-components-react"
 import AtiProjects from "../features/ati/AtiProjects"
 import Layout from "../features/components/Layout"
 
+import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
 import { IAtiProject } from "../types/ati"
+import { getResponseFromError } from "../utils/httpRequestUtils"
 
 import {
   ANNOREP_METADATA_VALUE,
-  DATAVERSE_HEADER_NAME,
+  DATASET_DV_TYPE,
   KIND_OF_DATA_NAME,
-  NUMBER_OF_ATI_PROJECTS_PER_PAGE,
-  PublicationStatus,
-  VersionState,
+  PUBLICATION_STATUSES,
 } from "../constants/dataverse"
 
 import styles from "../styles/Home.module.css"
@@ -28,8 +29,20 @@ interface HomeProps {
   isLoggedIn: boolean
   atiProjects: IAtiProject[]
   totalCount: number
+  atisPerPage?: number
+  publicationStatusCount?: any
+  selectedFilters?: any
+  errorMsg?: string
 }
-const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects, totalCount }) => {
+const Home: FC<HomeProps> = ({
+  isLoggedIn,
+  atiProjects,
+  totalCount,
+  errorMsg,
+  atisPerPage,
+  publicationStatusCount,
+  selectedFilters,
+}) => {
   return (
     <Layout isLoggedIn={isLoggedIn} title="AnnoREP">
       <>
@@ -43,16 +56,22 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects, totalCount }) => {
                 </Button>
               </Link>
             </div>
-            {totalCount === 0 ? (
+            {totalCount === 0 || errorMsg ? (
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind="info"
-                subtitle={<span>No ATI projects found.</span>}
-                title="Status"
+                kind={errorMsg ? "error" : "info"}
+                subtitle={<span>{errorMsg ? errorMsg : "No ATI projects found."}</span>}
+                title={errorMsg ? "Error!" : "Status"}
               />
             ) : (
-              <AtiProjects atiProjects={atiProjects} initialTotalCount={totalCount} />
+              <AtiProjects
+                atiProjects={atiProjects}
+                initialTotalCount={totalCount}
+                atisPerPage={atisPerPage as number}
+                publicationStatusCount={publicationStatusCount}
+                selectedFilters={selectedFilters}
+              />
             )}
           </div>
         ) : (
@@ -81,42 +100,55 @@ export default Home
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
-  const atiProjects: IAtiProject[] = []
-  let totalCount = 0
+  const props: HomeProps = {
+    isLoggedIn: false,
+    atiProjects: [],
+    totalCount: 0,
+  }
   if (session) {
-    const { status, data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/search`, {
-      params: {
-        q: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
-        type: "dataset",
-        sort: "score",
-        order: "desc",
-        per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,
-        show_entity_ids: true,
-      },
-      headers: {
-        [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
-      },
-    })
-    if (status === 200 && data.data.total_count > 0) {
-      totalCount = data.data.total_count
-      const items = data.data.items
-      for (let i = 0; i < items.length; i++) {
-        atiProjects.push({
-          id: items[i].entity_id,
-          title: items[i].name,
-          description: items[i].description,
-          status:
-            items[i].versionState === VersionState.Released
-              ? PublicationStatus.Published
-              : PublicationStatus.Unpublished,
-          version: items[i].majorVersion
-            ? `${items[i].majorVersion}.${items[i].minorVersion}`
-            : items[i].versionState,
-        })
+    props.isLoggedIn = true
+    try {
+      const { data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+        params: {
+          key: session.dataverseApiToken,
+          dvobject_types: DATASET_DV_TYPE,
+          published_states: PUBLICATION_STATUSES,
+          mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { indices: false })
+        },
+        headers: {
+          [REQUEST_DESC_HEADER_NAME]: `Searching for ${ANNOREP_METADATA_VALUE} datasets`,
+        },
+      })
+      if (data.success) {
+        const items = data.data.items
+        for (let i = 0; i < items.length; i++) {
+          props.atiProjects.push({
+            id: items[i].entity_id,
+            name: items[i].name,
+            description: items[i].description,
+            citationHtml: items[i].citationHtml,
+            dataverseName: items[i].name_of_dataverse,
+            publicationStatuses: items[i].publication_statuses,
+            dateDisplay: items[i].date_to_display_on_card,
+            userRoles: items[i].user_roles,
+            dataverseServerUrl: process.env.DATAVERSE_SERVER_URL as string,
+            dataverse: items[i].identifier_of_dataverse,
+          })
+        }
+        props.totalCount = data.data.total_count
+        props.atisPerPage = data.data.pagination.docsPerPage
+        props.publicationStatusCount = data.data.pubstatus_counts
+        props.selectedFilters = data.data.selected_filters
       }
+    } catch (e) {
+      const { message } = getResponseFromError(e)
+      props.errorMsg = message
     }
   }
   return {
-    props: { isLoggedIn: session ? true : false, atiProjects, totalCount },
+    props: props,
   }
 }

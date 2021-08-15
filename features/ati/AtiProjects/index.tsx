@@ -1,16 +1,8 @@
 import React, { FC, FormEventHandler } from "react"
 
-import {
-  PaginationNav,
-  InlineNotification,
-  Search,
-  Form,
-  Dropdown,
-  OnChangeData,
-} from "carbon-components-react"
+import { PaginationNav, InlineNotification, Search, Form } from "carbon-components-react"
 
 import AtiProject from "../AtiProject"
-import { INITIAL_Q } from "./state"
 import useSearch from "./useSearch"
 import {
   getStart,
@@ -23,10 +15,8 @@ import {
   getInlineNotficationSubtitle,
   getInlineNotficationTitle,
   getShowResultDesc,
-  getSelectedSortItem,
 } from "./selectors"
 
-import { SORT_ITEMS, SORT_LABEL, SORT_SEPARATOR } from "./constants"
 import { IAtiProject } from "../../../types/ati"
 
 import styles from "./AtiProjects.module.css"
@@ -34,23 +24,25 @@ import styles from "./AtiProjects.module.css"
 export interface AtiProjectsProps {
   atiProjects: IAtiProject[]
   initialTotalCount: number
+  atisPerPage: number
+  publicationStatusCount: any
+  selectedFilters: any
 }
 
-const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) => {
+const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount, atisPerPage }) => {
   const [state, dispatch] = useSearch({
     currentTotal: atiProjects.length,
     totalCount: initialTotalCount,
-    status: "inactive",
-    error: "",
     atiProjects: atiProjects.reduce((acc, curr, i) => {
       acc[i] = curr
       return acc
     }, {} as Record<number, IAtiProject>),
+    status: "inactive",
     page: 0,
-    q: INITIAL_Q,
+    perPage: atisPerPage,
+    q: "",
     fetchQ: false,
-    sort: "score",
-    order: "desc",
+    error: "",
   })
   const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
@@ -59,10 +51,6 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
       atiSearch: { value: string }
     }
     dispatch({ type: "UPDATE_Q", payload: target.atiSearch.value.trim() })
-  }
-  const onSort = (data: OnChangeData<string>) => {
-    const [sort, order] = (data.selectedItem as string).split(SORT_SEPARATOR)
-    dispatch({ type: "UPDATE_SORT", payload: { sort, order } })
   }
 
   const start = getStart(state)
@@ -75,7 +63,6 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
   const inlineNotficationTitle = getInlineNotficationTitle(state)
   const atis = getAtis(state)
   const showPagination = getShowPagination(state)
-  const selectedSortIem = getSelectedSortItem(state)
   return (
     <>
       <Form onSubmit={onSearch}>
@@ -88,26 +75,10 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
           size="lg"
         />
       </Form>
-      {atis.length > 0 && (
-        <div className={styles.searchResultDescContainer}>
-          <div>
-            {showResultDesc && (
-              <div
-                className={styles.searchResultDesc}
-              >{`${start} to ${end} of ${totalCount} project(s)`}</div>
-            )}
-          </div>
-          <Dropdown
-            ariaLabel="ATI sort options"
-            id="ati-sort-options"
-            label="Sort"
-            titleText="Sort"
-            items={SORT_ITEMS}
-            itemToString={(item) => SORT_LABEL[item]}
-            selectedItem={selectedSortIem}
-            onChange={onSort}
-          />
-        </div>
+      {showResultDesc && (
+        <div
+          className={styles.searchResultDesc}
+        >{`${start} to ${end} of ${totalCount} project(s)`}</div>
       )}
       {state.status !== "inactive" && (
         <InlineNotification
@@ -117,16 +88,34 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
           title={inlineNotficationTitle}
         />
       )}
-      {atis.map(({ id, title, description, version, status }) => (
-        <AtiProject
-          key={id}
-          id={id}
-          title={title}
-          description={description}
-          version={version}
-          status={status}
-        />
-      ))}
+      {atis.map(
+        ({
+          id,
+          name,
+          description,
+          dateDisplay,
+          dataverseName,
+          citationHtml,
+          publicationStatuses,
+          userRoles,
+          dataverseServerUrl,
+          dataverse,
+        }) => (
+          <AtiProject
+            key={id}
+            id={id}
+            name={name}
+            description={description}
+            dateDisplay={dateDisplay}
+            dataverseName={dataverseName}
+            citationHtml={citationHtml}
+            publicationStatuses={publicationStatuses}
+            userRoles={userRoles}
+            dataverseServerUrl={dataverseServerUrl}
+            dataverse={dataverse}
+          />
+        )
+      )}
       {showPagination && (
         <PaginationNav
           loop={false}

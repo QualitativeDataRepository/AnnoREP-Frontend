@@ -10,7 +10,12 @@ import NewAtiProjectForm from "../../features/ati/NewAtiProjectForm"
 import Layout from "../../features/components/Layout"
 
 import { IDataset } from "../../types/dataverse"
-import { ANNOREP_METADATA_VALUE, KIND_OF_DATA_NAME } from "../../constants/dataverse"
+import {
+  ANNOREP_METADATA_VALUE,
+  DATASET_DV_TYPE,
+  KIND_OF_DATA_NAME,
+  PUBLICATION_STATUSES,
+} from "../../constants/dataverse"
 
 interface NewAtiProps {
   isLoggedIn: boolean
@@ -48,10 +53,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       {
         params: {
           key: session.dataverseApiToken,
-          dvobject_types: "Dataset",
-          published_states: ["Published", "Unpublished", "Draft", "In Review"],
+          dvobject_types: DATASET_DV_TYPE,
+          published_states: PUBLICATION_STATUSES,
           mydata_search_term: `-${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
-          //role_ids: [5, 6, 7, 26, 27],
         },
         paramsSerializer: (params) => {
           return qs.stringify(params, { indices: false })

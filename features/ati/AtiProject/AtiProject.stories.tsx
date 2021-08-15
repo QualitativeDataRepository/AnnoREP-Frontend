@@ -12,8 +12,13 @@ const Template: Story<AtiProjectProps> = (args) => <AtiProject {...args} />
 export const Default = Template.bind({})
 Default.args = {
   id: "ati-project-id-1",
-  title: "ATI Project Title",
+  name: "ATI Project Title",
   description: "Test desc",
-  version: "1.0.0",
-  status: "Draft",
+  dataverseName: "Dataverse name",
+  citationHtml: "Citation HTML",
+  publicationStatuses: ["Draft"],
+  dateDisplay: "Date display",
+  userRoles: ["User role"],
+  dataverse: "main",
+  dataverseServerUrl: "Server URL",
 }

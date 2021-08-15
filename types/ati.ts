@@ -1,7 +1,12 @@
 export interface IAtiProject {
   id: string
-  title: string
+  name: string
   description: string
-  status: string
-  version: string
+  citationHtml: string
+  dataverseName: string
+  publicationStatuses: string[]
+  dateDisplay: string
+  userRoles: string[]
+  dataverseServerUrl: string
+  dataverse: string
 }
