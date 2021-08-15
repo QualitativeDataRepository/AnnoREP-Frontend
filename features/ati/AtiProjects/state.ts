@@ -8,11 +8,19 @@ export interface SearchState {
   atiProjects: Record<number, IAtiProject>
   status: InlineLoadingStatus
   page: number
+  q: string
   error?: string
 }
 
 export interface Action {
-  type: "SEARCH_INIT" | "SEARCH_SUCCESS" | "SEARCH_FAILURE" | "UPDATE_PAGE" | "SEARCH_CLEAN_UP"
+  type:
+    | "SEARCH_INIT"
+    | "SEARCH_SUCCESS"
+    | "SEARCH_FAILURE"
+    | "UPDATE_PAGE"
+    | "SEARCH_CLEAN_UP"
+    | "SEARCH_Q"
+    | "UPDATE_Q"
   payload?: any
 }
 
@@ -37,11 +45,29 @@ export function searchReducer(state: SearchState, action: Action) {
     case "SEARCH_FAILURE": {
       return { ...state, status: "error", error: action.payload } as SearchState
     }
+    case "SEARCH_Q": {
+      const atiData = action.payload.atiProjects as IAtiProject[]
+      const newAtis = atiData.reduce((acc, curr, i) => {
+        acc[i] = curr
+        return acc
+      }, {} as Record<number, IAtiProject>)
+      return {
+        ...state,
+        totalCount: action.payload.totalCount,
+        currentTotal: atiData.length,
+        aitProjects: newAtis,
+        status: "finished",
+        page: 0,
+      } as SearchState
+    }
     case "SEARCH_CLEAN_UP": {
       return { ...state, status: "inactive" } as SearchState
     }
     case "UPDATE_PAGE": {
       return { ...state, page: action.payload }
+    }
+    case "UPDATE_Q": {
+      return { ...state, q: action.payload }
     }
     default: {
       return state

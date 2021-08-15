@@ -1,26 +1,4 @@
-.paginationDesc {
-  display: grid;
-  grid-template-columns: 1fr;
-  background-color: whitesmoke;
-}
-
-.paginationDesc > div {
+.searchResultDesc {
   padding: 16px;
   font-size: 1rem;
-}
-
-@media (min-width: 42rem) {
-  .paginationDesc {
-    grid-template-columns: auto auto;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .paginationDesc > a {
-    order: 1;
-  }
-
-  .paginationDesc > div {
-    padding: 0px 0px 0px 16px;
-  }
 }

@@ -36,16 +36,16 @@ const Home: FC<HomeProps> = ({ isLoggedIn, atiProjects, totalCount }) => {
         {isLoggedIn ? (
           <div className={styles.loggedInContainer}>
             <h1>ATI Projects</h1>
-            {atiProjects.length === 0 ? (
+            {totalCount === 0 ? (
               <InlineNotification
                 hideCloseButton
                 lowContrast
                 kind="info"
-                subtitle={<span>No current ATI projects.</span>}
-                title="Info"
+                subtitle={<span>No ATI projects found.</span>}
+                title="Status"
               />
             ) : (
-              <AtiProjects atiProjects={atiProjects} totalCount={totalCount} />
+              <AtiProjects atiProjects={atiProjects} initialTotalCount={totalCount} />
             )}
           </div>
         ) : (

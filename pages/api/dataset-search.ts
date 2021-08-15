@@ -19,17 +19,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { dataverseApiToken } = session
-      const { start } = req.query
+      const { start, q } = req.query
       try {
         const { data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/search`, {
           params: {
-            q: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
+            q: q || "*",
             type: "dataset",
             sort: "date",
             order: "desc",
             start: start,
             per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,
             show_entity_ids: true,
+            fq: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
           },
           headers: {
             [DATAVERSE_HEADER_NAME]: dataverseApiToken,
@@ -55,6 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json({
           atiProjects,
           start: data.data.start,
+          totalCount: data.data.total_count,
+          responseCount: data.data.count_in_response,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e)

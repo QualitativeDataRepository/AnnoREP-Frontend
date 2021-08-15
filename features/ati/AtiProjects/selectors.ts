@@ -17,8 +17,13 @@ export const getEnd = (state: SearchState): number =>
     state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE + NUMBER_OF_ATI_PROJECTS_PER_PAGE
   )
 
+export const getTotalCount = (state: SearchState): number => state.totalCount
+
 export const getTotalPages = (state: SearchState): number =>
   Math.ceil(state.totalCount / NUMBER_OF_ATI_PROJECTS_PER_PAGE)
+
+export const getShowResultDesc = (state: SearchState) =>
+  ["inactive", "finished"].includes(state.status) && state.currentTotal > 0
 
 export const getAtis = (state: SearchState): IAtiProject[] => {
   const indices = range(
@@ -37,15 +42,32 @@ export const getShowPagination = (state: SearchState): boolean => {
   return getTotalPages(state) > 1 && ["inactive", "finished"].includes(state.status)
 }
 
-export const getInlineNotficationKind = (state: SearchState): NotificationKind =>
-  state.status === "active" ? "info" : state.status === "finished" ? "success" : "error"
+export const getInlineNotficationKind = (state: SearchState): NotificationKind => {
+  if (state.status === "active") {
+    return "info"
+  } else if (state.status === "finished") {
+    return state.currentTotal === 0 ? "info" : "success"
+  } else {
+    return "error"
+  }
+}
 
-export const getInlineNotficationSubtitle = (state: SearchState): ReactNode =>
-  state.status === "active"
-    ? `Getting page ${state.page + 1} of ATI projects...`
-    : state.status === "finished"
-    ? `Finished getting page ${state.page + 1} of ATI projects.`
-    : state.error
+export const getInlineNotficationSubtitle = (state: SearchState): ReactNode => {
+  if (state.status === "active") {
+    return `Fetching ATI projects...`
+  } else if (state.status === "finished") {
+    return state.currentTotal === 0 ? "No ATI projects found." : `Finished fetching ATI projects.`
+  } else {
+    return state.error
+  }
+}
 
-export const getInlineNotficationTitle = (state: SearchState): string =>
-  state.status === "active" ? "Status" : state.status === "finished" ? "Success!" : "Error!"
+export const getInlineNotficationTitle = (state: SearchState): string => {
+  if (state.status === "active") {
+    return "Status"
+  } else if (state.status === "finished") {
+    return state.currentTotal === 0 ? "Status" : "Success!"
+  } else {
+    return "Error!"
+  }
+}
