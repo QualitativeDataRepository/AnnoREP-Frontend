@@ -1,6 +1,13 @@
 import React, { FC, FormEventHandler } from "react"
 
-import { PaginationNav, InlineNotification, Search, Form } from "carbon-components-react"
+import {
+  PaginationNav,
+  InlineNotification,
+  Search,
+  Form,
+  Dropdown,
+  OnChangeData,
+} from "carbon-components-react"
 
 import AtiProject from "../AtiProject"
 import { INITIAL_Q } from "./state"
@@ -16,8 +23,10 @@ import {
   getInlineNotficationSubtitle,
   getInlineNotficationTitle,
   getShowResultDesc,
+  getSelectedSortItem,
 } from "./selectors"
 
+import { SORT_ITEMS, SORT_LABEL, SORT_SEPARATOR } from "./constants"
 import { IAtiProject } from "../../../types/ati"
 
 import styles from "./AtiProjects.module.css"
@@ -39,6 +48,9 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
     }, {} as Record<number, IAtiProject>),
     page: 0,
     q: INITIAL_Q,
+    fetchQ: false,
+    sort: "date",
+    order: "desc",
   })
   const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
@@ -47,6 +59,10 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
       atiSearch: { value: string }
     }
     dispatch({ type: "UPDATE_Q", payload: target.atiSearch.value.trim() })
+  }
+  const onSort = (data: OnChangeData<string>) => {
+    const [sort, order] = (data.selectedItem as string).split(SORT_SEPARATOR)
+    dispatch({ type: "UPDATE_SORT", payload: { sort, order } })
   }
 
   const start = getStart(state)
@@ -59,6 +75,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
   const inlineNotficationTitle = getInlineNotficationTitle(state)
   const atis = getAtis(state)
   const showPagination = getShowPagination(state)
+  const selectedSortIem = getSelectedSortItem(state)
   return (
     <>
       <Form onSubmit={onSearch}>
@@ -71,6 +88,25 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
           size="lg"
         />
       </Form>
+      <div className={styles.searchResultDescContainer}>
+        <div>
+          {showResultDesc && (
+            <div
+              className={styles.searchResultDesc}
+            >{`${start} to ${end} of ${totalCount} project(s)`}</div>
+          )}
+        </div>
+        <Dropdown
+          ariaLabel="ATI sort options"
+          id="ati-sort-options"
+          label="Sort"
+          titleText="Sort"
+          items={SORT_ITEMS}
+          itemToString={(item) => SORT_LABEL[item]}
+          selectedItem={selectedSortIem}
+          onChange={onSort}
+        />
+      </div>
       {state.status !== "inactive" && (
         <InlineNotification
           lowContrast
@@ -78,11 +114,6 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount }) =
           subtitle={<span>{inlineNotificationSubtitle}</span>}
           title={inlineNotficationTitle}
         />
-      )}
-      {showResultDesc && (
-        <div
-          className={styles.searchResultDesc}
-        >{`${start} to ${end} of ${totalCount} project(s)`}</div>
       )}
       {atis.map(({ id, title, description, version, status }) => (
         <AtiProject

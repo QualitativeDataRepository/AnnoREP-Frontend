@@ -9,6 +9,9 @@ export interface SearchState {
   status: InlineLoadingStatus
   page: number
   q: string
+  fetchQ: boolean
+  sort: "name" | "date"
+  order: "asc" | "desc"
   error?: string
 }
 
@@ -21,6 +24,7 @@ export interface Action {
     | "SEARCH_CLEAN_UP"
     | "SEARCH_Q"
     | "UPDATE_Q"
+    | "UPDATE_SORT"
   payload?: any
 }
 
@@ -57,7 +61,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         ...state,
         totalCount: action.payload.totalCount,
         currentTotal: atiData.length,
-        aitProjects: newAtis,
+        atiProjects: newAtis,
         status: "finished",
         page: 0,
       } as SearchState
@@ -66,10 +70,18 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
       return { ...state, status: "inactive" } as SearchState
     }
     case "UPDATE_PAGE": {
-      return { ...state, page: action.payload }
+      return { ...state, page: action.payload } as SearchState
     }
     case "UPDATE_Q": {
-      return { ...state, q: action.payload }
+      return { ...state, q: action.payload, fetchQ: true } as SearchState
+    }
+    case "UPDATE_SORT": {
+      return {
+        ...state,
+        sort: action.payload.sort,
+        order: action.payload.order,
+        fetchQ: true,
+      } as SearchState
     }
     default: {
       return state

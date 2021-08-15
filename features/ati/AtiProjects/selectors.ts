@@ -4,6 +4,7 @@ import { NotificationKind } from "carbon-components-react"
 
 import { SearchState } from "./state"
 
+import { SORT_SEPARATOR } from "./constants"
 import { NUMBER_OF_ATI_PROJECTS_PER_PAGE } from "../../../constants/dataverse"
 import { range } from "../../../utils/arrayUtils"
 import { IAtiProject } from "../../../types/ati"
@@ -26,6 +27,9 @@ export const getShowResultDesc = (state: SearchState) =>
   ["inactive", "finished"].includes(state.status) && state.currentTotal > 0
 
 export const getAtis = (state: SearchState): IAtiProject[] => {
+  if (state.status === "active") {
+    return []
+  }
   const indices = range(
     state.page * NUMBER_OF_ATI_PROJECTS_PER_PAGE,
     Math.min(
@@ -71,3 +75,6 @@ export const getInlineNotficationTitle = (state: SearchState): string => {
     return "Error!"
   }
 }
+
+export const getSelectedSortItem = (state: SearchState) =>
+  `${state.sort}${SORT_SEPARATOR}${state.order}`

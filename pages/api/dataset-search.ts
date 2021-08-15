@@ -19,14 +19,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { dataverseApiToken } = session
-      const { start, q } = req.query
+      const { start, q, sort, order } = req.query
       try {
         const { data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/search`, {
           params: {
             q: q || "*",
             type: "dataset",
-            sort: "date",
-            order: "desc",
+            sort: sort || "date",
+            order: order || "desc",
             start: start,
             per_page: NUMBER_OF_ATI_PROJECTS_PER_PAGE,
             show_entity_ids: true,

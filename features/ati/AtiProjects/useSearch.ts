@@ -2,7 +2,7 @@ import { Dispatch, useEffect, useReducer } from "react"
 
 import axios from "axios"
 
-import { Action, INITIAL_Q, searchReducer, SearchState } from "./state"
+import { Action, searchReducer, SearchState } from "./state"
 
 import { NUMBER_OF_ATI_PROJECTS_PER_PAGE } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -57,6 +57,8 @@ const useSearch = (inititalState: SearchState) => {
         const { data } = await axios.get(`/api/dataset-search`, {
           params: {
             q: state.q,
+            sort: state.sort,
+            order: state.order,
             start: 0,
           },
         })
@@ -73,11 +75,11 @@ const useSearch = (inititalState: SearchState) => {
         }
       }
     }
-    if (state.q !== INITIAL_Q) {
+    if (state.fetchQ) {
       //Don't initially search q
       search()
     }
-  }, [state.q])
+  }, [state.q, state.fetchQ, state.sort, state.order])
 
   return [state, dispatch] as [SearchState, Dispatch<Action>]
 }
