@@ -142,6 +142,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props.atisPerPage = data.data.pagination.docsPerPage
         props.publicationStatusCount = data.data.pubstatus_counts
         props.selectedFilters = data.data.selected_filters
+      } else {
+        props.errorMsg = data.error_message
       }
     } catch (e) {
       const { message } = getResponseFromError(e)
