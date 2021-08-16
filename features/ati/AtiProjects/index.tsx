@@ -2,26 +2,21 @@ import React, { FC, FormEventHandler } from "react"
 
 import {
   PaginationNav,
-  InlineNotification,
   Search,
   Form,
   FormGroup,
   Checkbox,
+  InlineLoading,
 } from "carbon-components-react"
 
 import AtiProject from "../AtiProject"
 import useSearch from "./useSearch"
 import {
-  getStart,
-  getEnd,
   getAtis,
-  getTotalCount,
   getTotalPages,
   getShowPagination,
-  getInlineNotficationKind,
-  getInlineNotficationSubtitle,
-  getInlineNotficationTitle,
-  getShowResultDesc,
+  getLoadingDesc,
+  getLoadingIconDesc,
 } from "./selectors"
 
 import { PUBLICATION_STATUS_NAME } from "../../../constants/dataverse"
@@ -34,8 +29,8 @@ export interface AtiProjectsProps {
   atiProjects: IAtiProject[]
   initialTotalCount: number
   atisPerPage: number
-  publicationStatusCount: any
-  selectedFilters: any
+  publicationStatusCount: Record<string, number>
+  selectedFilters: Record<string, string[]>
 }
 
 const AtiProjects: FC<AtiProjectsProps> = ({
@@ -58,6 +53,13 @@ const AtiProjects: FC<AtiProjectsProps> = ({
     q: "",
     fetchQ: false,
     error: "",
+    selectedPublicationStatuses: selectedFilters["publication_statuses"].reduce((acc, curr) => {
+      acc[curr] = true
+      return acc
+    }, {} as Record<string, boolean>),
+    selectedFilters: selectedFilters,
+    publicationStatusCount: publicationStatusCount,
+    fetchPublicationStatus: false,
   })
   const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
@@ -67,15 +69,12 @@ const AtiProjects: FC<AtiProjectsProps> = ({
     }
     dispatch({ type: "UPDATE_Q", payload: target.atiSearch.value.trim() })
   }
+  const onFacetFieldChange = (checked: boolean, id: string) =>
+    dispatch({ type: "UPDATE_SELECTED_PUBLICATION_STATUS", payload: { id, checked } })
 
-  const start = getStart(state)
-  const end = getEnd(state)
-  const totalCount = getTotalCount(state)
   const totalPages = getTotalPages(state)
-  const showResultDesc = getShowResultDesc(state)
-  const inlineNotificationKind = getInlineNotficationKind(state)
-  const inlineNotificationSubtitle = getInlineNotficationSubtitle(state)
-  const inlineNotficationTitle = getInlineNotficationTitle(state)
+  const loadingDesc = getLoadingDesc(state)
+  const loadingIconDesc = getLoadingIconDesc(state)
   const atis = getAtis(state)
   const showPagination = getShowPagination(state)
   return (
@@ -90,15 +89,6 @@ const AtiProjects: FC<AtiProjectsProps> = ({
           size="lg"
         />
       </Form>
-
-      {state.status !== "inactive" && (
-        <InlineNotification
-          lowContrast
-          kind={inlineNotificationKind}
-          subtitle={<span>{inlineNotificationSubtitle}</span>}
-          title={inlineNotficationTitle}
-        />
-      )}
       <div className={styles.resultContainer}>
         <Form>
           <FormGroup legendText={PUBLICATION_STATUS_NAME}>
@@ -107,9 +97,14 @@ const AtiProjects: FC<AtiProjectsProps> = ({
                 return (
                   <Checkbox
                     key={status}
-                    defaultChecked
                     id={status}
-                    labelText={getLabelTextForPublicationStatus(status, publicationStatusCount)}
+                    name={status}
+                    checked={state.selectedPublicationStatuses[status]}
+                    labelText={getLabelTextForPublicationStatus(
+                      status,
+                      state.publicationStatusCount
+                    )}
+                    onChange={onFacetFieldChange}
                   />
                 )
               }
@@ -117,11 +112,12 @@ const AtiProjects: FC<AtiProjectsProps> = ({
           </FormGroup>
         </Form>
         <div className={styles.atiContainer}>
-          {showResultDesc && (
-            <div
-              className={styles.searchResultDesc}
-            >{`${start} to ${end} of ${totalCount} project(s)`}</div>
-          )}
+          <InlineLoading
+            id="ati-search-results-status"
+            status={state.status}
+            description={loadingDesc}
+            iconDescription={loadingIconDesc}
+          />
           {atis.map(
             ({
               id,

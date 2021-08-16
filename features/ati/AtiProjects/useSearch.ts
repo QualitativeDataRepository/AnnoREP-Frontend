@@ -1,9 +1,12 @@
 import { Dispatch, useEffect, useReducer } from "react"
 
 import axios from "axios"
+import qs from "qs"
 
 import { Action, searchReducer, SearchState } from "./state"
+import { getTrueFields } from "./utils"
 
+import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 const useSearch = (inititalState: SearchState) => {
@@ -23,11 +26,15 @@ const useSearch = (inititalState: SearchState) => {
             //dataverse mydata selected_page starts at 1
             selectedPage: state.page + 1,
             isAnnoRep: true,
-            //pub status
+            //use current pub statuses
+            publicationStatuses: getTrueFields(state.selectedPublicationStatuses),
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false })
           },
         })
         if (!didCancel) {
-          dispatch({ type: "SEARCH_SUCCESS", payload: data })
+          dispatch({ type: "SEARCH_PAGE", payload: data })
         }
       } catch (e) {
         if (!didCancel) {
@@ -44,11 +51,18 @@ const useSearch = (inititalState: SearchState) => {
     return () => {
       didCancel = true
     }
-  }, [state.q, state.page, state.totalCount, state.currentTotal, state.atiProjects])
+  }, [
+    state.q,
+    state.page,
+    state.totalCount,
+    state.currentTotal,
+    state.atiProjects,
+    state.selectedPublicationStatuses,
+  ])
 
-  //Searching
+  //Searching q
   useEffect(() => {
-    const didCancel = false
+    let didCancel = false
     const search = async () => {
       try {
         dispatch({ type: "SEARCH_INIT" })
@@ -58,7 +72,11 @@ const useSearch = (inititalState: SearchState) => {
             //dataverse mydata selected_page starts at 1
             selectedPage: 1,
             isAnnoRep: true,
-            //pub status
+            //when searching q, search all pub statuses
+            publicationStatuses: PUBLICATION_STATUSES,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false })
           },
         })
         if (!didCancel) {
@@ -68,6 +86,7 @@ const useSearch = (inititalState: SearchState) => {
         if (!didCancel) {
           const message = getMessageFromError(e)
           dispatch({ type: "SEARCH_FAILURE", payload: message })
+          dispatch({ type: "NO_RESULTS" })
         }
       }
     }
@@ -75,7 +94,48 @@ const useSearch = (inititalState: SearchState) => {
       //Don't initially search q
       search()
     }
+    return () => {
+      didCancel = true
+    }
   }, [state.q, state.fetchQ])
+
+  //Publication status change
+  useEffect(() => {
+    let didCancel = false
+    const publicationStatuses = getTrueFields(state.selectedPublicationStatuses)
+    const search = async () => {
+      try {
+        dispatch({ type: "SEARCH_INIT" })
+        const { data } = await axios.get(`/api/mydata-search`, {
+          params: {
+            q: state.q,
+            //dataverse mydata selected_page starts at 1
+            selectedPage: 1,
+            isAnnoRep: true,
+            publicationStatuses: publicationStatuses,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false })
+          },
+        })
+        if (!didCancel) {
+          dispatch({ type: "SEARCH_Q", payload: data })
+        }
+      } catch (e) {
+        if (!didCancel) {
+          const message = getMessageFromError(e)
+          dispatch({ type: "SEARCH_FAILURE", payload: message })
+          dispatch({ type: "NO_RESULTS" })
+        }
+      }
+    }
+    if (state.fetchPublicationStatus) {
+      search()
+    }
+    return () => {
+      didCancel = true
+    }
+  }, [state.q, state.selectedPublicationStatuses, state.fetchPublicationStatus])
 
   return [state, dispatch] as [SearchState, Dispatch<Action>]
 }

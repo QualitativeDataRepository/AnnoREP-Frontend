@@ -7,7 +7,6 @@ import {
   ANNOREP_METADATA_VALUE,
   DATASET_DV_TYPE,
   KIND_OF_DATA_NAME,
-  PUBLICATION_STATUSES,
 } from "../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
 import { IAtiProject } from "../../types/ati"
@@ -34,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             params: {
               key: dataverseApiToken,
               dvobject_types: DATASET_DV_TYPE,
-              published_states: publicationStatuses || PUBLICATION_STATUSES,
+              published_states: publicationStatuses,
               mydata_search_term: searchTerm,
               selected_page: selectedPage || 1,
             },
@@ -75,9 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             selectedFilters: data.data.selected_filters,
           })
         } else {
-          res.status(200).json({
-            atiProjects: [],
-            totalCount: 0,
+          res.status(400).json({
+            message: data.error_message,
           })
         }
       } catch (e) {

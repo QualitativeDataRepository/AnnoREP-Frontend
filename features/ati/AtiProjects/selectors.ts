@@ -1,24 +1,10 @@
-import { ReactNode } from "react"
-
-import { NotificationKind } from "carbon-components-react"
-
 import { SearchState } from "./state"
 
 import { range } from "../../../utils/arrayUtils"
 import { IAtiProject } from "../../../types/ati"
 
-export const getStart = (state: SearchState): number => state.page * state.perPage + 1
-
-export const getEnd = (state: SearchState): number =>
-  Math.min(state.totalCount, state.page * state.perPage + state.perPage)
-
-export const getTotalCount = (state: SearchState): number => state.totalCount
-
 export const getTotalPages = (state: SearchState): number =>
   Math.ceil(state.totalCount / state.perPage)
-
-export const getShowResultDesc = (state: SearchState): boolean =>
-  ["inactive", "finished"].includes(state.status) && state.totalCount > 0
 
 export const getAtis = (state: SearchState): IAtiProject[] => {
   if (state.status === "active") {
@@ -34,37 +20,33 @@ export const getAtis = (state: SearchState): IAtiProject[] => {
 }
 
 export const getShowPagination = (state: SearchState): boolean => {
-  return getTotalPages(state) > 1 && ["inactive", "finished"].includes(state.status)
+  return ["inactive", "finished"].includes(state.status) && getTotalPages(state) > 1
 }
 
-export const getInlineNotficationKind = (state: SearchState): NotificationKind => {
-  if (state.status === "active") {
-    return "info"
-  } else if (state.status === "finished") {
-    return state.currentTotal === 0 ? "info" : "success"
-  } else {
-    return "error"
-  }
-}
-
-export const getInlineNotficationSubtitle = (state: SearchState): ReactNode => {
-  if (state.status === "active") {
-    return `Fetching ATI projects...`
-  } else if (state.status === "finished") {
-    return state.currentTotal === 0 ? "No ATI projects found." : `Finished fetching ATI projects.`
+export const getLoadingDesc = (state: SearchState) => {
+  if (["inactive", "finished"].includes(state.status)) {
+    if (state.totalCount === 1) {
+      return "1 project"
+    }
+    return `${state.page * state.perPage + 1} to ${Math.min(
+      state.totalCount,
+      state.page * state.perPage + state.perPage
+    )} of ${state.totalCount} project(s)`
+  } else if (state.status === "active") {
+    return "Searching..."
   } else {
     return state.error
   }
 }
 
-export const getInlineNotficationTitle = (state: SearchState): string => {
-  if (state.status === "active") {
-    return "Status"
+export const getLoadingIconDesc = (state: SearchState) => {
+  if (state.status == "inactive") {
+    return "Inactive!"
   } else if (state.status === "finished") {
-    return state.currentTotal === 0 ? "Status" : "Success!"
+    return "Success!"
+  } else if (state.status === "active") {
+    return "Searching..."
   } else {
     return "Error!"
   }
 }
-
-export const showResult = (state: SearchState): boolean => state.totalCount > 0

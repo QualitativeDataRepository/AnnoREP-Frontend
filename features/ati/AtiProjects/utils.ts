@@ -6,3 +6,7 @@ export const getLabelTextForPublicationStatus = (
   const count = counts[key]
   return `${status} (${count})`
 }
+
+export const getTrueFields = (fields: Record<string, boolean>): string[] => {
+  return Object.keys(fields).filter((field) => fields[field])
+}
