@@ -7,9 +7,21 @@
   row-gap: 4px;
 }
 
-.atiProject > h2 > a {
+.atiProject h2 {
+  display: flex;
+  align-items: center;
+}
+
+.atiProject h2 > a {
   font-size: 1.25rem;
   font-weight: 600;
+}
+
+.titleContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 4px;
+  column-gap: 8px;
 }
 
 .atiProject p {
@@ -19,4 +31,18 @@
 .citation {
   padding: 4px;
   background-color: #dfdfe7;
+}
+
+.tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 42rem) {
+  .titleContainer {
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: center;
+  }
 }

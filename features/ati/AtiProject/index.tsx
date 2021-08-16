@@ -2,7 +2,9 @@ import React, { FC } from "react"
 
 import NextLink from "next/link"
 
-import { Link } from "carbon-components-react"
+import { Link, Tag } from "carbon-components-react"
+
+import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 
 import styles from "./AtiProject.module.css"
 
@@ -26,21 +28,35 @@ const AtiProject: FC<AtiProjectProps> = ({
   description,
   dataverseName,
   citationHtml,
-  //publicationStatuses,
+  publicationStatuses,
   dateDisplay,
-  //userRoles,
+  userRoles,
   dataverseServerUrl,
   dataverse,
 }) => {
   return (
     <section aria-label={name} className={styles.atiProject}>
-      <h2>
-        <NextLink href={`/ati/${id}`}>
-          <a className="bx--link" href={`/ati/${id}`}>
-            {name}
-          </a>
-        </NextLink>
-      </h2>
+      <div className={styles.titleContainer}>
+        <h2>
+          <NextLink href={`/ati/${id}`}>
+            <a className="bx--link" href={`/ati/${id}`}>
+              {name}
+            </a>
+          </NextLink>
+        </h2>
+        <div className={styles.tags}>
+          {publicationStatuses.sort().map((status, i) => (
+            <Tag key={i} id={status} type={PUBLICATION_STATUSES_COLOR[status]} size="sm">
+              {status}
+            </Tag>
+          ))}
+          {userRoles.sort().map((role, i) => (
+            <Tag key={i} id={role} type="teal" size="sm">
+              {role}
+            </Tag>
+          ))}
+        </div>
+      </div>
       <p>
         {dateDisplay} -{" "}
         <Link
