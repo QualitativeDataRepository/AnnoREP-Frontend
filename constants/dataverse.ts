@@ -37,3 +37,5 @@ export const PUBLICATION_STATUSES_COLOR: Record<string, TagTypeName> = {
 }
 
 export const DATASET_DV_TYPE = "Dataset"
+
+export const PUBLICATION_STATUS_NAME = "Publication Statuses"

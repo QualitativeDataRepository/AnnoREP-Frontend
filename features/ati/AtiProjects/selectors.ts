@@ -18,7 +18,7 @@ export const getTotalPages = (state: SearchState): number =>
   Math.ceil(state.totalCount / state.perPage)
 
 export const getShowResultDesc = (state: SearchState): boolean =>
-  ["inactive", "finished"].includes(state.status) && state.currentTotal > 0
+  ["inactive", "finished"].includes(state.status) && state.totalCount > 0
 
 export const getAtis = (state: SearchState): IAtiProject[] => {
   if (state.status === "active") {
@@ -66,3 +66,5 @@ export const getInlineNotficationTitle = (state: SearchState): string => {
     return "Error!"
   }
 }
+
+export const showResult = (state: SearchState): boolean => state.totalCount > 0

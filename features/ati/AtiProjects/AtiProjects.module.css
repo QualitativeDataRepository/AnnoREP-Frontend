@@ -9,9 +9,25 @@
   font-size: 1rem;
 }
 
+.resultContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.atiContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 24px;
+}
+
 @media (min-width: 42rem) {
   .searchResultDescContainer {
     grid-template-columns: 0.9fr auto;
     align-items: center;
+  }
+
+  .resultContainer {
+    grid-template-columns: 0.25fr 1fr;
+    align-items: start;
   }
 }

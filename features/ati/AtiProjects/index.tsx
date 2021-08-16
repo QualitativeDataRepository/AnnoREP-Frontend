@@ -1,6 +1,13 @@
 import React, { FC, FormEventHandler } from "react"
 
-import { PaginationNav, InlineNotification, Search, Form } from "carbon-components-react"
+import {
+  PaginationNav,
+  InlineNotification,
+  Search,
+  Form,
+  FormGroup,
+  Checkbox,
+} from "carbon-components-react"
 
 import AtiProject from "../AtiProject"
 import useSearch from "./useSearch"
@@ -17,7 +24,9 @@ import {
   getShowResultDesc,
 } from "./selectors"
 
+import { PUBLICATION_STATUS_NAME } from "../../../constants/dataverse"
 import { IAtiProject } from "../../../types/ati"
+import { getLabelTextForPublicationStatus } from "./utils"
 
 import styles from "./AtiProjects.module.css"
 
@@ -29,7 +38,13 @@ export interface AtiProjectsProps {
   selectedFilters: any
 }
 
-const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount, atisPerPage }) => {
+const AtiProjects: FC<AtiProjectsProps> = ({
+  atiProjects,
+  initialTotalCount,
+  atisPerPage,
+  publicationStatusCount,
+  selectedFilters,
+}) => {
   const [state, dispatch] = useSearch({
     currentTotal: atiProjects.length,
     totalCount: initialTotalCount,
@@ -75,11 +90,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount, ati
           size="lg"
         />
       </Form>
-      {showResultDesc && (
-        <div
-          className={styles.searchResultDesc}
-        >{`${start} to ${end} of ${totalCount} project(s)`}</div>
-      )}
+
       {state.status !== "inactive" && (
         <InlineNotification
           lowContrast
@@ -88,42 +99,67 @@ const AtiProjects: FC<AtiProjectsProps> = ({ atiProjects, initialTotalCount, ati
           title={inlineNotficationTitle}
         />
       )}
-      {atis.map(
-        ({
-          id,
-          name,
-          description,
-          dateDisplay,
-          dataverseName,
-          citationHtml,
-          publicationStatuses,
-          userRoles,
-          dataverseServerUrl,
-          dataverse,
-        }) => (
-          <AtiProject
-            key={id}
-            id={id}
-            name={name}
-            description={description}
-            dateDisplay={dateDisplay}
-            dataverseName={dataverseName}
-            citationHtml={citationHtml}
-            publicationStatuses={publicationStatuses}
-            userRoles={userRoles}
-            dataverseServerUrl={dataverseServerUrl}
-            dataverse={dataverse}
-          />
-        )
-      )}
-      {showPagination && (
-        <PaginationNav
-          loop={false}
-          page={state.page}
-          totalItems={totalPages}
-          onChange={onCurrentPageChange}
-        />
-      )}
+      <div className={styles.resultContainer}>
+        <Form>
+          <FormGroup legendText={PUBLICATION_STATUS_NAME}>
+            {selectedFilters[PUBLICATION_STATUS_NAME.toLowerCase().split(" ").join("_")].map(
+              (status: string) => {
+                return (
+                  <Checkbox
+                    key={status}
+                    defaultChecked
+                    id={status}
+                    labelText={getLabelTextForPublicationStatus(status, publicationStatusCount)}
+                  />
+                )
+              }
+            )}
+          </FormGroup>
+        </Form>
+        <div className={styles.atiContainer}>
+          {showResultDesc && (
+            <div
+              className={styles.searchResultDesc}
+            >{`${start} to ${end} of ${totalCount} project(s)`}</div>
+          )}
+          {atis.map(
+            ({
+              id,
+              name,
+              description,
+              dateDisplay,
+              dataverseName,
+              citationHtml,
+              publicationStatuses,
+              userRoles,
+              dataverseServerUrl,
+              dataverse,
+            }) => (
+              <AtiProject
+                key={id}
+                id={id}
+                name={name}
+                description={description}
+                dateDisplay={dateDisplay}
+                dataverseName={dataverseName}
+                citationHtml={citationHtml}
+                publicationStatuses={publicationStatuses}
+                userRoles={userRoles}
+                dataverseServerUrl={dataverseServerUrl}
+                dataverse={dataverse}
+              />
+            )
+          )}
+          {showPagination && (
+            <PaginationNav
+              loop={false}
+              page={state.page}
+              totalItems={totalPages}
+              onChange={onCurrentPageChange}
+            />
+          )}
+        </div>
+      </div>
     </>
   )
 }
