@@ -38,7 +38,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
       return { ...state, status: "active", error: "" } as SearchState
     }
     case "SEARCH_PAGE": {
-      const atiData = action.payload.atiProjects as IAtiProject[]
+      const atiData = action.payload.datasets as IAtiProject[]
       const newAtis = atiData.reduce((acc, curr, i) => {
         acc[i + action.payload.start] = curr
         return acc
@@ -54,7 +54,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
       return { ...state, status: "error", error: action.payload } as SearchState
     }
     case "SEARCH_Q": {
-      const atiData = action.payload.atiProjects as IAtiProject[]
+      const atiData = action.payload.datasets as IAtiProject[]
       const newAtis = atiData.reduce((acc, curr, i) => {
         acc[i] = curr
         return acc
@@ -78,7 +78,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
             : {},
         selectedFilters: action.payload.selectedFilters,
         publicationStatusCount: action.payload.publicationStatusCount,
-        perPage: action.payload.atisPerPage,
+        perPage: action.payload.docsPerPage,
         fetchPublicationStatus: false,
       } as SearchState
     }

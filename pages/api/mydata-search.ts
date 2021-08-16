@@ -48,10 +48,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         )
         if (data.success) {
-          const atiProjects: IAtiProject[] = []
+          const datasets: IAtiProject[] = []
           const items = data.data.items
           for (let i = 0; i < items.length; i++) {
-            atiProjects.push({
+            datasets.push({
               id: items[i].entity_id,
               name: items[i].name,
               description: items[i].description,
@@ -65,11 +65,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
           }
           res.status(200).json({
-            atiProjects,
+            datasets,
             totalCount: data.data.total_count,
             //0th index, this is used for changeing pages
             start: data.data.start,
-            atisPerPage: data.data.pagination.docsPerPage,
+            docsPerPage: data.data.pagination.docsPerPage,
             publicationStatusCount: data.data.pubstatus_counts,
             selectedFilters: data.data.selected_filters,
           })
