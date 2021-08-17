@@ -12,10 +12,27 @@
   gap: 0px;
   justify-content: start;
   align-items: center;
-  margin-bottom: 16px;
   background-color: whitesmoke;
 }
 
 .deleteManuscript {
   justify-self: end;
+}
+
+.tabContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 16px;
+}
+
+.centerUploadManuscript {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+@media (min-width: 42rem) {
+  .centerUploadManuscript {
+    padding-top: 20vh;
+  }
 }

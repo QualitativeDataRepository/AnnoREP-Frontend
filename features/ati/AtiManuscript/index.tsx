@@ -124,92 +124,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
 
   return (
     <>
-      <div className={styles.buttonContainer}>
-        <Button
-          className={styles.blackButton}
-          kind="ghost"
-          size="md"
-          hasIconOnly
-          iconDescription="Show datasources"
-          tooltipPosition="top"
-          tooltipAlignment="start"
-          onClick={openModal}
-        >
-          <Document20 />
-        </Button>
-        {manuscriptId && (
-          <Button
-            className={styles.blackButton}
-            as="a"
-            target="_blank"
-            kind="ghost"
-            size="md"
-            href={`/manuscript/${manuscriptId}`}
-            hasIconOnly
-            iconDescription="Preview manuscript"
-            tooltipPosition="top"
-            tooltipAlignment="start"
-          >
-            <Launch20 />
-          </Button>
-        )}
-        {manuscriptId && (
-          <Form onSubmit={onDelete} className={styles.deleteManuscript}>
-            <Button
-              type="submit"
-              kind="danger"
-              size="md"
-              hasIconOnly
-              iconDescription="Delete manuscript"
-              tooltipPosition="top"
-              tooltipAlignment="end"
-            >
-              <TrashCan20 />
-            </Button>
-          </Form>
-        )}
-      </div>
-      {taskStatus !== "inactive" && (
-        <div className="ar--form-item">
-          <InlineNotification
-            hideCloseButton
-            lowContrast
-            kind={
-              taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-            }
-            subtitle={<span>{taskDesc}</span>}
-            title={
-              taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
-            }
-          />
-        </div>
-      )}
-      {!manuscriptId && (
-        <Form onSubmit={onUpload}>
-          <div className="ar--form-item">
-            <FileUploader
-              aria-required={true}
-              accept={[
-                ManuscriptFileExtension.docx,
-                ManuscriptFileExtension.pdf,
-                ManuscriptMimeType.docx,
-                ManuscriptMimeType.pdf,
-              ]}
-              buttonKind="tertiary"
-              buttonLabel="Add file"
-              filenameStatus="edit"
-              iconDescription="Clear file"
-              labelDescription="Supported file types are .docx and .pdf"
-              labelTitle="Upload manuscript"
-              name="manuscript"
-              size="small"
-            />
-          </div>
-          <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
-            Upload manuscript
-          </Button>
-        </Form>
-      )}
       <DatasourceModal
         datasources={datasources}
         serverUrl={serverUrl}
@@ -217,15 +131,109 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         open={modalIsOpen}
         closeModal={closeModal}
       />
-      {manuscriptId && (
-        <iframe
-          className={styles.iframe}
-          id={`manuscript__${manuscriptId}`}
-          title="manuscript"
-          src={`/manuscript/${manuscriptId}`}
-          width="100%"
-        />
-      )}
+      <div className={styles.tabContainer}>
+        <div className={styles.buttonContainer}>
+          <Button
+            className={styles.blackButton}
+            kind="ghost"
+            size="md"
+            hasIconOnly
+            iconDescription="Show datasources"
+            tooltipPosition="top"
+            tooltipAlignment="start"
+            onClick={openModal}
+          >
+            <Document20 />
+          </Button>
+          {manuscriptId && (
+            <Button
+              className={styles.blackButton}
+              as="a"
+              target="_blank"
+              kind="ghost"
+              size="md"
+              href={`/manuscript/${manuscriptId}`}
+              hasIconOnly
+              iconDescription="Preview manuscript"
+              tooltipPosition="top"
+              tooltipAlignment="start"
+            >
+              <Launch20 />
+            </Button>
+          )}
+          {manuscriptId && (
+            <Form onSubmit={onDelete} className={styles.deleteManuscript}>
+              <Button
+                type="submit"
+                kind="danger"
+                size="md"
+                hasIconOnly
+                iconDescription="Delete manuscript"
+                tooltipPosition="top"
+                tooltipAlignment="end"
+              >
+                <TrashCan20 />
+              </Button>
+            </Form>
+          )}
+        </div>
+        {taskStatus !== "inactive" && (
+          <div className="ar--form-item">
+            <InlineNotification
+              hideCloseButton
+              lowContrast
+              kind={
+                taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
+              }
+              subtitle={<span>{taskDesc}</span>}
+              title={
+                taskStatus === "active"
+                  ? "Status"
+                  : taskStatus === "finished"
+                  ? "Success!"
+                  : "Error!"
+              }
+            />
+          </div>
+        )}
+        {!manuscriptId && (
+          <div className={styles.centerUploadManuscript}>
+            <Form onSubmit={onUpload}>
+              <div className="ar--form-item">
+                <FileUploader
+                  aria-required={true}
+                  accept={[
+                    ManuscriptFileExtension.docx,
+                    ManuscriptFileExtension.pdf,
+                    ManuscriptMimeType.docx,
+                    ManuscriptMimeType.pdf,
+                  ]}
+                  buttonKind="tertiary"
+                  buttonLabel="Add file"
+                  filenameStatus="edit"
+                  iconDescription="Clear file"
+                  labelDescription="Supported file types are .docx and .pdf"
+                  labelTitle="Upload manuscript"
+                  name="manuscript"
+                  size="small"
+                />
+              </div>
+              <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
+                Upload manuscript
+              </Button>
+            </Form>
+          </div>
+        )}
+        {manuscriptId && (
+          <iframe
+            className={styles.iframe}
+            id={`manuscript__${manuscriptId}`}
+            title="manuscript"
+            src={`/manuscript/${manuscriptId}`}
+            width="100%"
+          />
+        )}
+      </div>
     </>
   )
 }
