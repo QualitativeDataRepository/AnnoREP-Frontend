@@ -44,7 +44,7 @@ const Home: FC<HomeProps> = ({
   selectedFilters,
 }) => {
   return (
-    <Layout isLoggedIn={isLoggedIn} title="AnnoREP">
+    <Layout isLoggedIn={isLoggedIn} title="AnnoREP - Home">
       <>
         {isLoggedIn ? (
           <div className={styles.loggedInContainer}>
