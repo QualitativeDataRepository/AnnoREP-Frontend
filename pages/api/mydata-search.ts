@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             headers: {
               [REQUEST_DESC_HEADER_NAME]: `Searching for ${
                 searchForAnnoRep ? ANNOREP_METADATA_VALUE : ""
-              } datasets...`,
+              } datasets`,
             },
           }
         )
