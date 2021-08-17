@@ -49,10 +49,14 @@ const Home: FC<HomeProps> = ({
         {isLoggedIn ? (
           <div className={styles.loggedInContainer}>
             <div className={styles.titleContainer}>
-              <h1>ATI Projects</h1>
+              <h1>
+                <abbr>ATI</abbr> Projects
+              </h1>
               <Link href="/new">
                 <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add16}>
-                  New ATI Project
+                  <span>
+                    New <abbr>ATI</abbr> Project
+                  </span>
                 </Button>
               </Link>
             </div>
@@ -82,13 +86,9 @@ const Home: FC<HomeProps> = ({
               <a href={"https://qdr.syr.edu/ati"}>Annotation for Transprent Inquiry (ATI)</a> and
               other annotation-based workflows.
             </p>
-            <div>
-              <Link href="/new">
-                <Button as="a" href="/new" kind="primary" size="sm" renderIcon={Add16}>
-                  New ATI Project
-                </Button>
-              </Link>
-            </div>
+            <p>
+              Please login to create a new <abbr>ATI</abbr> project.
+            </p>
           </div>
         )}
       </>
