@@ -16,7 +16,7 @@
     "npm": "6.x"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS=--max_old_space_size=2096 next dev",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --pretty --noEmit",
@@ -79,6 +79,7 @@
     "@typescript-eslint/parser": "^4.16.1",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
+    "cross-env": "^7.0.3",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
