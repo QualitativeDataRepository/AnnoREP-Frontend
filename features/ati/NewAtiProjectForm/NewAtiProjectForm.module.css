@@ -1,0 +1,27 @@
+.searchBox {
+  display: grid;
+  grid-template-columns: 1fr 0.15fr;
+  align-items: center;
+  column-gap: 8px;
+}
+/*More datasets button*/
+.moreDatasets {
+  padding: 4px;
+}
+
+/*Separate the title and loader*/
+.searchTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+/*Expand the label width*/
+.searchBox label[for="dataset-search"] {
+  width: 100%;
+}
+
+/*Unset the loader min height*/
+.searchLoader {
+  min-height: unset;
+}

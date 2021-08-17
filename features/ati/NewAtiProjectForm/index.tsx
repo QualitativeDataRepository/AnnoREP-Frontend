@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, useState } from "react"
+import React, { FC, FormEventHandler, KeyboardEventHandler, useState } from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -7,35 +7,80 @@ import {
   Button,
   Form,
   FileUploader,
-  Select,
-  SelectItem,
   Link,
   InlineNotification,
   InlineLoadingStatus,
+  ComboBox,
+  InlineLoading,
 } from "carbon-components-react"
 import { useRouter } from "next/router"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
-import { IDataset } from "../../../types/dataverse"
+import { IDatasetOption } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import useSearchDataset from "./useDatasetSearch"
+import {
+  getErrorMsg,
+  getItems,
+  getResultDesc,
+  getSearchPlaceholder,
+  hasMoreDatasets,
+} from "./selectors"
+
+import styles from "./NewAtiProjectForm.module.css"
 
 export interface NewAtiProjectFormProps {
   /**List of Dataverse datasets */
-  datasets: IDataset[]
+  datasets: IDatasetOption[]
   /**Dataverse server URL */
   serverUrl: string
+  /**The initial number of datasets */
+  initialTotalCount: number
+  /**The number of datasets per page */
+  datasetsPerPage?: number
 }
 
 /**Form to create a new ATI project */
-const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) => {
+const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
+  datasets,
+  serverUrl,
+  initialTotalCount,
+  datasetsPerPage,
+}) => {
   const router = useRouter()
+  const [state, dispatch] = useSearchDataset({
+    currentTotal: datasets.length,
+    totalCount: initialTotalCount,
+    datasets: datasets,
+    status: "inactive",
+    page: 0,
+    fetchPage: false,
+    perPage: datasetsPerPage || 0,
+    q: "",
+    fetchQ: false,
+    error: "",
+  })
+  const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
+  const onSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const target = e.target as typeof e.target & {
+      value: string
+    }
+    if (e.key === "Enter") {
+      dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
+    }
+  }
+  const [selectedDataset, setSelectedDataet] = useState<string>("")
+  const onSelect = (data: any) => {
+    setSelectedDataet(data.selectedItem ? data.selectedItem.id : "")
+  }
+
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
-      dataset: { value: string; selectedIndex: number }
+      dataset: { value: string }
       manuscript: { files: FileList }
     }
     if (target.manuscript.files.length === 0) {
@@ -67,13 +112,13 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
     setTaskDesc("Creating ATI project...")
     await axios({
       method: "PUT",
-      url: `/api/datasets/${target.dataset.value}/annorep`,
+      url: `/api/datasets/${selectedDataset}/annorep`,
     })
       .then(() => {
         setTaskDesc(`Uploading ${manuscript.name}...`)
         return axios({
           method: "POST",
-          url: `/api/datasets/${target.dataset.value}/manuscript`,
+          url: `/api/datasets/${selectedDataset}/manuscript`,
           data: formData,
           headers: {
             "Content-Type": "multipart/form-data",
@@ -90,11 +135,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
       })
       .then(() => {
         setTaskStatus("finished")
-        // - 1 because there is an empty placeholder option
-        setTaskDesc(
-          `Created ATI project for dataset ${datasets[target.dataset.selectedIndex - 1].title}.`
-        )
-        router.push(`/ati/${target.dataset.value}`)
+        setTaskDesc(`Created ATI project for dataset ${target.dataset.value}.`)
+        router.push(`/ati/${selectedDataset}`)
       })
       .catch((error) => {
         setTaskStatus("error")
@@ -142,30 +184,47 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({ datasets, serverUrl }) 
               />
             </div>
           )}
-          <div className="ar--form-item">
-            <Select
+          <div className={`ar--form-item ${styles.searchBox}`}>
+            <ComboBox
+              id="dataset-search"
               name="dataset"
-              defaultValue=""
-              helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
-              id="dataverse-dataset"
-              labelText="Link to a Dataverse dataset"
               required={true}
               aria-required={true}
-            >
-              <SelectItem
-                id="placeholder-item"
-                text={datasets.length ? "Choose a dataset" : "Please create a dataset"}
-                value=""
-              />
-              {datasets.map((dataset) => (
-                <SelectItem
-                  id={dataset.id}
-                  key={dataset.id}
-                  text={dataset.title}
-                  value={dataset.id}
-                />
-              ))}
-            </Select>
+              items={getItems(state)}
+              itemToString={(item) => item?.label || ""}
+              placeholder={getSearchPlaceholder(state)}
+              titleText={
+                <div className={styles.searchTitle}>
+                  <div>{"Link to a Dataverse dataset"}</div>
+                  <div>
+                    {state.status !== "error" && (
+                      <InlineLoading
+                        className={styles.searchLoader}
+                        status={state.status}
+                        description={getResultDesc(state)}
+                      />
+                    )}
+                  </div>
+                </div>
+              }
+              helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
+              invalid={state.error !== ""}
+              invalidText={getErrorMsg(state)}
+              onKeyUp={onSearch}
+              onChange={onSelect}
+            />
+            <div>
+              {hasMoreDatasets(state) && (
+                <Button
+                  className={styles.moreDatasets}
+                  kind="tertiary"
+                  size="md"
+                  onClick={onShowMore}
+                >
+                  More datasets
+                </Button>
+              )}
+            </div>
           </div>
           <div className="ar--form-item">
             <FileUploader

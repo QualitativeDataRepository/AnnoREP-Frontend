@@ -14,26 +14,23 @@ WithDatasets.args = {
   datasets: [
     {
       id: "dataset-1",
-      doi: "doi:123",
-      title: "Dataset 1",
+      name: "Dataset 1",
     },
     {
       id: "dataset-2",
-      doi: "doi:123",
-      title: "Dataset 2",
+      name: "Dataset 2",
     },
     {
       id: "dataset-3",
-      doi: "doi:123",
-      title: "Dataset 3",
+      name: "Dataset 3",
     },
     {
       id: "dataset-3",
-      doi: "doi:123",
-      title: "Dataset 4",
+      name: "Dataset 4",
     },
   ],
   serverUrl: "https://test.com",
+  initialTotalCount: 10,
 }
 
 export const WithoutDatasets = Template.bind({})

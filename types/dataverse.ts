@@ -25,3 +25,8 @@ export interface IATIProjectDetails {
   datasources: IDatasource[]
   manuscript: IManuscript
 }
+
+export interface IDatasetOption {
+  id: string
+  name: string
+}

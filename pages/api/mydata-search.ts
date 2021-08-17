@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         searchTerm = "-" + searchTerm
       }
       if (q) {
-        searchTerm = searchTerm + `AND ${q}`
+        searchTerm = searchTerm + ` AND ${q}`
       }
       try {
         const { data } = await axios.get(
