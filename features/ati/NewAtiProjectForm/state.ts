@@ -81,6 +81,7 @@ export function searchDatasetReducer(
         totalCount: 0,
         currentTotal: 0,
         datasets: [],
+        fetchQ: false,
       }
     }
     default: {
