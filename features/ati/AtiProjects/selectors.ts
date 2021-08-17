@@ -25,8 +25,8 @@ export const getShowPagination = (state: SearchState): boolean => {
 
 export const getLoadingDesc = (state: SearchState) => {
   if (["inactive", "finished"].includes(state.status)) {
-    if (state.totalCount === 1) {
-      return "1 project"
+    if (state.totalCount <= state.perPage) {
+      return `${state.totalCount} project(s)`
     }
     return `${state.page * state.perPage + 1} to ${Math.min(
       state.totalCount,
