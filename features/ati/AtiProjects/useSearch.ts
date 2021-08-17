@@ -81,6 +81,7 @@ const useSearch = (inititalState: SearchState) => {
         })
         if (!didCancel) {
           dispatch({ type: "SEARCH_Q", payload: data })
+          dispatch({ type: "UPDATE_FETCH_Q" })
         }
       } catch (e) {
         if (!didCancel) {
@@ -120,6 +121,7 @@ const useSearch = (inititalState: SearchState) => {
         })
         if (!didCancel) {
           dispatch({ type: "SEARCH_Q", payload: data })
+          dispatch({ type: "UPDATE_FETCH_PUBLICATION_STATUS" })
         }
       } catch (e) {
         if (!didCancel) {

@@ -29,6 +29,8 @@ export interface Action {
     | "UPDATE_Q"
     | "UPDATE_SELECTED_PUBLICATION_STATUS"
     | "NO_RESULTS"
+    | "UPDATE_FETCH_Q"
+    | "UPDATE_FETCH_PUBLICATION_STATUS"
   payload?: any
 }
 
@@ -113,6 +115,18 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         currentTotal: 0,
         publicationStatusCount: newPublicationStatusCount,
       } as SearchState
+    }
+    case "UPDATE_FETCH_Q": {
+      return {
+        ...state,
+        fetchQ: false,
+      }
+    }
+    case "UPDATE_FETCH_PUBLICATION_STATUS": {
+      return {
+        ...state,
+        fetchPublicationStatus: false,
+      }
     }
     default: {
       return state
