@@ -24,13 +24,10 @@ export interface Action {
     | "SEARCH_PAGE"
     | "SEARCH_FAILURE"
     | "UPDATE_PAGE"
-    | "SEARCH_CLEAN_UP"
     | "SEARCH_Q"
     | "UPDATE_Q"
     | "UPDATE_SELECTED_PUBLICATION_STATUS"
     | "NO_RESULTS"
-    | "UPDATE_FETCH_Q"
-    | "UPDATE_FETCH_PUBLICATION_STATUS"
   payload?: any
 }
 
@@ -81,6 +78,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         selectedFilters: action.payload.selectedFilters,
         publicationStatusCount: action.payload.publicationStatusCount,
         perPage: action.payload.docsPerPage,
+        fetchQ: false,
         fetchPublicationStatus: false,
       } as SearchState
     }
@@ -114,19 +112,9 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         totalCount: 0,
         currentTotal: 0,
         publicationStatusCount: newPublicationStatusCount,
-      } as SearchState
-    }
-    case "UPDATE_FETCH_Q": {
-      return {
-        ...state,
         fetchQ: false,
-      }
-    }
-    case "UPDATE_FETCH_PUBLICATION_STATUS": {
-      return {
-        ...state,
         fetchPublicationStatus: false,
-      }
+      } as SearchState
     }
     default: {
       return state
