@@ -22,7 +22,6 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
       <section aria-label="about" className={styles.section}>
         <h2 className={styles.header}>About</h2>
         <p>
-          Project title:{" "}
           <Link
             href={`${serverUrl}/dataset.xhtml?persistentId=${doi}`}
             target="_blank"
