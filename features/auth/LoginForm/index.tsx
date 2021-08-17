@@ -52,7 +52,7 @@ const LoginForm: FC<LoginFormProps> = ({
   }
 
   return (
-    <main className="ar--form-container">
+    <div className="ar--form-container">
       <Form onSubmit={onSubmit}>
         <h1 className="ar--form-title">Login</h1>
         <p className="ar--form-desc">
@@ -148,7 +148,7 @@ const LoginForm: FC<LoginFormProps> = ({
           Login
         </Button>
       </Form>
-    </main>
+    </div>
   )
 }
 
