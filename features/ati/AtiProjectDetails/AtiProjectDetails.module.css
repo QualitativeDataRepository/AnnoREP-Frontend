@@ -1,9 +1,3 @@
-.tabs ~ div[role="tabpanel"] {
-  padding: 1rem 0;
-}
-
-@media (min-width: 42rem) {
-  .tabs ~ div[role="tabpanel"] {
-    padding: 1rem;
-  }
+.tabs {
+  margin-bottom: 16px;
 }
