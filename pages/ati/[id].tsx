@@ -40,7 +40,7 @@ const Ati: FC<AtiProps> = ({
     <Layout
       isLoggedIn={isLoggedIn}
       title={`AnnoREP ${atiProjectDetails ? `- ${atiProjectDetails.dataset.title}` : ""}`}
-      isFullWidth={true}
+      isFullWidth={false}
     >
       {atiProjectDetails ? (
         <ATIProjectDetails
