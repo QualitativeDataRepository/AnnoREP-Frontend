@@ -22,20 +22,11 @@ import { getResponseFromError } from "../../utils/httpRequestUtils"
 interface AtiProps {
   isLoggedIn: boolean
   serverUrl: string
-  siteUrl: string
-  canExportAnnotations: boolean
   atiTab: IAtiTab
   atiProjectDetails?: IATIProjectDetails
 }
 
-const Ati: FC<AtiProps> = ({
-  isLoggedIn,
-  serverUrl,
-  siteUrl,
-  canExportAnnotations,
-  atiProjectDetails,
-  atiTab,
-}) => {
+const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, atiProjectDetails, atiTab }) => {
   return (
     <Layout
       isLoggedIn={isLoggedIn}
@@ -45,9 +36,7 @@ const Ati: FC<AtiProps> = ({
       {atiProjectDetails ? (
         <ATIProjectDetails
           serverUrl={serverUrl}
-          siteUrl={siteUrl}
           atiProjectDetails={atiProjectDetails}
-          canExportAnnotations={canExportAnnotations}
           atiTab={atiTab}
         />
       ) : (
@@ -68,27 +57,11 @@ export default Ati
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const datasetId = context?.params?.id
-  let canExportAnnotations = false
   const responses: AxiosResponse<any>[] = []
   let datasetZip = ""
   let ingestPdf = ""
   if (session && datasetId) {
     const { dataverseApiToken } = session
-    try {
-      //Is the qdr hypothesis api token valid?
-      const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
-        headers: {
-          Authorization: `Bearer ${process.env.QDR_HYPOTHESIS_API_TOKEN}`,
-        },
-      })
-      if (data.userid !== null) {
-        //The qdr hypothesis api token is valid
-        canExportAnnotations = true
-      }
-    } catch (e) {
-      const { status, message } = getResponseFromError(e)
-      console.error(status, message)
-    }
     //Get the dataset json
     await axios
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
@@ -163,12 +136,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       isLoggedIn: session ? true : false,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
-      siteUrl: process.env.DATAVERSE_SITE_URL,
       atiProjectDetails:
         responses.length === 1
           ? createAtiProjectDetails(responses[0], datasetZip, ingestPdf)
           : null,
-      canExportAnnotations,
       atiTab:
         tabs.findIndex((tab) => tab === context.query.atiTab) > -1
           ? context.query.atiTab

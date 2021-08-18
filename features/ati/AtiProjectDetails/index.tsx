@@ -15,17 +15,13 @@ import styles from "./AtiProjectDetails.module.css"
 
 interface ATIProjectDetailsProps {
   serverUrl: string
-  siteUrl: string
   atiProjectDetails: IATIProjectDetails
-  canExportAnnotations: boolean
   atiTab: IAtiTab
 }
 
 const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
   serverUrl,
-  siteUrl,
   atiProjectDetails,
-  canExportAnnotations,
   atiTab,
 }) => {
   const router = useRouter()
@@ -58,11 +54,7 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
         </Tab>
         <Tab {...AtiTab.exportAnnotations}>
           {atiProjectDetails.manuscript.id ? (
-            <AtiExportAnnotations
-              manuscript={atiProjectDetails.manuscript}
-              canExportAnnotations={canExportAnnotations}
-              dataverseSiteUrl={siteUrl}
-            />
+            <AtiExportAnnotations manuscript={atiProjectDetails.manuscript} />
           ) : (
             <InlineNotification
               hideCloseButton
