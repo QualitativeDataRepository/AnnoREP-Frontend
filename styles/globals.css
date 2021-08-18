@@ -64,3 +64,8 @@ a {
 .hypothesis-highlight::selection {
   background-color: blue;
 }
+
+/*Dont hide the scrollbar when modal is open. Prevent manuscript's width from changing and removing highlights*/
+body.bx--body--with-modal-open {
+  overflow: auto;
+}
