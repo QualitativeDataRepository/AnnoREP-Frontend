@@ -9,32 +9,31 @@ import {
   InlineLoadingStatus,
 } from "carbon-components-react"
 import FormData from "form-data"
-import { Document20, TrashCan20, Upload16, Launch20 } from "@carbon/icons-react"
+import { Document20, TrashCan20, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import DatasourceModal from "./DatasourceModal"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
-import { IDatasource } from "../../../types/dataverse"
+import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiManuscript.module.css"
+import IngestPdf from "./IngestPdf"
 
 interface AtiManuscriptProps {
   datasetId: string
   doi: string
   datasources: IDatasource[]
   serverUrl: string
-  manuscriptId?: string
-  manuscriptName?: string
+  manuscript: IManuscript
 }
 
 const AtiManuscript: FC<AtiManuscriptProps> = ({
   datasetId,
   doi,
-  manuscriptId,
-  manuscriptName,
+  manuscript,
   datasources,
   serverUrl,
 }) => {
@@ -47,14 +46,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
 
   const onDelete: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-    const id = manuscriptId as string
     setTaskStatus("active")
     setTaskDesc("Deleting manuscript...")
     await axios
-      .delete(`/api/delete-file/${id}`)
+      .delete(`/api/delete-file/${manuscript.id}`)
       .then(() => {
         setTaskStatus("finished")
-        setTaskDesc(`Deleted ${manuscriptName}.`)
+        setTaskDesc(`Deleted ${manuscript.name}.`)
         router.reload()
       })
       .catch((error) => {
@@ -145,23 +143,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           >
             <Document20 />
           </Button>
-          {manuscriptId && (
-            <Button
-              className={styles.blackButton}
-              as="a"
-              target="_blank"
-              kind="ghost"
-              size="md"
-              href={`/manuscript/${manuscriptId}`}
-              hasIconOnly
-              iconDescription="Preview manuscript"
-              tooltipPosition="top"
-              tooltipAlignment="start"
-            >
-              <Launch20 />
-            </Button>
-          )}
-          {manuscriptId && (
+          {manuscript.id && (
             <Form onSubmit={onDelete} className={styles.deleteManuscript}>
               <Button
                 type="submit"
@@ -178,25 +160,31 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           )}
         </div>
         {taskStatus !== "inactive" && (
-          <div className="ar--form-item">
+          <InlineNotification
+            hideCloseButton
+            lowContrast
+            kind={
+              taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
+            }
+            subtitle={<span>{taskDesc}</span>}
+            title={
+              taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
+            }
+          />
+        )}
+        {manuscript.id ? (
+          manuscript.ingest ? (
+            <IngestPdf pdf={manuscript.ingest} />
+          ) : (
             <InlineNotification
               hideCloseButton
               lowContrast
-              kind={
-                taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-              }
-              subtitle={<span>{taskDesc}</span>}
-              title={
-                taskStatus === "active"
-                  ? "Status"
-                  : taskStatus === "finished"
-                  ? "Success!"
-                  : "Error!"
-              }
+              kind="info"
+              subtitle={<span>Ingest PDF of manuscript not found.</span>}
+              title="Error!"
             />
-          </div>
-        )}
-        {!manuscriptId && (
+          )
+        ) : (
           <div className={styles.centerUploadManuscript}>
             <Form onSubmit={onUpload}>
               <div className="ar--form-item">
@@ -223,15 +211,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
               </Button>
             </Form>
           </div>
-        )}
-        {manuscriptId && (
-          <iframe
-            className={styles.iframe}
-            id={`manuscript__${manuscriptId}`}
-            title="manuscript"
-            src={`/manuscript/${manuscriptId}`}
-            width="100%"
-          />
         )}
       </div>
     </>
