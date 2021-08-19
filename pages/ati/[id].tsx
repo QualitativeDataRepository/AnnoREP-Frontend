@@ -32,6 +32,7 @@ const Ati: FC<AtiProps> = ({ isLoggedIn, serverUrl, atiProjectDetails, atiTab })
       isLoggedIn={isLoggedIn}
       title={`AnnoREP ${atiProjectDetails ? `- ${atiProjectDetails.dataset.title}` : ""}`}
       isFullWidth={false}
+      hasHypotheisClient={true}
     >
       {atiProjectDetails ? (
         <ATIProjectDetails

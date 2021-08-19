@@ -11,15 +11,25 @@ interface LayoutProps {
   children: ReactNode
   isLoggedIn: boolean
   isFullWidth?: boolean
+  hasHypotheisClient?: boolean
 }
 
-const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth }) => {
+const Layout: FC<LayoutProps> = ({
+  title,
+  children,
+  isLoggedIn,
+  isFullWidth,
+  hasHypotheisClient,
+}) => {
   return (
     <>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        {hasHypotheisClient && (
+          <script key="hypothesis" src="https://hypothes.is/embed.js" async></script>
+        )}
       </Head>
       <div className={styles.container}>
         <AppBar isLoggedIn={isLoggedIn} />
