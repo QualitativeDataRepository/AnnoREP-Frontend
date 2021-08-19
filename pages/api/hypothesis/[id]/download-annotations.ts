@@ -2,6 +2,7 @@ import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
+import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { range } from "../../../../utils/arrayUtils"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
@@ -13,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const uri = `${process.env.NEXTAUTH_URL}/manuscript/${id}`
+      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}?atiTab=${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken } = session
       const requestDesc = `Getting annotations from Hypothes.is server for source manuscript ${id}`

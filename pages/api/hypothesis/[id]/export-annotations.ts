@@ -9,9 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
-      const { id } = req.query
       const { destinationUrl: url, annotations } = req.body
-      const requestDesc = `Exporting annotations from source manuscript ${id} to ${url}`
+      const requestDesc = `Exporting annotations to ${url}`
       const { hypothesisApiToken } = session
       try {
         const copyAnns: AxiosPromise<any>[] = annotations.map((annotation: any) => {

@@ -18,17 +18,18 @@ import styles from "./AtiExportAnnotations.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface AtiExportAnnotationstProps {
+  datasetId: string
   manuscript: IManuscript
 }
 
-const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ manuscript }) => {
+const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ datasetId, manuscript }) => {
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
 
   useEffect(() => {
     const getAnnotationsJson = async () => {
-      const { data } = await axios.get(`/api/hypothesis/${manuscript.id}/download-annotations`, {
+      const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
         headers: {
           Accept: "application/json",
         },
@@ -51,11 +52,11 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ manuscript }) =>
     setTaskStatus("active")
     setTaskDesc("Downloading annotations...")
     await axios
-      .get(`/api/hypothesis/${manuscript.id}/download-annotations`)
+      .get(`/api/hypothesis/${datasetId}/download-annotations`)
       .then(({ data }) => {
         setTaskDesc("Exporting annotations...")
         return axios.post(
-          `/api/hypothesis/${manuscript.id}/export-annotations`,
+          `/api/hypothesis/${datasetId}/export-annotations`,
           JSON.stringify({
             destinationUrl: target.destinationUrl.value,
             annotations: data.annotations,

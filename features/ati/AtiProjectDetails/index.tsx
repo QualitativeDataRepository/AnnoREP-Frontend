@@ -53,7 +53,10 @@ const ATIProjectDetails: FC<ATIProjectDetailsProps> = ({
         </Tab>
         <Tab {...AtiTab.exportAnnotations}>
           {atiProjectDetails.manuscript.id ? (
-            <AtiExportAnnotations manuscript={atiProjectDetails.manuscript} />
+            <AtiExportAnnotations
+              datasetId={atiProjectDetails.dataset.id}
+              manuscript={atiProjectDetails.manuscript}
+            />
           ) : (
             <InlineNotification
               hideCloseButton
