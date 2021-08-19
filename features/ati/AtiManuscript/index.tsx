@@ -107,6 +107,11 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         return axios({
           method: "PUT",
           url: `/api/arcore/${newManuscriptId}`,
+          params: {
+            datasetId: datasetId,
+            //TODO add UI option
+            isRevision: true,
+          },
         })
       })
       .then(() => {
