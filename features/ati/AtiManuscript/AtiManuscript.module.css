@@ -8,7 +8,7 @@
 
 .buttonContainer {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr;
   gap: 0px;
   justify-content: start;
   align-items: center;
