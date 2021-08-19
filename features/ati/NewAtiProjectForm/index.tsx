@@ -131,6 +131,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
         return axios({
           method: "PUT",
           url: `/api/arcore/${manuscriptId}`,
+          params: {
+            datasetId: selectedDataset,
+            isRevision: false,
+          },
         })
       })
       .then(() => {
