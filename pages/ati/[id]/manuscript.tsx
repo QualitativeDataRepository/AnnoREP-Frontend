@@ -31,7 +31,7 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, serverUrl, atiProjectDetails })
       isLoggedIn={isLoggedIn}
       dataset={atiProjectDetails ? atiProjectDetails.dataset : null}
       selectedTab={AtiTabConstant.manuscript.id}
-      hasHypotheisClient={true}
+      hasHypotheisClient={atiProjectDetails?.manuscript.id ? true : false}
     >
       {atiProjectDetails && (
         <AtiManuscript
