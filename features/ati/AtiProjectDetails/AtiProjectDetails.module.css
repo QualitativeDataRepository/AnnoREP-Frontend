@@ -1,7 +1,0 @@
-.tabs {
-  margin-bottom: 16px;
-}
-
-.tabs ~ div[role="tabpanel"] {
-  padding: 0px;
-}
