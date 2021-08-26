@@ -7,6 +7,7 @@ import {
   FileUploader,
   InlineNotification,
   InlineLoadingStatus,
+  Toggle,
 } from "carbon-components-react"
 import FormData from "form-data"
 import { Document20, TrashCan20, Upload16 } from "@carbon/icons-react"
@@ -65,6 +66,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     e.preventDefault()
     const target = e.target as typeof e.target & {
       manuscript: { files: FileList }
+      uploadAnnotations: { checked: boolean }
     }
     if (target.manuscript.files.length === 0) {
       setTaskStatus("error")
@@ -109,8 +111,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           url: `/api/arcore/${newManuscriptId}`,
           params: {
             datasetId: datasetId,
-            //TODO add UI option
-            isRevision: true,
+            uploadAnnotations: target.uploadAnnotations.checked,
           },
         })
       })
@@ -209,6 +210,15 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   labelTitle="Upload manuscript"
                   name="manuscript"
                   size="small"
+                />
+              </div>
+              <div className="ar--form-item">
+                <Toggle
+                  id="upload-annotations-toggle"
+                  labelA="No"
+                  labelB="Yes"
+                  labelText="Upload manuscript's annotations to Hypothes.is server"
+                  name="uploadAnnotations"
                 />
               </div>
               <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>

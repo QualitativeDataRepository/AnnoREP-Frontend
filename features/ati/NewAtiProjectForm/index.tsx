@@ -135,7 +135,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           url: `/api/arcore/${manuscriptId}`,
           params: {
             datasetId: selectedDataset,
-            isRevision: false,
+            uploadAnnotations: true,
           },
         })
       })

@@ -8,7 +8,7 @@ import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { datasetId, isRevision } = req.query
+  const { datasetId, uploadAnnotations } = req.query
   if (req.method === "PUT") {
     const session = await getSession({ req })
     if (session) {
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         })
         .then(({ data }) => {
-          if (isRevision !== "true") {
+          if (uploadAnnotations === "true") {
             //Uploading new file, send annotations to hypothes.is server
             const uri = `${process.env.NEXTAUTH_URL}/ati/${datasetId}/${AtiTab.manuscript.id}`
             const sendAnns: AxiosPromise<any>[] = data.map((annotation: any) => {
