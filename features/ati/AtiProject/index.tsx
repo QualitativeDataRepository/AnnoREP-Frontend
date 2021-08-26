@@ -4,6 +4,7 @@ import NextLink from "next/link"
 
 import { Link, Tag } from "carbon-components-react"
 
+import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 
 import styles from "./AtiProject.module.css"
@@ -38,8 +39,8 @@ const AtiProject: FC<AtiProjectProps> = ({
     <section aria-label={name} className={styles.atiProject}>
       <div className={styles.titleContainer}>
         <h2>
-          <NextLink href={`/ati/${id}`}>
-            <a className="bx--link" href={`/ati/${id}`}>
+          <NextLink href={`/ati/${id}/${AtiTab.summary.id}`}>
+            <a className="bx--link" href={`/ati/${id}/${AtiTab.summary.id}`}>
               {name}
             </a>
           </NextLink>
