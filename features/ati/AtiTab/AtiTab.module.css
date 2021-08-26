@@ -1,0 +1,7 @@
+.tabs {
+  margin-bottom: 16px;
+}
+
+.tabs ~ div[role="tabpanel"] {
+  display: none;
+}
