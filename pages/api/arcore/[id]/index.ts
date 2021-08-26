@@ -35,8 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .then(({ data }) => {
           if (isRevision !== "true") {
-            //Uploading revised manuscript, donn't send annotations
-            const uri = `${process.env.NEXTAUTH_URL}/ati/${datasetId}?atiTab=${AtiTab.manuscript.id}`
+            //Uploading new file, send annotations to hypothes.is server
+            const uri = `${process.env.NEXTAUTH_URL}/ati/${datasetId}/${AtiTab.manuscript.id}`
             const sendAnns: AxiosPromise<any>[] = data.map((annotation: any) => {
               annotation.target.forEach((element: any) => {
                 element.source = uri

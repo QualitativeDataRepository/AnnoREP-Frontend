@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}?atiTab=${AtiTab.manuscript.id}`
+      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken } = session
       const requestDesc = `Getting annotations from Hypothes.is server for source manuscript ${id}`
