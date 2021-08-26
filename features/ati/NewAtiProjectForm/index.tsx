@@ -28,6 +28,8 @@ import {
   hasMoreDatasets,
 } from "./selectors"
 
+import { AtiTab } from "../../../constants/ati"
+
 import styles from "./NewAtiProjectForm.module.css"
 
 export interface NewAtiProjectFormProps {
@@ -140,7 +142,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
       .then(() => {
         setTaskStatus("finished")
         setTaskDesc(`Created ATI project for dataset ${target.dataset.value}.`)
-        router.push(`/ati/${selectedDataset}`)
+        router.push(`/ati/${selectedDataset}/${AtiTab.summary.id}`)
       })
       .catch((error) => {
         setTaskStatus("error")
