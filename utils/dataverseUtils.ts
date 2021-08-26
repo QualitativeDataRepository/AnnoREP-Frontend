@@ -1,11 +1,6 @@
 import { AxiosResponse } from "axios"
 
-import {
-  ANNOREP_METADATA_VALUE,
-  SOURCE_MANUSCRIPT_TAG,
-  VersionState,
-  PublicationStatus,
-} from "../constants/dataverse"
+import { ANNOREP_METADATA_VALUE, SOURCE_MANUSCRIPT_TAG } from "../constants/dataverse"
 import { IATIProjectDetails } from "../types/dataverse"
 
 export function createAtiProjectDetails(
@@ -29,14 +24,8 @@ export function createAtiProjectDetails(
       title: metadataFields.find((field: any) => field.typeName === "title").value,
       description: metadataFields.find((field: any) => field.typeName === "dsDescription").value[0]
         .dsDescriptionValue.value,
-      version: latest.versionNumber
-        ? `${latest.versionNumber}.${latest.versionMinorNumber}`
-        : latest.versionState,
-      status:
-        latest.versionState === VersionState.Released
-          ? PublicationStatus.Published
-          : PublicationStatus.Unpublished,
       zip: datasetZip,
+      subjects: metadataFields.find((field: any) => field.typeName === "subject").value,
     },
     manuscript: {
       id: manuscript?.dataFile.id || "",

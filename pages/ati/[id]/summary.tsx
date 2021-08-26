@@ -3,15 +3,19 @@ import { FC } from "react"
 import axios, { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
+import qs from "qs"
 
 import AtiSummary from "../../../features/ati/AtiSummary"
 import AtiTab from "../../../features/ati/AtiTab"
 
-import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
+import {
+  DATASET_DV_TYPE,
+  DATAVERSE_HEADER_NAME,
+  PUBLICATION_STATUSES,
+} from "../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
 import { AtiTab as AtiTabConstant } from "../../../constants/ati"
 import { IATIProjectDetails } from "../../../types/dataverse"
-
 import { createAtiProjectDetails } from "../../../utils/dataverseUtils"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
@@ -48,6 +52,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const responses: AxiosResponse<any>[] = []
   let datasetZip = ""
+  let citationHtml = ""
+  let publicationStatuses: string[] = []
 
   if (session) {
     props.isLoggedIn = true
@@ -62,24 +68,48 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       })
       .then((datasetJsonResponse) => {
-        //Add dataset json
         responses.push(datasetJsonResponse)
+        const dsPersistentId = datasetJsonResponse.data.data.latestVersion.datasetPersistentId
+        const promises = [
+          axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+            params: {
+              key: dataverseApiToken,
+              dvobject_types: DATASET_DV_TYPE,
+              published_states: PUBLICATION_STATUSES,
+              mydata_search_term: `"${dsPersistentId}"`,
+            },
+            paramsSerializer: (params) => {
+              return qs.stringify(params, { indices: false })
+            },
+            headers: {
+              [REQUEST_DESC_HEADER_NAME]: `Searching for dataset ${dsPersistentId}`,
+            },
+          }),
+        ]
         const latest = datasetJsonResponse.data.data.latestVersion
         if (latest.files.length > 0) {
           //Get the dataset zip
-          return axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
-            responseType: "arraybuffer",
-            headers: {
-              [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-              [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
-              Accept: "application/zip",
-            },
-          })
+          promises.push(
+            axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
+              responseType: "arraybuffer",
+              headers: {
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
+                Accept: "application/zip",
+              },
+            })
+          )
         }
+        return Promise.all(promises)
       })
-      .then((response) => {
-        if (response) {
-          datasetZip = Buffer.from(response.data, "binary").toString("base64")
+      .then((extraResponses) => {
+        if (extraResponses[0].data.success && extraResponses[0].data.data.items.length > 0) {
+          const dataset = extraResponses[0].data.data.items[0]
+          citationHtml = dataset.citationHtml
+          publicationStatuses = dataset.publication_statuses
+        }
+        if (extraResponses.length == 2) {
+          datasetZip = Buffer.from(extraResponses[1].data, "binary").toString("base64")
         }
       })
       .catch((e) => {
@@ -88,6 +118,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       })
     if (responses.length === 1) {
       props.atiProjectDetails = createAtiProjectDetails(responses[0], datasetZip, "")
+      if (citationHtml) {
+        props.atiProjectDetails.dataset.citationHtml = citationHtml
+      }
+      if (publicationStatuses) {
+        props.atiProjectDetails.dataset.publicationStatuses = publicationStatuses
+      }
     }
   }
 

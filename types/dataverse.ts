@@ -3,9 +3,10 @@ export interface IDataset {
   doi: string
   title: string
   description?: string
-  status?: string
-  version?: string
   zip?: string
+  citationHtml?: string
+  publicationStatuses?: string[]
+  subjects?: string[]
 }
 
 export interface IDatasource {
