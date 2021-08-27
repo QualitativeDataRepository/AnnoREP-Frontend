@@ -15,6 +15,7 @@ import {
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
 import { AtiTab as AtiTabConstant } from "../../../constants/ati"
 import { IATIProjectDetails } from "../../../types/dataverse"
+import { IHypothesisGroup } from "../../../types/hypothesis"
 
 import { createAtiProjectDetails } from "../../../utils/dataverseUtils"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
@@ -23,9 +24,10 @@ interface AtiPageProps {
   isLoggedIn: boolean
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
+  hypothesisGroups: IHypothesisGroup[]
 }
 
-const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails }) => {
+const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGroups }) => {
   return (
     <AtiTab
       isLoggedIn={isLoggedIn}
@@ -36,6 +38,7 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails }) => {
         <AtiExportAnnotations
           datasetId={atiProjectDetails.dataset.id}
           manuscript={atiProjectDetails.manuscript}
+          hypothesisGroups={hypothesisGroups}
         />
       )}
     </AtiTab>
@@ -49,6 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     isLoggedIn: false,
     atiProjectDetails: null,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
+    hypothesisGroups: [],
   }
   const session = await getSession(context)
   const datasetId = context?.params?.id
@@ -59,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (session) {
     props.isLoggedIn = true
-    const { dataverseApiToken } = session
+    const { dataverseApiToken, hypothesisApiToken } = session
     //Get the dataset json
     await axios
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
@@ -104,6 +108,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       })
     if (responses.length === 1) {
       props.atiProjectDetails = createAtiProjectDetails(responses[0], "", ingestPdf)
+    }
+
+    try {
+      const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/groups`, {
+        headers: {
+          Authorization: `Bearer ${hypothesisApiToken}`,
+          Accept: "application/json",
+          [REQUEST_DESC_HEADER_NAME]: "Getting Hypothes.is groups",
+        },
+      })
+      data.forEach((group: any) => {
+        props.hypothesisGroups.push({
+          id: group.id,
+          name: group.name,
+          type: group.type,
+        })
+      })
+    } catch (e) {
+      const { status, message } = getResponseFromError(e)
+      console.warn(status, message)
     }
   }
 

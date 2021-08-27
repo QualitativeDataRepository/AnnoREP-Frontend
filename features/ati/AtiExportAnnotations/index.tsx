@@ -9,9 +9,12 @@ import {
   Button,
   InlineNotification,
   InlineLoadingStatus,
+  Select,
+  SelectItem,
 } from "carbon-components-react"
 
 import { IManuscript } from "../../../types/dataverse"
+import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiExportAnnotations.module.css"
@@ -20,9 +23,14 @@ import layoutStyles from "../../components/Layout/Layout.module.css"
 interface AtiExportAnnotationstProps {
   datasetId: string
   manuscript: IManuscript
+  hypothesisGroups: IHypothesisGroup[]
 }
 
-const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ datasetId, manuscript }) => {
+const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
+  datasetId,
+  manuscript,
+  hypothesisGroups,
+}) => {
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
@@ -47,6 +55,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ datasetId, manus
     e.preventDefault()
     const target = e.target as typeof e.target & {
       destinationUrl: { value: string }
+      destinationHypothesisGroup: { value: string }
     }
 
     setTaskStatus("active")
@@ -60,6 +69,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ datasetId, manus
           JSON.stringify({
             destinationUrl: target.destinationUrl.value,
             annotations: data.annotations,
+            destinationHypothesisGroup: target.destinationHypothesisGroup.value,
           }),
           {
             headers: {
@@ -133,6 +143,24 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({ datasetId, manus
               aria-required={true}
               size="xl"
             />
+          </div>
+          <div className="ar--form-item">
+            <Select
+              required
+              aria-required
+              helperText="Choose the unique identifier for the exported annotations' group"
+              id="destinaton-hypothesis-group"
+              name="destinationHypothesisGroup"
+              labelText="Destination Hypothes.is group"
+            >
+              {hypothesisGroups.map((group) => (
+                <SelectItem
+                  key={group.id}
+                  text={`${group.name} (${group.type})`}
+                  value={group.id}
+                />
+              ))}
+            </Select>
           </div>
           <Button className="ar--form-submit-btn" type="submit" renderIcon={Export16}>
             Export annotations
