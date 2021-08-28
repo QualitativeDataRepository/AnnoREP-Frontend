@@ -11,6 +11,7 @@ import {
   InlineLoadingStatus,
   Select,
   SelectItem,
+  Toggle,
 } from "carbon-components-react"
 
 import { IManuscript } from "../../../types/dataverse"
@@ -34,7 +35,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
-
   useEffect(() => {
     const getAnnotationsJson = async () => {
       const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
@@ -56,6 +56,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     const target = e.target as typeof e.target & {
       destinationUrl: { value: string }
       destinationHypothesisGroup: { value: string }
+      privateAnnotation: { checked: boolean }
     }
 
     setTaskStatus("active")
@@ -70,6 +71,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             destinationUrl: target.destinationUrl.value,
             annotations: data.annotations,
             destinationHypothesisGroup: target.destinationHypothesisGroup.value,
+            privateAnnotation: target.privateAnnotation.checked,
           }),
           {
             headers: {
@@ -161,6 +163,15 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 />
               ))}
             </Select>
+          </div>
+          <div className="ar--form-item">
+            <Toggle
+              id="toggle-annotation-visibility"
+              labelA="No"
+              labelB="Yes"
+              labelText="Post annotations to only me"
+              name="privateAnnotation"
+            />
           </div>
           <Button className="ar--form-submit-btn" type="submit" renderIcon={Export16}>
             Export annotations

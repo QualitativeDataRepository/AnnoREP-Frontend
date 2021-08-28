@@ -9,7 +9,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
-      const { destinationUrl: url, annotations, destinationHypothesisGroup } = req.body
+      const {
+        destinationUrl: url,
+        annotations,
+        destinationHypothesisGroup,
+        privateAnnotation,
+      } = req.body
       const requestDesc = `Exporting annotations to ${url}`
       const { hypothesisApiToken } = session
       try {
@@ -17,6 +22,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           annotation.target.forEach((element: any) => {
             element.source = url
           })
+          let newReadPermission = annotation.permissions.read
+          if (!privateAnnotation) {
+            newReadPermission = [`group:${destinationHypothesisGroup}`]
+          }
           return axios({
             method: "POST",
             url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
@@ -26,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               text: annotation.text,
               tags: annotation.tags,
               group: destinationHypothesisGroup,
-              //permissions
+              permissions: { read: newReadPermission },
               target: annotation.target,
               //references
             }),
