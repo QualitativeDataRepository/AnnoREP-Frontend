@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         //Get the annotations in parallel
         .then(({ data }) => {
-          const offsets = range(0, data.total, ANNOTATIONS_MAX_LIMIT)
+          const offsets = range(0, data.total - 1, ANNOTATIONS_MAX_LIMIT)
           return Promise.all(
             offsets.map((offset) => {
               return axios.get(searchEndpoint, {
