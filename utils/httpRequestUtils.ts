@@ -8,7 +8,9 @@ export const getResponseFromError = (
 ): AnnoRepResponse => {
   if (axios.isAxiosError(e)) {
     const requestInfo =
-      e.config.headers[REQUEST_DESC_HEADER_NAME] || `${e.config.method} ${e.config.url}`
+      e.config.headers[REQUEST_DESC_HEADER_NAME] ||
+      requestDesc ||
+      `${e.config.method} ${e.config.url}`
     let failureMessage = `${requestInfo} failed.`
     if (e.response) {
       const additional =
