@@ -104,7 +104,11 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       },
     })
       .then(({ data }) => {
-        setTaskDesc(`Extracting annotations from ${manuscript.name}...`)
+        setTaskDesc(
+          `${
+            target.uploadAnnotations.checked ? "Extracting annotations" : "Creating ingest PDF"
+          } from ${manuscript.name}...`
+        )
         const newManuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
