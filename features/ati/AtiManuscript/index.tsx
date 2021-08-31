@@ -160,7 +160,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                 kind="danger"
                 size="md"
                 hasIconOnly
-                iconDescription="Delete manuscript"
+                iconDescription="Delete manuscript and upload another file"
                 tooltipPosition="top"
                 tooltipAlignment="end"
               >
