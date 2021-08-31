@@ -42,6 +42,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const router = useRouter()
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
+  const hasSubmittedForReview = publicationStatuses?.includes("In Review")
 
   const submitForReview = async () => {
     try {
@@ -94,7 +95,7 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
         <div className={styles.buttonSet}>
           {zip && (
             <Button
-              kind="tertiary"
+              kind="primary"
               href={`data:application/zip;base64,${zip}`}
               download={`dataverse_files.zip`}
               size="sm"
@@ -102,12 +103,14 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
               Download project
             </Button>
           )}
-
-          {!publicationStatuses?.includes("In Review") && (
-            <Button kind="tertiary" size="sm" onClick={submitForReview}>
-              Submit for review
-            </Button>
-          )}
+          <Button
+            kind="primary"
+            size="sm"
+            disabled={hasSubmittedForReview}
+            onClick={submitForReview}
+          >
+            {hasSubmittedForReview ? "Submitted for review" : "Submit for review"}
+          </Button>
         </div>
         <div className={styles.about}>
           {citationHtml && (

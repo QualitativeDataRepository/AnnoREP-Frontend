@@ -21,6 +21,7 @@
   grid-template-columns: 0.5fr 0.5fr;
   justify-content: start;
   align-items: stretch;
+  gap: 1px;
 }
 
 .buttonSet > * {
