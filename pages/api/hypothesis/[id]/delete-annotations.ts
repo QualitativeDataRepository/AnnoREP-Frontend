@@ -9,8 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "DELETE") {
     const session = await getSession({ req })
     if (session) {
+      const { id } = req.query
       const { annotations } = req.body
-      const requestDesc = `Deleting annotations`
+      const requestDesc = `Deleting annotations from dataset ${id}`
       const { hypothesisApiToken } = session
       try {
         const deleteAnns: AxiosPromise<any>[] = annotations.map((annotation: any) => {
