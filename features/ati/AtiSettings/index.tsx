@@ -35,6 +35,20 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
         }
       })
       .then(() => {
+        return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`)
+      })
+      .then(({ data }) => {
+        if (data.total > 0) {
+          setTaskDesc("Deleting annotations from Hypothes.is server...")
+          return axios.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
+            data: JSON.stringify({ annotations: data.annotations }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+        }
+      })
+      .then(() => {
         setTaskStatus("finished")
         setTaskDesc(`Deleted ATI project from dataset ${dataset.title}.`)
         router.push("/")
