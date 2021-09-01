@@ -23,7 +23,7 @@ export const getShowPagination = (state: SearchState): boolean => {
   return ["inactive", "finished"].includes(state.status) && getTotalPages(state) > 1
 }
 
-export const getLoadingDesc = (state: SearchState) => {
+export const getLoadingDesc = (state: SearchState): string | undefined => {
   if (["inactive", "finished"].includes(state.status)) {
     if (state.totalCount <= state.perPage) {
       return `${state.totalCount} project(s)`
@@ -39,7 +39,7 @@ export const getLoadingDesc = (state: SearchState) => {
   }
 }
 
-export const getLoadingIconDesc = (state: SearchState) => {
+export const getLoadingIconDesc = (state: SearchState): string => {
   if (state.status == "inactive") {
     return "Inactive!"
   } else if (state.status === "finished") {
