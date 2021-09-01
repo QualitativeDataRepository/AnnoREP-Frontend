@@ -1,4 +1,4 @@
-import { FC, FormEventHandler, useState } from "react"
+import { FC, FormEventHandler, useReducer, useState } from "react"
 
 import axios from "axios"
 import {
@@ -16,6 +16,8 @@ import { useRouter } from "next/router"
 import DatasourceModal from "./DatasourceModal"
 import DeleteManuscriptModal from "./DeleteManuscriptModal"
 import IngestPdf from "./IngestPdf"
+import UploadManuscriptModal from "./UploadManuscriptModal"
+import { uploadManuscriptReducer } from "./UploadManuscriptModal/state"
 import useBoolean from "../../../hooks/useBoolean"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
@@ -49,6 +51,11 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     deleteManuscriptModalIsOpen,
     { setTrue: openDeleteManuscriptModal, setFalse: closeDeleteManuscriptModal },
   ] = useBoolean(false)
+  const [uploadManuscript, dispatch] = useReducer(uploadManuscriptReducer, {
+    manuscript: undefined,
+    modalIsOpen: false,
+    uploadAnnotations: false,
+  })
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
 
@@ -73,7 +80,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
   }
 
-  const onUpload: FormEventHandler<HTMLFormElement> = async (e) => {
+  const onClickUploadManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
       manuscript: { files: FileList }
@@ -102,43 +109,83 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     if (target.manuscript.files[0].type === "") {
       manuscript = new File([manuscript], manuscript.name, { type: mimeType })
     }
-    const formData = new FormData()
-    formData.append("manuscript", manuscript)
-    setTaskStatus("active")
-    setTaskDesc(`Uploading ${manuscript.name}...`)
-    await axios({
-      method: "POST",
-      url: `/api/datasets/${datasetId}/manuscript`,
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
+    dispatch({
+      type: "UPLOAD",
+      payload: {
+        manuscript: manuscript,
+        uploadAnnotations: target.uploadAnnotations.checked,
       },
     })
-      .then(({ data }) => {
-        setTaskDesc(
-          `${
-            target.uploadAnnotations.checked ? "Extracting annotations" : "Creating ingest PDF"
-          } from ${manuscript.name}...`
-        )
-        const newManuscriptId = data.data.files[0].dataFile.id
-        return axios({
-          method: "PUT",
-          url: `/api/arcore/${newManuscriptId}`,
-          params: {
-            datasetId: datasetId,
-            uploadAnnotations: target.uploadAnnotations.checked,
-          },
+  }
+
+  const handleUploadManuscript = async () => {
+    if (uploadManuscript.manuscript) {
+      dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })
+      const formData = new FormData()
+      formData.append("manuscript", uploadManuscript.manuscript)
+      setTaskStatus("active")
+      setTaskDesc(`Uploading ${uploadManuscript.manuscript.name}...`)
+      await axios({
+        method: "POST",
+        url: `/api/datasets/${datasetId}/manuscript`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+        .then(async ({ data }) => {
+          const newManuscriptId = data.data.files[0].dataFile.id
+          const deleteAnnotationsPromise = uploadManuscript.uploadAnnotations
+            ? axios({
+                method: "GET",
+                url: `/api/hypothesis/${datasetId}/download-annotations`,
+              }).then(({ data }) => {
+                if (data.total > 0) {
+                  setTaskDesc(
+                    `Deleting ${data.total} current annotation(s) from Hypothes.is server...`
+                  )
+                  return axios({
+                    method: "DELETE",
+                    url: `/api/hypothesis/${datasetId}/delete-annotations`,
+                    data: JSON.stringify({ annotations: data.annotations }),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  })
+                }
+              })
+            : Promise.resolve("Skip!")
+          return await deleteAnnotationsPromise.then(() => {
+            setTaskDesc(
+              `${
+                uploadManuscript.uploadAnnotations
+                  ? "Extracting annotations"
+                  : "Creating ingest PDF"
+              } from ${uploadManuscript.manuscript?.name}...`
+            )
+            return axios({
+              method: "PUT",
+              url: `/api/arcore/${newManuscriptId}`,
+              params: {
+                datasetId: datasetId,
+                uploadAnnotations: uploadManuscript.uploadAnnotations,
+              },
+            })
+          })
         })
-      })
-      .then(() => {
-        setTaskStatus("finished")
-        setTaskDesc(`Uploaded ${manuscript.name}.`)
-        router.reload()
-      })
-      .catch((error) => {
-        setTaskStatus("error")
-        setTaskDesc(`${getMessageFromError(error)}`)
-      })
+        .then(() => {
+          setTaskStatus("finished")
+          setTaskDesc(`Uploaded ${uploadManuscript.manuscript?.name}.`)
+          router.reload()
+        })
+        .catch((error) => {
+          setTaskStatus("error")
+          setTaskDesc(`${getMessageFromError(error)}`)
+        })
+    } else {
+      setTaskStatus("error")
+      setTaskDesc("Please upload a manuscript file.")
+    }
   }
 
   return (
@@ -155,6 +202,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         open={deleteManuscriptModalIsOpen}
         closeModal={closeDeleteManuscriptModal}
         handleDeleteManuscript={handleDeleteManuscript}
+      />
+      <UploadManuscriptModal
+        manuscriptName={uploadManuscript.manuscript?.name as string}
+        uploadAnnotations={uploadManuscript.uploadAnnotations}
+        open={uploadManuscript.modalIsOpen}
+        closeModal={() => dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })}
+        handleUploadManuscript={handleUploadManuscript}
       />
       <div className={styles.tabContainer}>
         <div className={styles.buttonContainer}>
@@ -213,7 +267,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           )
         ) : (
           <div className={styles.centerUploadManuscript}>
-            <Form onSubmit={onUpload}>
+            <Form onSubmit={onClickUploadManuscript}>
               <div className="ar--form-item">
                 <FileUploader
                   aria-required={true}
@@ -238,7 +292,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   id="upload-annotations-toggle"
                   labelA="No"
                   labelB="Yes"
-                  labelText="Upload manuscript's annotations to Hypothes.is server"
+                  labelText="Start with new annotations?"
                   name="uploadAnnotations"
                 />
               </div>
