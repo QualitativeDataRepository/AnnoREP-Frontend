@@ -29,7 +29,7 @@ const DeleteManuscriptModal: FC<DeleteManuscriptModalProps> = ({
       <ModalFooter
         id="delete-manuscript-modal-footer"
         danger
-        primaryButtonText="Delete"
+        primaryButtonText="Continue"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
       />
