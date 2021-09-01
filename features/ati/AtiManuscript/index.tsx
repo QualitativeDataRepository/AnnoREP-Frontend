@@ -14,6 +14,9 @@ import { Document20, TrashCan20, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import DatasourceModal from "./DatasourceModal"
+import DeleteManuscriptModal from "./DeleteManuscriptModal"
+import IngestPdf from "./IngestPdf"
+import useBoolean from "../../../hooks/useBoolean"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
@@ -21,7 +24,6 @@ import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiManuscript.module.css"
-import IngestPdf from "./IngestPdf"
 
 interface AtiManuscriptProps {
   datasetId: string
@@ -39,14 +41,23 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   serverUrl,
 }) => {
   const router = useRouter()
-  const [modalIsOpen, setModalIsopen] = useState<boolean>(false)
-  const openModal = () => setModalIsopen(true)
-  const closeModal = () => setModalIsopen(false)
+  const [
+    datasourcesModalIsOpen,
+    { setTrue: openDatasourcesModal, setFalse: closeDatasourcesModal },
+  ] = useBoolean(false)
+  const [
+    deleteManuscriptModalIsOpen,
+    { setTrue: openDeleteManuscriptModal, setFalse: closeDeleteManuscriptModal },
+  ] = useBoolean(false)
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
 
-  const onDelete: FormEventHandler<HTMLFormElement> = async (e) => {
+  const onClickDeleteManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
+    openDeleteManuscriptModal()
+  }
+  const handleDeleteManuscript = async () => {
+    closeDeleteManuscriptModal()
     setTaskStatus("active")
     setTaskDesc("Deleting manuscript...")
     await axios
@@ -136,8 +147,14 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         datasources={datasources}
         serverUrl={serverUrl}
         datasetDoi={doi}
-        open={modalIsOpen}
-        closeModal={closeModal}
+        open={datasourcesModalIsOpen}
+        closeModal={closeDatasourcesModal}
+      />
+      <DeleteManuscriptModal
+        manuscriptName={manuscript.name}
+        open={deleteManuscriptModalIsOpen}
+        closeModal={closeDeleteManuscriptModal}
+        handleDeleteManuscript={handleDeleteManuscript}
       />
       <div className={styles.tabContainer}>
         <div className={styles.buttonContainer}>
@@ -149,12 +166,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             iconDescription="Show datasources"
             tooltipPosition="top"
             tooltipAlignment="start"
-            onClick={openModal}
+            onClick={openDatasourcesModal}
           >
             <Document20 />
           </Button>
           {manuscript.id && (
-            <Form onSubmit={onDelete} className={styles.deleteManuscript}>
+            <Form onSubmit={onClickDeleteManuscript} className={styles.deleteManuscript}>
               <Button
                 type="submit"
                 kind="danger"
