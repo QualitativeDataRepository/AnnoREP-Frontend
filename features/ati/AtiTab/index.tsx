@@ -14,7 +14,8 @@ interface AtiTabProps {
   children: ReactNode
   isLoggedIn: boolean
   dataset: IDataset | null
-  hasHypotheisClient?: boolean
+  /**Inlude Hypothes.is client and pdf.js? */
+  hasPdf?: boolean
 }
 
 const AtiTabComponent: FC<AtiTabProps> = ({
@@ -22,10 +23,10 @@ const AtiTabComponent: FC<AtiTabProps> = ({
   children,
   isLoggedIn,
   selectedTab,
-  hasHypotheisClient,
+  hasPdf,
 }: AtiTabProps) => {
   const onSelectionChange = (index: number) =>
-    window.open(`/ati/${dataset?.id}/${tabs[index]}`, "_self")
+    window.location.assign(`/ati/${dataset?.id}/${tabs[index]}`)
   const selectedTabIndex = tabs.findIndex((tab) => tab === selectedTab)
 
   let content
@@ -69,7 +70,7 @@ const AtiTabComponent: FC<AtiTabProps> = ({
     <Layout
       title={dataset ? `AnnoREP - ${dataset.title}` : "AnnoREP"}
       isLoggedIn={isLoggedIn}
-      hasHypotheisClient={hasHypotheisClient}
+      hasPdf={hasPdf}
     >
       {content}
     </Layout>
