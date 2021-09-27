@@ -26,13 +26,19 @@ import { getLabelTextForPublicationStatus } from "./utils"
 import styles from "./AtiProjects.module.css"
 
 export interface AtiProjectsProps {
+  /** The list of ati projects */
   atiProjects: IAtiProject[]
+  /** The initial number of total ati projects found */
   initialTotalCount: number
+  /** The number of the ati project to show per page */
   atisPerPage: number
+  /** Publication status count of the list of ati projects */
   publicationStatusCount: Record<string, number>
+  /** Facets to filter the ati projects */
   selectedFilters: Record<string, string[]>
 }
 
+/** A user's ati projects with a search bar */
 const AtiProjects: FC<AtiProjectsProps> = ({
   atiProjects,
   initialTotalCount,
