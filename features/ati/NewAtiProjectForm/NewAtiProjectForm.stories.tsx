@@ -30,7 +30,12 @@ WithDatasets.args = {
     },
   ],
   serverUrl: "https://test.com",
-  initialTotalCount: 10,
+  initialTotalCount: 4,
 }
 
 export const WithoutDatasets = Template.bind({})
+WithoutDatasets.args = {
+  datasets: [],
+  serverUrl: "https://test.com",
+  initialTotalCount: 0,
+}
