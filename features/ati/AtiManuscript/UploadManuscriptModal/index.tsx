@@ -2,11 +2,16 @@ import { FC } from "react"
 
 import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "carbon-components-react"
 
-interface UploadManuscriptModalProps {
+export interface UploadManuscriptModalProps {
+  /** The manuscript name */
   manuscriptName: string
+  /** Upload annotations from the user uploaded manuscript? */
   uploadAnnotations: boolean
+  /** Is the modal open? */
   open: boolean
+  /** Callback to close the modal */
   closeModal(): void
+  /** Callback to upload a manuscript */
   handleUploadManuscript(): void
 }
 
