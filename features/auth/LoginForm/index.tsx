@@ -3,6 +3,8 @@ import React, { ChangeEvent, FC, FormEventHandler } from "react"
 import { Login16 } from "@carbon/icons-react"
 import { Button, Form, TextInput, Link } from "carbon-components-react"
 
+import formStyles from "../../../styles/Form.module.css"
+
 export interface LoginFormProps {
   /**The dataverse server url */
   dataverseServerUrl: string
@@ -52,15 +54,15 @@ const LoginForm: FC<LoginFormProps> = ({
   }
 
   return (
-    <div className="ar--form-container">
+    <div className={formStyles.container}>
       <Form onSubmit={onSubmit}>
-        <h1 className="ar--form-title">Login</h1>
-        <p className="ar--form-desc">
+        <h1 className={formStyles.title}>Login</h1>
+        <p className={formStyles.desc}>
           Give AnnoREP permissions to access your Dataverse resources and to write annotations to
           Hypothes.is server by providing your Application programming interface (<abbr>API</abbr>)
           tokens.
         </p>
-        <div className="ar--form-item">
+        <div className={formStyles.item}>
           <TextInput
             id="dataverse-api-token"
             name="dataverseApiToken"
@@ -102,7 +104,7 @@ const LoginForm: FC<LoginFormProps> = ({
             onChange={onDataverseApiTokenChange}
           />
         </div>
-        <div className="ar--form-item">
+        <div className={formStyles.item}>
           <TextInput
             id="hypothesis-api-token"
             name="hypothesisApiToken"
@@ -144,7 +146,7 @@ const LoginForm: FC<LoginFormProps> = ({
             onChange={onHypothesisApiTokenChange}
           />
         </div>
-        <Button className="ar--form-submit-btn" type="submit" renderIcon={Login16}>
+        <Button className={formStyles.submitBtn} type="submit" renderIcon={Login16}>
           Login
         </Button>
       </Form>

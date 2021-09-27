@@ -31,6 +31,7 @@ import {
 import { AtiTab } from "../../../constants/ati"
 
 import styles from "./NewAtiProjectForm.module.css"
+import formStyles from "../../../styles/Form.module.css"
 
 export interface NewAtiProjectFormProps {
   /**List of Dataverse datasets */
@@ -152,16 +153,16 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
   //TODO: is ownerId=1 justified?
   return (
     <>
-      <div className="ar--form-container">
+      <div className={formStyles.container}>
         <Form encType="multipart/form-data" onSubmit={onSubmit}>
-          <h1 className="ar--form-title">
+          <h1 className={formStyles.title}>
             New <abbr>ATI</abbr> Project
           </h1>
-          <p className="ar--form-desc">
+          <p className={formStyles.desc}>
             Link to a Dataverse dataset and upload a manuscript to create a new <abbr>ATI</abbr>{" "}
             project
           </p>
-          <div className="ar--form-item">
+          <div className={formStyles.item}>
             <Link
               href={`${serverUrl}/dataset.xhtml?ownerId=1`}
               target="_blank"
@@ -172,7 +173,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             </Link>
           </div>
           {taskStatus !== "inactive" && (
-            <div className="ar--form-item">
+            <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
@@ -190,7 +191,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               />
             </div>
           )}
-          <div className={`ar--form-item ${styles.searchBox}`}>
+          <div className={`${formStyles.item} ${styles.searchBox}`}>
             <ComboBox
               id="dataset-search"
               name="dataset"
@@ -232,7 +233,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               )}
             </div>
           </div>
-          <div className="ar--form-item">
+          <div className={formStyles.item}>
             <FileUploader
               aria-required={true}
               accept={[
@@ -251,7 +252,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               size="small"
             />
           </div>
-          <Button className="ar--form-submit-btn" type="submit" renderIcon={Add16}>
+          <Button className={formStyles.submitBtn} type="submit" renderIcon={Add16}>
             Create project
           </Button>
         </Form>

@@ -26,6 +26,7 @@ import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiManuscript.module.css"
+import formStyles from "../../../styles/Form.module.css"
 
 interface AtiManuscriptProps {
   datasetId: string
@@ -268,7 +269,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         ) : (
           <div className={styles.centerUploadManuscript}>
             <Form onSubmit={onClickUploadManuscript}>
-              <div className="ar--form-item">
+              <div className={formStyles.item}>
                 <FileUploader
                   aria-required={true}
                   accept={[
@@ -287,7 +288,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   size="small"
                 />
               </div>
-              <div className="ar--form-item">
+              <div className={formStyles.item}>
                 <Toggle
                   id="upload-annotations-toggle"
                   labelA="No"

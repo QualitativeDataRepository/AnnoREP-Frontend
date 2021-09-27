@@ -19,6 +19,7 @@ import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiExportAnnotations.module.css"
+import formStyles from "../../../styles/Form.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface AtiExportAnnotationstProps {
@@ -96,9 +97,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     <>
       <div className={layoutStyles.maxWidth}>
         <Form onSubmit={onSumbit}>
-          <h2 className="ar--form-title">Export Hypothes.is annotations</h2>
+          <h2 className={formStyles.title}>Export Hypothes.is annotations</h2>
           {manuscript.ingest && (
-            <div className={`${styles.downloadContainer} ar--form-desc`}>
+            <div className={`${styles.downloadContainer} ${formStyles.desc}`}>
               <Link
                 href={`data:application/pdf;base64,${manuscript.ingest}`}
                 download={`ingest_manuscript.pdf`}
@@ -116,7 +117,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             </div>
           )}
           {taskStatus !== "inactive" && (
-            <div className="ar--form-item">
+            <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
@@ -134,7 +135,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               />
             </div>
           )}
-          <div className="ar--form-item">
+          <div className={formStyles.item}>
             <TextInput
               id="destination-url"
               name="destinationUrl"
@@ -146,7 +147,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               size="xl"
             />
           </div>
-          <div className="ar--form-item">
+          <div className={formStyles.item}>
             <Select
               required
               aria-required
@@ -164,7 +165,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               ))}
             </Select>
           </div>
-          <div className="ar--form-item">
+          <div className={formStyles.item}>
             <Toggle
               id="toggle-annotation-visibility"
               labelA="No"
@@ -173,7 +174,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               name="privateAnnotation"
             />
           </div>
-          <Button className="ar--form-submit-btn" type="submit" renderIcon={Export16}>
+          <Button className={formStyles.submitBtn} type="submit" renderIcon={Export16}>
             Export annotations
           </Button>
         </Form>

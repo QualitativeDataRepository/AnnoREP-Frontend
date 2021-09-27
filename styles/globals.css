@@ -15,27 +15,6 @@ a {
   box-sizing: border-box;
 }
 
-.ar--form-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.ar--form-title {
-  margin-bottom: 4px;
-}
-
-.ar--form-desc {
-  margin-bottom: 32px;
-}
-
-.ar--form-item {
-  margin-bottom: 24px;
-}
-
-.ar--form-submit-btn {
-  margin-top: 32px;
-}
-
 .ar--secondary-text {
   color: #525252;
 }

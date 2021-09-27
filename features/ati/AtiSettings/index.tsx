@@ -9,6 +9,7 @@ import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiSettings.module.css"
+import formStyles from "../../../styles/Form.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
 interface AtiSettingsProps {
@@ -71,7 +72,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             file.
           </p>
           {taskStatus !== "inactive" && (
-            <div className="ar--form-item">
+            <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
