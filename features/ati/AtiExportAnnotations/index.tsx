@@ -22,9 +22,12 @@ import styles from "./AtiExportAnnotations.module.css"
 import formStyles from "../../../styles/Form.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
-interface AtiExportAnnotationstProps {
+export interface AtiExportAnnotationstProps {
+  /** The dataset id of the ati project */
   datasetId: string
+  /** The manuscript for the ati project */
   manuscript: IManuscript
+  /** The list of hypothes.is groups */
   hypothesisGroups: IHypothesisGroup[]
 }
 
