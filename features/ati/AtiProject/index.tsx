@@ -10,15 +10,25 @@ import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import styles from "./AtiProject.module.css"
 
 export interface AtiProjectProps {
+  /**The id of the dataset for the ati project */
   id: string
+  /**The name of the dataset for the ati project */
   name: string
+  /**The description of the dataset for the ati project */
   description: string
+  /**The dataverse where the dataset for the ati project is deposited */
   dataverseName: string
+  /**The citation string of the dataset for the ati project */
   citationHtml: string
+  /**The publication statuses of the dataset for the ati project */
   publicationStatuses: string[]
+  /**When the dataset for the ati project was created */
   dateDisplay: string
+  /**The user roles of the dataset for the ati project */
   userRoles: string[]
+  /**The dataverse server url where the dataset for the ati project is deposited */
   dataverseServerUrl: string
+  /**The dataverse id where the dataset for the ati project is deposited */
   dataverse: string
 }
 
