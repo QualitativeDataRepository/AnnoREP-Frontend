@@ -4,7 +4,7 @@ import DatasourceModal, { DatasourceModalProps } from "."
 
 export default {
   component: DatasourceModal,
-  title: "ATI/Datasource Modal",
+  title: "ATI/ATI Manuscript/Datasource Modal",
 } as Meta
 
 const Template: Story<DatasourceModalProps> = (args) => <DatasourceModal {...args} />

@@ -4,7 +4,7 @@ import DeleteManuscriptModal, { DeleteManuscriptModalProps } from "."
 
 export default {
   component: DeleteManuscriptModal,
-  title: "ATI/Delete Manuscript Modal",
+  title: "ATI/ATI Manuscript/Delete Manuscript Modal",
 } as Meta
 
 const Template: Story<DeleteManuscriptModalProps> = (args) => <DeleteManuscriptModal {...args} />

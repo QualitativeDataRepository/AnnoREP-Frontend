@@ -4,7 +4,7 @@ import UploadManuscriptModal, { UploadManuscriptModalProps } from "."
 
 export default {
   component: UploadManuscriptModal,
-  title: "ATI/Upload Manuscript Modal",
+  title: "ATI/ATI Manuscript/Upload Manuscript Modal",
 } as Meta
 
 const Template: Story<UploadManuscriptModalProps> = (args) => <UploadManuscriptModal {...args} />

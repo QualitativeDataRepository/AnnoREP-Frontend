@@ -4,7 +4,7 @@ import IngestPdf, { IngestPdfProps } from "."
 
 export default {
   component: IngestPdf,
-  title: "ATI/Ingest PDF",
+  title: "ATI/ATI Manuscript/Ingest PDF",
 } as Meta
 
 const Template: Story<IngestPdfProps> = (args) => <IngestPdf {...args} />
