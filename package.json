@@ -92,6 +92,7 @@
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
     "react-docgen-typescript": "^1.21.0",
+    "storybook-css-modules-preset": "^1.1.1",
     "typescript": "^4.2.2"
   }
 }
