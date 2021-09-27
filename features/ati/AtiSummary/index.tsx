@@ -15,14 +15,16 @@ import { useRouter } from "next/router"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { IATIProjectDetails } from "../../../types/dataverse"
 
-import styles from "./ATISummary.module.css"
+import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 import atiProjectStyles from "../AtiProject/AtiProject.module.css"
 import axios from "axios"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
-interface ATISummaryProps {
+export interface ATISummaryProps {
+  /** The dataverse server url where the dataset for the ati project is deposited */
   serverUrl: string
+  /** The ati project details */
   atiProjectDetails: IATIProjectDetails
 }
 
