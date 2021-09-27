@@ -9,15 +9,20 @@ import { IDataset } from "../../../types/dataverse"
 
 import styles from "./AtiTab.module.css"
 
-interface AtiTabProps {
+export interface AtiTabProps {
+  /** The selected tab */
   selectedTab: IAtiTab
+  /** The children of the tab */
   children: ReactNode
+  /** Is the user logged in? */
   isLoggedIn: boolean
+  /** The dataset for the ati project */
   dataset: IDataset | null
-  /**Inlude Hypothes.is client and pdf.js? */
+  /** Display Hypothes.is client? */
   hasPdf?: boolean
 }
 
+/** A container for different tabs of an ati project */
 const AtiTabComponent: FC<AtiTabProps> = ({
   dataset,
   children,
