@@ -7,7 +7,8 @@ import { SizeMe } from "react-sizeme"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
-interface IngestPdfProps {
+export interface IngestPdfProps {
+  /** The base64 string of the pdf */
   pdf: string
 }
 
