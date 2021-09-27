@@ -2,10 +2,14 @@ import { FC } from "react"
 
 import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "carbon-components-react"
 
-interface DeleteManuscriptModalProps {
+export interface DeleteManuscriptModalProps {
+  /** The manuscript name */
   manuscriptName: string
+  /** Is the modal open? */
   open: boolean
+  /** Callback to close the modal */
   closeModal(): void
+  /** Callback to delete the manuscript */
   handleDeleteManuscript(): void
 }
 
