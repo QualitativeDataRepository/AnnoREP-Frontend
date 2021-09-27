@@ -14,11 +14,16 @@ import { IDatasource } from "../../../../types/dataverse"
 
 import styles from "./DatasourceModal.module.css"
 
-interface DatasourceModalProps {
+export interface DatasourceModalProps {
+  /** Is the datasource modal open? */
   open: boolean
+  /** The list of datasources */
   datasources: IDatasource[]
+  /** The dataverse server url */
   serverUrl: string
+  /** The dataset doi */
   datasetDoi: string
+  /** Callback to close the modal */
   closeModal(): void
 }
 
