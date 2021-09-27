@@ -4,7 +4,7 @@ import { InlineNotification, Tabs, Tab } from "carbon-components-react"
 
 import Layout from "../../components/Layout"
 
-import { IAtiTab, tabs, AtiTab } from "../../../constants/ati"
+import { IAtiTab, tabs, AtiTab as AtiTabs } from "../../../constants/ati"
 import { IDataset } from "../../../types/dataverse"
 
 import styles from "./AtiTab.module.css"
@@ -23,7 +23,7 @@ export interface AtiTabProps {
 }
 
 /** A container for different tabs of an ati project */
-const AtiTabComponent: FC<AtiTabProps> = ({
+const AtiTab: FC<AtiTabProps> = ({
   dataset,
   children,
   isLoggedIn,
@@ -58,10 +58,10 @@ const AtiTabComponent: FC<AtiTabProps> = ({
           selected={selectedTabIndex}
           onSelectionChange={onSelectionChange}
         >
-          <Tab id={AtiTab.summary.id} label={AtiTab.summary.label} />
-          <Tab id={AtiTab.manuscript.id} label={AtiTab.manuscript.label} />
-          <Tab id={AtiTab.exportAnnotations.id} label={AtiTab.exportAnnotations.label} />
-          <Tab id={AtiTab.settings.id} label={AtiTab.settings.label} />
+          <Tab id={AtiTabs.summary.id} label={AtiTabs.summary.label} />
+          <Tab id={AtiTabs.manuscript.id} label={AtiTabs.manuscript.label} />
+          <Tab id={AtiTabs.exportAnnotations.id} label={AtiTabs.exportAnnotations.label} />
+          <Tab id={AtiTabs.settings.id} label={AtiTabs.settings.label} />
         </Tabs>
         <div>
           <div role="tabpanel" id={`${selectedTab}__panel`} aria-labelledby={selectedTab}>
@@ -82,4 +82,4 @@ const AtiTabComponent: FC<AtiTabProps> = ({
   )
 }
 
-export default AtiTabComponent
+export default AtiTab

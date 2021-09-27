@@ -21,14 +21,14 @@ import atiProjectStyles from "../AtiProject/AtiProject.module.css"
 import axios from "axios"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
-export interface ATISummaryProps {
+export interface AtiSummaryProps {
   /** The dataverse server url where the dataset for the ati project is deposited */
   serverUrl: string
   /** The ati project details */
   atiProjectDetails: IATIProjectDetails
 }
 
-const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
+const AtiSummary: FC<AtiSummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   const {
     id,
     doi,
@@ -160,4 +160,4 @@ const ATISummary: FC<ATISummaryProps> = ({ serverUrl, atiProjectDetails }) => {
   )
 }
 
-export default ATISummary
+export default AtiSummary

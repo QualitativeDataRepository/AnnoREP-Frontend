@@ -28,7 +28,7 @@ export const AtiSummary = Template.bind({})
 AtiSummary.args = {
   ...args,
   selectedTab: "summary",
-  children: <div>ATI summary tab</div>,
+  children: <div>ATI Summary tab</div>,
 }
 
 export const AtiManuscript = Template.bind({})

@@ -1,13 +1,13 @@
 import { Story, Meta } from "@storybook/react"
 
-import ATISummary, { ATISummaryProps } from "."
+import AtiSummary, { AtiSummaryProps } from "."
 
 export default {
-  component: ATISummary,
+  component: AtiSummary,
   title: "ATI/ATI Summary",
 } as Meta
 
-const Template: Story<ATISummaryProps> = (args) => <ATISummary {...args} />
+const Template: Story<AtiSummaryProps> = (args) => <AtiSummary {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
