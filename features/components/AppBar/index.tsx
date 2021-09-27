@@ -7,7 +7,8 @@ import LogoutLink from "../../auth/LogoutLink"
 
 import styles from "./AppBar.module.css"
 
-interface AppBarProps {
+export interface AppBarProps {
+  /** Is the user logged in? */
   isLoggedIn: boolean
 }
 
