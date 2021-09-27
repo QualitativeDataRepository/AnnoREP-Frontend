@@ -28,11 +28,16 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import styles from "./AtiManuscript.module.css"
 import formStyles from "../../../styles/Form.module.css"
 
-interface AtiManuscriptProps {
+export interface AtiManuscriptProps {
+  /** The dataset id for the ati project */
   datasetId: string
+  /** The doi of the dataset for the ati project */
   doi: string
+  /** The list of datasources */
   datasources: IDatasource[]
+  /** The dataverse server url where the dataset is deposited */
   serverUrl: string
+  /** The manuscript for the ati project */
   manuscript: IManuscript
 }
 
