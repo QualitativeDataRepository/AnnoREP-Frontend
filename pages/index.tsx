@@ -10,6 +10,7 @@ import { Add16 } from "@carbon/icons-react"
 import { InlineNotification, Button } from "carbon-components-react"
 
 import AtiProjects from "../features/ati/AtiProjects"
+import AppDesc from "../features/components/AppDesc"
 import Layout from "../features/components/Layout"
 
 import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
@@ -79,17 +80,7 @@ const Home: FC<HomeProps> = ({
             )}
           </div>
         ) : (
-          <div className={styles.callout}>
-            <h1>About</h1>
-            <p>
-              AnnoREP is an open-source, web-based tool that will help facilitate{" "}
-              <a href={"https://qdr.syr.edu/ati"}>Annotation for Transprent Inquiry (ATI)</a> and
-              other annotation-based workflows.
-            </p>
-            <p>
-              Please login to create a new <abbr>ATI</abbr> project.
-            </p>
-          </div>
+          <AppDesc />
         )}
       </>
     </Layout>
