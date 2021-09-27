@@ -12,8 +12,10 @@ import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 
-interface AtiSettingsProps {
+export interface AtiSettingsProps {
+  /** The dataset for the ati project */
   dataset: IDataset
+  /** The manuscript for the ati project */
   manuscript: IManuscript
 }
 
