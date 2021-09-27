@@ -3,20 +3,3 @@
   grid-template-columns: 1fr;
   row-gap: 24px;
 }
-
-.titleContainer {
-  display: grid;
-  grid-template-columns: 1fr;
-  row-gap: 24px;
-}
-
-.titleContainer > a {
-  max-width: unset;
-}
-
-@media (min-width: 42rem) {
-  .titleContainer {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
-}

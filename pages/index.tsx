@@ -2,15 +2,14 @@ import { FC } from "react"
 
 import axios from "axios"
 import { GetServerSideProps } from "next"
-import Link from "next/link"
 import { getSession } from "next-auth/client"
 import qs from "qs"
 
-import { Add16 } from "@carbon/icons-react"
-import { InlineNotification, Button } from "carbon-components-react"
+import { InlineNotification } from "carbon-components-react"
 
 import AtiProjects from "../features/ati/AtiProjects"
 import AppDesc from "../features/components/AppDesc"
+import HomePageTitle from "../features/components/HomePageTitle"
 import Layout from "../features/components/Layout"
 
 import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
@@ -49,18 +48,7 @@ const Home: FC<HomeProps> = ({
       <>
         {isLoggedIn ? (
           <div className={styles.loggedInContainer}>
-            <div className={styles.titleContainer}>
-              <h1>
-                <abbr>ATI</abbr> Projects
-              </h1>
-              <Link href="/new">
-                <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add16}>
-                  <span>
-                    New <abbr>ATI</abbr> Project
-                  </span>
-                </Button>
-              </Link>
-            </div>
+            <HomePageTitle />
             {totalCount === 0 || errorMsg ? (
               <InlineNotification
                 hideCloseButton
