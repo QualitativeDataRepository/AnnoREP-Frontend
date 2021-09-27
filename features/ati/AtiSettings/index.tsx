@@ -5,6 +5,9 @@ import { TrashCan16 } from "@carbon/icons-react"
 import { Button, Form, InlineNotification, InlineLoadingStatus } from "carbon-components-react"
 import { useRouter } from "next/router"
 
+import DeleteAtiModal from "./DeleteAtiModal"
+
+import useBoolean from "../../../hooks/useBoolean"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
@@ -21,10 +24,20 @@ export interface AtiSettingsProps {
 
 const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
   const router = useRouter()
+  const [
+    deleteAtiModalIsOpen,
+    { setTrue: openDeleteAtiModal, setFalse: closeDeleteAtiModal },
+  ] = useBoolean(false)
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
+
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
+    openDeleteAtiModal()
+  }
+
+  const handleDeleteAti = async () => {
+    closeDeleteAtiModal()
     setTaskStatus("active")
     setTaskDesc(`Deleting ATI project...`)
     await axios
@@ -61,6 +74,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
         setTaskDesc(`${getMessageFromError(error)}`)
       })
   }
+
   return (
     <div className={layoutStyles.maxWidth}>
       <h2>Danger zone</h2>
@@ -96,6 +110,12 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             Delete
           </Button>
         </Form>
+        <DeleteAtiModal
+          atiName={dataset.title}
+          open={deleteAtiModalIsOpen}
+          closeModal={closeDeleteAtiModal}
+          handleDeleteAti={handleDeleteAti}
+        />
       </div>
     </div>
   )
