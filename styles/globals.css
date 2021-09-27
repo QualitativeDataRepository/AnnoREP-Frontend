@@ -15,10 +15,6 @@ a {
   box-sizing: border-box;
 }
 
-.ar--secondary-text {
-  color: #525252;
-}
-
 .bx--inline-notification {
   width: 100% !important;
   max-width: 100% !important;
