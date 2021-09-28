@@ -1,0 +1,6 @@
+.downloadContainer {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  column-gap: 32px;
+}

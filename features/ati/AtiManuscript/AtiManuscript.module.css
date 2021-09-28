@@ -1,0 +1,38 @@
+.iframe {
+  min-height: 100vh;
+}
+
+.blackButton > svg {
+  color: black;
+}
+
+.buttonContainer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0px;
+  justify-content: start;
+  align-items: center;
+  background-color: whitesmoke;
+}
+
+.deleteManuscript {
+  justify-self: end;
+}
+
+.tabContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 16px;
+}
+
+.centerUploadManuscript {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+@media (min-width: 42rem) {
+  .centerUploadManuscript {
+    padding-top: 15vh;
+  }
+}

@@ -1,0 +1,13 @@
+.container {
+  border-bottom: 1px solid #dbdbdb;
+  padding: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.logoLink {
+  font-size: 1.5rem;
+  color: black;
+}
