@@ -9,7 +9,7 @@ import styles from "./Layout.module.css"
 interface LayoutProps {
   title: string
   children: ReactNode
-  isLoggedIn: boolean
+  isLoggedIn?: boolean
   isFullWidth?: boolean
   hasPdf?: boolean
 }

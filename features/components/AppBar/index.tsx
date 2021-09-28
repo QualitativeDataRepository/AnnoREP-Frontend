@@ -9,7 +9,7 @@ import styles from "./AppBar.module.css"
 
 export interface AppBarProps {
   /** Is the user logged in? */
-  isLoggedIn: boolean
+  isLoggedIn?: boolean
 }
 
 const AppBar: FC<AppBarProps> = ({ isLoggedIn }) => {
@@ -19,7 +19,11 @@ const AppBar: FC<AppBarProps> = ({ isLoggedIn }) => {
       <a href="/" className={styles.logoLink}>
         AnnoREP
       </a>
-      {isLoggedIn ? <LogoutLink handleLogout={handleLougout} /> : <LoginLink />}
+      <div>
+        {isLoggedIn !== undefined && (
+          <>{isLoggedIn ? <LogoutLink handleLogout={handleLougout} /> : <LoginLink />}</>
+        )}
+      </div>
     </nav>
   )
 }
