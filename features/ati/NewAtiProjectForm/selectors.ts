@@ -28,5 +28,5 @@ export const getErrorMsg = (state: SearchDatasetState): string => {
 export const hasMoreDatasets = (state: SearchDatasetState): boolean =>
   state.currentTotal < state.totalCount
 
-export const getSearchPlaceholder = (state: SearchDatasetState) =>
+export const getSearchPlaceholder = (state: SearchDatasetState): string =>
   state.totalCount === 0 ? "Please create a new dataset" : "Please choose a dataset"
