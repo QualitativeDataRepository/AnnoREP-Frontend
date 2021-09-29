@@ -24,7 +24,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "lint:fix": "npm run lint -- --fix",
-    "test": "jest",
+    "test:unit": "jest --watch",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
     "build-storybook": "build-storybook",
     "deploy-storybook": "gh-pages -d storybook-static"
@@ -67,6 +67,7 @@
     "@storybook/addons": "^6.1.21",
     "@storybook/react": "^6.1.21",
     "@storybook/theming": "^6.1.21",
+    "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.5",
     "@types/formidable": "^1.2.2",
     "@types/jest": "^26.0.20",
