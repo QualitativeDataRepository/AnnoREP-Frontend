@@ -4,7 +4,7 @@ import React from "react"
 
 import { render, act } from "@testing-library/react"
 
-import useBoolean, { IUseBooleanCallbacks } from "./useBoolean"
+import useBoolean, { IUseBooleanCallbacks } from "../useBoolean"
 
 describe("useBoolean", () => {
   test("has initial value", () => {
