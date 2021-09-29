@@ -1,4 +1,4 @@
-import { range } from "../../utils/arrayUtils"
+import { range } from "./arrayUtils"
 
 describe("range", () => {
   test("includes stop and increment by 1", () => {

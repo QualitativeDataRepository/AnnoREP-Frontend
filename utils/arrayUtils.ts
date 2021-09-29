@@ -5,5 +5,5 @@
  * @param step step > 0
  * @returns An array of numbers from start to stop, inclusive and incremented by step.
  */
-export const range = (start: number, stop: number, step: number) =>
+export const range = (start: number, stop: number, step: number): number[] =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
