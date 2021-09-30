@@ -17,7 +17,7 @@ jobs:
         npm i
     - name: Run Unit Tests
       run: |
-        CI=true npm run test:unit
+        CI=true npm run test:all-unit
 
   lint:
     runs-on: ubuntu-latest

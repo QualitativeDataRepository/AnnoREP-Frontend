@@ -25,6 +25,7 @@
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "lint:fix": "npm run lint -- --fix",
     "test:unit": "jest --watch",
+    "test:all-unit": "jest",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
     "build-storybook": "build-storybook",
     "deploy-storybook": "gh-pages -d storybook-static"
