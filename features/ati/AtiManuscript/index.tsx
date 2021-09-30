@@ -97,11 +97,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       setTaskDesc("Please upload a manuscript file.")
       return
     }
-    const firstFourBytes = await target.manuscript.files[0].slice(0, 4).arrayBuffer()
-    const firstFourBytesView = new Int8Array(firstFourBytes)
-    const mimeType = target.manuscript.files[0].type
-      ? target.manuscript.files[0].type
-      : getMimeType(firstFourBytesView)
+    const mimeType = await getMimeType(target.manuscript.files[0])
     const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
     if (!acceptedMimeTypes.includes(mimeType)) {
       const msg = target.manuscript.files[0].type
