@@ -90,10 +90,14 @@ describe("searchReducer", () => {
         type: "SEARCH_Q",
         payload: {
           totalCount: 2,
-          docsPerPage: 2,
+          docsPerPage: 1,
           datasets: [{ id: "ati-2", name: "Ati 2" }],
-          selectedFilters: {},
-          publicationStatusCount: {},
+          selectedFilters: {
+            publication_statuses: ["Draft"],
+          },
+          publicationStatusCount: {
+            draft_count: 1,
+          },
         },
       })
     ).toEqual({
@@ -103,16 +107,20 @@ describe("searchReducer", () => {
       currentTotal: 1,
       atiProjects: { 0: { id: "ati-2", name: "Ati 2" } },
       page: 0,
-      perPage: 2,
-      selectedPublicationStatuses: {},
-      selectedFilters: {},
-      publicationStatusCount: {},
+      perPage: 1,
+      selectedPublicationStatuses: { Draft: true },
+      selectedFilters: {
+        publication_statuses: ["Draft"],
+      },
+      publicationStatusCount: {
+        draft_count: 1,
+      },
       fetchQ: false,
       fetchPublicationStatus: false,
     })
   })
 
-  test("handles update publication statuses", () => {
+  test("handles update publication statuses - true", () => {
     expect(
       searchReducer(initialState, {
         type: "UPDATE_SELECTED_PUBLICATION_STATUS",
@@ -126,6 +134,24 @@ describe("searchReducer", () => {
       fetchPublicationStatus: true,
       selectedPublicationStatuses: {
         Draft: true,
+      },
+    })
+  })
+
+  test("handles update publication statuses - false", () => {
+    expect(
+      searchReducer(initialState, {
+        type: "UPDATE_SELECTED_PUBLICATION_STATUS",
+        payload: {
+          id: "Draft",
+          checked: false,
+        },
+      })
+    ).toEqual({
+      ...initialState,
+      fetchPublicationStatus: true,
+      selectedPublicationStatuses: {
+        Draft: false,
       },
     })
   })
