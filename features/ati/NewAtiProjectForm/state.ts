@@ -39,7 +39,7 @@ export function searchDatasetReducer(
       return { ...state, status: "error", error: action.payload }
     }
     case "UPDATE_PAGE": {
-      return { ...state, page: state.page + 1, fetchPage: true }
+      return { ...state, page: state.page + 1, fetchPage: state.currentTotal < state.totalCount }
     }
     case "SEARCH_PAGE": {
       const newDatasets: IDatasetOption[] = action.payload.datasets.map((dataset: any) => {

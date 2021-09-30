@@ -3,7 +3,7 @@ import { searchDatasetReducer, SearchDatasetState, SearchDatasetAction } from ".
 describe("searchDatasetReducer", () => {
   const initialState: SearchDatasetState = {
     currentTotal: 1,
-    totalCount: 1,
+    totalCount: 2,
     datasets: [
       {
         id: "dataset-1",
@@ -13,7 +13,7 @@ describe("searchDatasetReducer", () => {
     status: "inactive",
     page: 0,
     fetchPage: false,
-    perPage: 10,
+    perPage: 1,
     q: "",
     fetchQ: false,
     error: "",
@@ -35,7 +35,7 @@ describe("searchDatasetReducer", () => {
     ).toEqual({ ...initialState, status: "error", error: "error" })
   })
 
-  test("handles update page", () => {
+  test("handles update page and should fetch datasets", () => {
     expect(searchDatasetReducer(initialState, { type: "UPDATE_PAGE" })).toEqual({
       ...initialState,
       page: 1,
@@ -72,7 +72,7 @@ describe("searchDatasetReducer", () => {
         type: "SEARCH_Q",
         payload: {
           totalCount: 1,
-          docsPerPage: 10,
+          docsPerPage: 1,
           datasets: [{ id: "dataset-2", name: "Dataset 2" }],
         },
       })
@@ -84,7 +84,7 @@ describe("searchDatasetReducer", () => {
       currentTotal: 1,
       datasets: [{ id: "dataset-2", name: "Dataset 2" }],
       page: 0,
-      perPage: 10,
+      perPage: 1,
     })
   })
 
