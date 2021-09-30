@@ -12,7 +12,6 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 const useSearch = (inititalState: SearchState) => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
 
-  //Change pages
   useEffect(() => {
     let didCancel = false
 
