@@ -73,9 +73,9 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
       dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
     }
   }
-  const [selectedDataset, setSelectedDataet] = useState<string>("")
+  const [selectedDataset, setSelectedDataset] = useState<string>("")
   const onSelect = (data: any) => {
-    setSelectedDataet(data.selectedItem ? data.selectedItem.id : "")
+    setSelectedDataset(data.selectedItem ? data.selectedItem.id : "")
   }
 
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
