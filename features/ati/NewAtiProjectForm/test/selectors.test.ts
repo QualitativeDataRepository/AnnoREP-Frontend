@@ -1,6 +1,7 @@
+import { act } from "@testing-library/react"
+
 import { SearchDatasetState } from "../state"
 import { getItems, getResultDesc } from "../selectors"
-import { act } from "@testing-library/react"
 
 describe("getItems", () => {
   test("handles empty array", () => {
