@@ -108,7 +108,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
       )
       return {
         ...state,
-        atiProjects: [],
+        atiProjects: {},
         totalCount: 0,
         currentTotal: 0,
         publicationStatusCount: newPublicationStatusCount,
