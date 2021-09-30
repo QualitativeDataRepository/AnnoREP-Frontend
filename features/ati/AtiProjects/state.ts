@@ -8,6 +8,7 @@ export interface SearchState {
   atiProjects: Record<number, IAtiProject>
   status: InlineLoadingStatus
   page: number
+  fetchPage: boolean
   perPage: number
   q: string
   fetchQ: boolean
@@ -47,6 +48,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         atiProjects: { ...state.atiProjects, ...newAtis },
         currentTotal: state.currentTotal + atiData.length,
         status: "finished",
+        fetchPage: false,
       } as SearchState
     }
     case "SEARCH_FAILURE": {
@@ -83,7 +85,9 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
       } as SearchState
     }
     case "UPDATE_PAGE": {
-      return { ...state, page: action.payload } as SearchState
+      const cursor = (action.payload as number) * state.perPage
+      const fetchPage = state.currentTotal < state.totalCount && !(cursor in state.atiProjects)
+      return { ...state, page: action.payload, fetchPage } as SearchState
     }
     case "UPDATE_Q": {
       return { ...state, q: action.payload, fetchQ: true } as SearchState
@@ -112,6 +116,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         totalCount: 0,
         currentTotal: 0,
         publicationStatusCount: newPublicationStatusCount,
+        fetchPage: false,
         fetchQ: false,
         fetchPublicationStatus: false,
       } as SearchState

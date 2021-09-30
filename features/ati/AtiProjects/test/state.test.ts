@@ -20,6 +20,7 @@ describe("searchReducer", () => {
     },
     status: "inactive",
     page: 0,
+    fetchPage: false,
     perPage: 1,
     q: "",
     fetchQ: false,
@@ -45,10 +46,19 @@ describe("searchReducer", () => {
     })
   })
 
-  test("handles update page", () => {
+  test("handles update page and should fetch projects", () => {
     expect(searchReducer(initialState, { type: "UPDATE_PAGE", payload: 1 })).toEqual({
       ...initialState,
       page: 1,
+      fetchPage: true,
+    })
+  })
+
+  test("handles update page and shouldn't fetch projects", () => {
+    expect(searchReducer(initialState, { type: "UPDATE_PAGE", payload: 0 })).toEqual({
+      ...initialState,
+      page: 0,
+      fetchPage: false,
     })
   })
 
@@ -126,6 +136,7 @@ describe("searchReducer", () => {
       totalCount: 0,
       currentTotal: 0,
       atiProjects: {},
+      fetchPage: false,
       fetchQ: false,
       fetchPublicationStatus: false,
     })
