@@ -3,7 +3,7 @@ name: Test, Lint, and Build
 on: pull_request
 
 jobs:
-  test:unit:
+  test-unit:
     runs-on: ubuntu-latest
 
     steps:
