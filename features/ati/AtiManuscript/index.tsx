@@ -1,4 +1,4 @@
-import { FC, FormEventHandler, useReducer, useState } from "react"
+import { FC, FormEventHandler, useReducer, useState, ChangeEvent } from "react"
 
 import axios from "axios"
 import {
@@ -58,7 +58,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     { setTrue: openDeleteManuscriptModal, setFalse: closeDeleteManuscriptModal },
   ] = useBoolean(false)
   const [uploadManuscript, dispatch] = useReducer(uploadManuscriptReducer, {
-    manuscript: undefined,
+    manuscript: null,
     modalIsOpen: false,
     uploadAnnotations: false,
   })
@@ -86,29 +86,35 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
   }
 
+  const onChangeFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: "SET_MANUSCRIPT", payload: e.target.files ? e.target.files[0] : null })
+  }
+  const onClearFile = () => {
+    dispatch({ type: "SET_MANUSCRIPT", payload: null })
+  }
+
   const onClickUploadManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
-      manuscript: { files: FileList }
       uploadAnnotations: { checked: boolean }
     }
-    if (target.manuscript.files.length === 0) {
+    if (uploadManuscript.manuscript === null) {
       setTaskStatus("error")
       setTaskDesc("Please upload a manuscript file.")
       return
     }
-    const mimeType = await getMimeType(target.manuscript.files[0])
+    const mimeType = await getMimeType(uploadManuscript.manuscript)
     const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
     if (!acceptedMimeTypes.includes(mimeType)) {
-      const msg = target.manuscript.files[0].type
-        ? `${target.manuscript.files[0].type} is not a supported file type.`
+      const msg = uploadManuscript.manuscript.type
+        ? `${uploadManuscript.manuscript.type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
       setTaskStatus("error")
       setTaskDesc(msg)
       return
     }
-    let manuscript = target.manuscript.files[0]
-    if (target.manuscript.files[0].type === "") {
+    let manuscript = uploadManuscript.manuscript
+    if (uploadManuscript.manuscript.type === "") {
       manuscript = new File([manuscript], manuscript.name, { type: mimeType })
     }
     dispatch({
@@ -121,8 +127,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   }
 
   const handleUploadManuscript = async () => {
+    dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })
     if (uploadManuscript.manuscript) {
-      dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })
       const formData = new FormData()
       formData.append("manuscript", uploadManuscript.manuscript)
       setTaskStatus("active")
@@ -287,6 +293,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   labelTitle="Upload manuscript"
                   name="manuscript"
                   size="small"
+                  onChange={onChangeFileUpload}
+                  onDelete={onClearFile}
                 />
               </div>
               <div className={formStyles.item}>
