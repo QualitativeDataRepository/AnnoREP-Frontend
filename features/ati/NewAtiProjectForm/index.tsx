@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, KeyboardEventHandler, useState } from "react"
+import React, { FC, FormEventHandler, KeyboardEventHandler, useState, ChangeEvent } from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -73,36 +73,40 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
       dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
     }
   }
-  const [selectedDataset, setSelectedDataset] = useState<string>("")
-  const onSelect = (data: any) => {
-    setSelectedDataset(data.selectedItem ? data.selectedItem.id : "")
+  const [selectedDataset, setSelectedDataset] = useState<{ id: number; label: string } | null>(null)
+  const onSelectDataset = (data: any) => {
+    setSelectedDataset(data.selectedItem)
+  }
+
+  const [selectedManuscript, setSelectedManuscript] = useState<FileList | null>(null)
+  const onChangeFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedManuscript(e.target.files)
+  }
+  const onClearFile = () => {
+    setSelectedManuscript(null)
   }
 
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-    const target = e.target as typeof e.target & {
-      dataset: { value: string }
-      manuscript: { files: FileList }
-    }
-    if (target.manuscript.files.length === 0) {
+    if (selectedManuscript === null || selectedManuscript.length === 0) {
       setTaskStatus("error")
       setTaskDesc("Please upload a manuscript file.")
       return
     }
-    const mimeType = await getMimeType(target.manuscript.files[0])
+    const mimeType = await getMimeType(selectedManuscript[0])
     const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
     if (!acceptedMimeTypes.includes(mimeType)) {
-      const msg = target.manuscript.files[0].type
-        ? `${target.manuscript.files[0].type} is not a supported file type.`
+      const msg = selectedManuscript[0].type
+        ? `${selectedManuscript[0].type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
       setTaskStatus("error")
       setTaskDesc(msg)
       return
     }
-    let manuscript = target.manuscript.files[0]
-    if (target.manuscript.files[0].type === "") {
+    let manuscript = selectedManuscript[0]
+    if (selectedManuscript[0].type === "") {
       manuscript = new File([manuscript], manuscript.name, { type: mimeType })
     }
     const formData = new FormData()
@@ -111,13 +115,13 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     setTaskDesc("Creating ATI project...")
     await axios({
       method: "PUT",
-      url: `/api/datasets/${selectedDataset}/annorep`,
+      url: `/api/datasets/${selectedDataset?.id}/annorep`,
     })
       .then(() => {
         setTaskDesc(`Uploading ${manuscript.name}...`)
         return axios({
           method: "POST",
-          url: `/api/datasets/${selectedDataset}/manuscript`,
+          url: `/api/datasets/${selectedDataset?.id}/manuscript`,
           data: formData,
           headers: {
             "Content-Type": "multipart/form-data",
@@ -131,15 +135,15 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           method: "PUT",
           url: `/api/arcore/${manuscriptId}`,
           params: {
-            datasetId: selectedDataset,
+            datasetId: selectedDataset?.id,
             uploadAnnotations: true,
           },
         })
       })
       .then(() => {
         setTaskStatus("finished")
-        setTaskDesc(`Created ATI project for dataset ${target.dataset.value}.`)
-        router.push(`/ati/${selectedDataset}/${AtiTab.summary.id}`)
+        setTaskDesc(`Created ATI project for dataset ${selectedDataset?.label}.`)
+        router.push(`/ati/${selectedDataset?.id}/${AtiTab.summary.id}`)
       })
       .catch((error) => {
         setTaskStatus("error")
@@ -214,7 +218,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
               onKeyUp={onSearch}
-              onChange={onSelect}
+              onChange={onSelectDataset}
             />
             <div>
               {hasMoreDatasets(state) && (
@@ -246,6 +250,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               labelTitle="Manuscript"
               name="manuscript"
               size="small"
+              onDelete={onClearFile}
+              onChange={onChangeFileUpload}
             />
           </div>
           <Button className={formStyles.submitBtn} type="submit" renderIcon={Add16}>
