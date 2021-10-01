@@ -6,7 +6,7 @@ import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {

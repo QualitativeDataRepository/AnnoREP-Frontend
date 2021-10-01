@@ -9,7 +9,7 @@ import { getTrueFields } from "./utils"
 import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
-const useSearch = (inititalState: SearchState) => {
+const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const useSearch = (inititalState: SearchState) => {
     state.fetchPublicationStatus,
   ])
 
-  return [state, dispatch] as [SearchState, Dispatch<Action>]
+  return [state, dispatch]
 }
 
 export default useSearch

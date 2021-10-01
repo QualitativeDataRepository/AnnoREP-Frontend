@@ -9,7 +9,7 @@ import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 const ANNOTATIONS_MAX_LIMIT = 200
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
