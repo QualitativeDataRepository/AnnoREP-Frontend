@@ -58,16 +58,19 @@ const AtiTab: FC<AtiTabProps> = ({
           selected={selectedTabIndex}
           onSelectionChange={onSelectionChange}
         >
-          <Tab id={AtiTabs.summary.id} label={AtiTabs.summary.label} />
-          <Tab id={AtiTabs.manuscript.id} label={AtiTabs.manuscript.label} />
-          <Tab id={AtiTabs.exportAnnotations.id} label={AtiTabs.exportAnnotations.label} />
-          <Tab id={AtiTabs.settings.id} label={AtiTabs.settings.label} />
+          <Tab id={AtiTabs.summary.id} label={AtiTabs.summary.label}>
+            {selectedTab === AtiTabs.summary.id && <>{children}</>}
+          </Tab>
+          <Tab id={AtiTabs.manuscript.id} label={AtiTabs.manuscript.label}>
+            {selectedTab === AtiTabs.manuscript.id && <>{children}</>}
+          </Tab>
+          <Tab id={AtiTabs.exportAnnotations.id} label={AtiTabs.exportAnnotations.label}>
+            {selectedTab === AtiTabs.exportAnnotations.id && <>{children}</>}
+          </Tab>
+          <Tab id={AtiTabs.settings.id} label={AtiTabs.settings.label}>
+            {selectedTab === AtiTabs.settings.id && <>{children}</>}
+          </Tab>
         </Tabs>
-        <div>
-          <div role="tabpanel" id={`${selectedTab}__panel`} aria-labelledby={selectedTab}>
-            {children}
-          </div>
-        </div>
       </>
     )
   }
