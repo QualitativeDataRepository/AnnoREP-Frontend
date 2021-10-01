@@ -93,7 +93,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({ serverUrl, atiProjectDetails }) => {
           ))}
         </div>
       </div>
-      <div aria-label="about" className={styles.aboutContainer}>
+      <div className={styles.aboutContainer}>
         <div className={styles.buttonSet}>
           {zip && (
             <Button
