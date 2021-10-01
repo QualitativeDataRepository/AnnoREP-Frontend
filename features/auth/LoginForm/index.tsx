@@ -79,16 +79,16 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Login
+                  Login to a Dataverse
                 </Link>{" "}
-                to Dataverse and get your{" "}
+                and get your{" "}
                 <Link
                   size="sm"
                   href={`${dataverseServerUrl}/dataverseuser.xhtml#dataverseUserForm:dataRelatedToMeView:apiTokenTab`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  API token
+                  Dataverse API token
                 </Link>
               </div>
             }
@@ -121,16 +121,16 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Login
+                  Login to Hypothes.is
                 </Link>{" "}
-                to Hypothes.is and get your{" "}
+                and get your{" "}
                 <Link
                   size="sm"
                   href="https://hypothes.is/account/developer"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  API token
+                  Hypothes.is API token
                 </Link>
               </div>
             }

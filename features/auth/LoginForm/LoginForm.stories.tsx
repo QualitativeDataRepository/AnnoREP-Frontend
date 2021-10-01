@@ -10,6 +10,10 @@ export default {
 const Template: Story<LoginFormProps> = (args) => <LoginForm {...args} />
 
 export const Default = Template.bind({})
+Default.args = {
+  dataverseServerUrl: "https://dv.dev-aws.qdr.org",
+  dataverseSiteUrl: "https://dev-aws.qdr.org",
+}
 
 export const Valid = Template.bind({})
 Valid.args = {
