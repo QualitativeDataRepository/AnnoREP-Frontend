@@ -118,7 +118,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       manuscript = new File([manuscript], manuscript.name, { type: mimeType })
     }
     dispatch({
-      type: "UPLOAD",
+      type: "UPLOAD_MANUSCRIPT",
       payload: {
         manuscript: manuscript,
         uploadAnnotations: target.uploadAnnotations.checked,

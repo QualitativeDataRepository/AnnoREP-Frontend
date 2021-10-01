@@ -9,7 +9,7 @@ export type Action =
   | { type: "TOGGLE_MODAL_IS_OPEN" }
   | { type: "SET_MANUSCRIPT"; payload: File | null }
   | {
-      type: "UPLOAD"
+      type: "UPLOAD_MANUSCRIPT"
       payload: {
         manuscript: File
         uploadAnnotations: boolean
@@ -21,7 +21,7 @@ export function uploadManuscriptReducer(
   action: Action
 ): UploadManuscriptState {
   switch (action.type) {
-    case "UPLOAD": {
+    case "UPLOAD_MANUSCRIPT": {
       return {
         manuscript: action.payload.manuscript,
         uploadAnnotations: action.payload.uploadAnnotations,
