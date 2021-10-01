@@ -8,7 +8,7 @@ interface ErrorProps {
   error: string
 }
 
-const Error = ({ error }: ErrorProps) => {
+const Error = ({ error }: ErrorProps): JSX.Element => {
   return <ErrorContainer error={error} />
 }
 
