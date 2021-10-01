@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "DELETE") {
     const session = await getSession({ req })
     if (session) {
