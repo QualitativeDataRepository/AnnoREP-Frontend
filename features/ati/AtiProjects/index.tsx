@@ -55,6 +55,7 @@ const AtiProjects: FC<AtiProjectsProps> = ({
     }, {} as Record<number, IAtiProject>),
     status: "inactive",
     page: 0,
+    fetchPage: false,
     perPage: atisPerPage,
     q: "",
     fetchQ: false,

@@ -12,39 +12,43 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 const useSearch = (inititalState: SearchState) => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
 
-  //Change pages
   useEffect(() => {
-    const cursor = state.page * state.perPage
     let didCancel = false
 
     const search = async () => {
       try {
         dispatch({ type: "SEARCH_INIT" })
+        //if search q use all the publication statuses, else use the selected publication statuses
+        const publicationStatuses = state.fetchQ
+          ? PUBLICATION_STATUSES
+          : getTrueFields(state.selectedPublicationStatuses)
         const { data } = await axios.get(`/api/mydata-search`, {
           params: {
+            publicationStatuses,
             q: state.q,
             //dataverse mydata selected_page starts at 1
-            selectedPage: state.page + 1,
+            //if search page then use state.page, else start at the beginning
+            selectedPage: state.fetchPage ? state.page + 1 : 1,
             isAnnoRep: true,
-            //use current pub statuses
-            publicationStatuses: getTrueFields(state.selectedPublicationStatuses),
           },
           paramsSerializer: (params) => {
             return qs.stringify(params, { indices: false })
           },
         })
         if (!didCancel) {
-          dispatch({ type: "SEARCH_PAGE", payload: data })
+          const actionType = state.fetchPage ? "SEARCH_PAGE" : "SEARCH_Q"
+          dispatch({ type: actionType, payload: data })
         }
       } catch (e) {
         if (!didCancel) {
           const message = getMessageFromError(e)
           dispatch({ type: "SEARCH_FAILURE", payload: message })
+          dispatch({ type: "NO_RESULTS" })
         }
       }
     }
 
-    if (state.currentTotal < state.totalCount && !(cursor in state.atiProjects)) {
+    if (state.fetchPage || state.fetchQ || state.fetchPublicationStatus) {
       search()
     }
 
@@ -53,89 +57,12 @@ const useSearch = (inititalState: SearchState) => {
     }
   }, [
     state.q,
+    state.fetchQ,
     state.page,
-    state.totalCount,
-    state.currentTotal,
-    state.atiProjects,
+    state.fetchPage,
     state.selectedPublicationStatuses,
+    state.fetchPublicationStatus,
   ])
-
-  //Searching q
-  useEffect(() => {
-    let didCancel = false
-    const search = async () => {
-      try {
-        dispatch({ type: "SEARCH_INIT" })
-        const { data } = await axios.get(`/api/mydata-search`, {
-          params: {
-            q: state.q,
-            //dataverse mydata selected_page starts at 1
-            selectedPage: 1,
-            isAnnoRep: true,
-            //when searching q, search all pub statuses
-            publicationStatuses: PUBLICATION_STATUSES,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { indices: false })
-          },
-        })
-        if (!didCancel) {
-          dispatch({ type: "SEARCH_Q", payload: data })
-        }
-      } catch (e) {
-        if (!didCancel) {
-          const message = getMessageFromError(e)
-          dispatch({ type: "SEARCH_FAILURE", payload: message })
-          dispatch({ type: "NO_RESULTS" })
-        }
-      }
-    }
-    if (state.fetchQ) {
-      //Don't initially search q
-      search()
-    }
-    return () => {
-      didCancel = true
-    }
-  }, [state.q, state.fetchQ])
-
-  //Publication status change
-  useEffect(() => {
-    let didCancel = false
-    const publicationStatuses = getTrueFields(state.selectedPublicationStatuses)
-    const search = async () => {
-      try {
-        dispatch({ type: "SEARCH_INIT" })
-        const { data } = await axios.get(`/api/mydata-search`, {
-          params: {
-            q: state.q,
-            //dataverse mydata selected_page starts at 1
-            selectedPage: 1,
-            isAnnoRep: true,
-            publicationStatuses: publicationStatuses,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { indices: false })
-          },
-        })
-        if (!didCancel) {
-          dispatch({ type: "SEARCH_Q", payload: data })
-        }
-      } catch (e) {
-        if (!didCancel) {
-          const message = getMessageFromError(e)
-          dispatch({ type: "SEARCH_FAILURE", payload: message })
-          dispatch({ type: "NO_RESULTS" })
-        }
-      }
-    }
-    if (state.fetchPublicationStatus) {
-      search()
-    }
-    return () => {
-      didCancel = true
-    }
-  }, [state.q, state.selectedPublicationStatuses, state.fetchPublicationStatus])
 
   return [state, dispatch] as [SearchState, Dispatch<Action>]
 }
