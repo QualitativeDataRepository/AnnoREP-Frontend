@@ -24,7 +24,12 @@ const UploadManuscriptModal: FC<UploadManuscriptModalProps> = ({
 }) => {
   const onRequestSubmit = () => handleUploadManuscript()
   return (
-    <ComposedModal open={open} onClose={closeModal} size="sm">
+    <ComposedModal
+      open={open}
+      onClose={closeModal}
+      size="sm"
+      aria-label="Upload manuscript confirmation"
+    >
       <ModalHeader
         id="upload-manuscript-modal-header"
         title={`${
@@ -32,7 +37,7 @@ const UploadManuscriptModal: FC<UploadManuscriptModalProps> = ({
         } annotations from ${manuscriptName}?`}
         iconDescription="Close"
       />
-      <ModalBody id="upload-manuscript-modal-body" aria-label="Upload manuscript confirmation">
+      <ModalBody id="upload-manuscript-modal-body">
         {uploadAnnotations
           ? `All your current annotations will be deleted and replaced with the annotations found in ${manuscriptName}.`
           : `No annotations from ${manuscriptName} will be uploaded.`}
