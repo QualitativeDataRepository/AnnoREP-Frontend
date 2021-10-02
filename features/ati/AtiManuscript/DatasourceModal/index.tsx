@@ -47,7 +47,11 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
         title="Copy datasource URL"
         iconDescription="Close"
       />
-      <ModalBody id="datasources-modal-body" aria-label="Datasources" hasScrollingContent={true}>
+      <ModalBody
+        id="datasources-modal-body"
+        aria-label="Datasource URLs"
+        hasScrollingContent={true}
+      >
         <Link
           href={`${serverUrl}/dataset.xhtml?persistentId=${datasetDoi}`}
           target="_blank"

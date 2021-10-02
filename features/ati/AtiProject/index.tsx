@@ -57,12 +57,17 @@ const AtiProject: FC<AtiProjectProps> = ({
         </h2>
         <div className={styles.tags}>
           {publicationStatuses.sort().map((status, i) => (
-            <Tag key={i} id={status} type={PUBLICATION_STATUSES_COLOR[status]} size="sm">
+            <Tag
+              key={i}
+              id={`${status} status`}
+              type={PUBLICATION_STATUSES_COLOR[status]}
+              size="sm"
+            >
               {status}
             </Tag>
           ))}
           {userRoles.sort().map((role, i) => (
-            <Tag key={i} id={role} type="teal" size="sm">
+            <Tag key={i} id={`${role} role`} type="teal" size="sm">
               {role}
             </Tag>
           ))}

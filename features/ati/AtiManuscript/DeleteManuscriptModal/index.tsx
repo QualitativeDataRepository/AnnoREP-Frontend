@@ -21,13 +21,18 @@ const DeleteManuscriptModal: FC<DeleteManuscriptModalProps> = ({
 }) => {
   const onRequestSubmit = () => handleDeleteManuscript()
   return (
-    <ComposedModal open={open} onClose={closeModal} size="xs">
+    <ComposedModal
+      open={open}
+      onClose={closeModal}
+      size="xs"
+      aria-label="Delete manuscript confirmation"
+    >
       <ModalHeader
         id="delete-manuscript-modal-header"
         title={`Delete ${manuscriptName}`}
         iconDescription="Close"
       />
-      <ModalBody id="delete-manuscript-modal-body" aria-label="Delete manuscript confirmation">
+      <ModalBody id="delete-manuscript-modal-body">
         Are you sure you want to delete this manuscript?
       </ModalBody>
       <ModalFooter
