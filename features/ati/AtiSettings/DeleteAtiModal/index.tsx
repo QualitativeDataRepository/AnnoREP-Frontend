@@ -21,13 +21,18 @@ const DeleteAtiModal: FC<DeleteAtiModalProps> = ({
 }) => {
   const onRequestSubmit = () => handleDeleteAti()
   return (
-    <ComposedModal open={open} onClose={closeModal} size="xs">
+    <ComposedModal
+      open={open}
+      onClose={closeModal}
+      size="xs"
+      aria-label="Delete ATI project confirmation"
+    >
       <ModalHeader
         id="delete-ati-modal-header"
         title={`Delete ${atiName}`}
         iconDescription="Close"
       />
-      <ModalBody id="delete-ati-modal-body" aria-label="Delete ATI project confirmation">
+      <ModalBody id="delete-ati-modal-body">
         Are you sure you want to delete this project?
       </ModalBody>
       <ModalFooter
