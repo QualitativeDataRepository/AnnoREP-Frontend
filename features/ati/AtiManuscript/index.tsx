@@ -235,8 +235,8 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           {manuscript.id && (
             <Form onSubmit={onClickDeleteManuscript} className={styles.deleteManuscript}>
               <Button
+                className="bx--btn--danger"
                 type="submit"
-                kind="danger"
                 size="md"
                 hasIconOnly
                 iconDescription="Delete manuscript and upload another file"
