@@ -34,7 +34,7 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl, siteUrl }) => {
 
   const handleLogin = () => {
     signIn(LOGIN_ID, { redirect: false, dataverseApiToken, hypothesisApiToken }).then((res) => {
-      const loginRes = (res as unknown) as SignInResponse
+      const loginRes = res as unknown as SignInResponse
       if (loginRes.error) {
         const [dataverseIsInvalid, hypothesisIsInvalid] = loginRes.error.split(SEPARATOR)
         if (JSON.parse(dataverseIsInvalid)) {
