@@ -1,4 +1,5 @@
 import { InlineLoadingStatus } from "carbon-components-react"
+import { IMyDataSearch } from "../../../types/api"
 
 import { IDatasetOption } from "../../../types/dataverse"
 
@@ -15,17 +16,14 @@ export interface SearchDatasetState {
   error?: string
 }
 
-export interface SearchDatasetAction {
-  type:
-    | "SEARCH_INIT"
-    | "SEARCH_FAILURE"
-    | "SEARCH_Q"
-    | "UPDATE_Q"
-    | "UPDATE_PAGE"
-    | "SEARCH_PAGE"
-    | "NO_RESULTS"
-  payload?: any
-}
+export type SearchDatasetAction =
+  | { type: "SEARCH_INIT" }
+  | { type: "SEARCH_FAILURE"; payload: string }
+  | { type: "UPDATE_PAGE" }
+  | { type: "SEARCH_PAGE"; payload: IMyDataSearch }
+  | { type: "UPDATE_Q"; payload: string }
+  | { type: "SEARCH_Q"; payload: IMyDataSearch }
+  | { type: "NO_RESULTS" }
 
 export function searchDatasetReducer(
   state: SearchDatasetState,
@@ -42,8 +40,8 @@ export function searchDatasetReducer(
       return { ...state, page: state.page + 1, fetchPage: state.currentTotal < state.totalCount }
     }
     case "SEARCH_PAGE": {
-      const newDatasets: IDatasetOption[] = action.payload.datasets.map((dataset: any) => {
-        return { id: dataset.id, name: dataset.name }
+      const newDatasets: IDatasetOption[] = action.payload.datasets.map(({ id, name }) => {
+        return { id, name }
       })
       return {
         ...state,
@@ -61,8 +59,8 @@ export function searchDatasetReducer(
       }
     }
     case "SEARCH_Q": {
-      const newDatasets: IDatasetOption[] = action.payload.datasets.map((dataset: any) => {
-        return { id: dataset.id, name: dataset.name }
+      const newDatasets: IDatasetOption[] = action.payload.datasets.map(({ id, name }) => {
+        return { id, name }
       })
       return {
         ...state,

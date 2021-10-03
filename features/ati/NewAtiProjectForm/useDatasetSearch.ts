@@ -7,6 +7,7 @@ import { SearchDatasetAction, searchDatasetReducer, SearchDatasetState } from ".
 
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
+import { IMyDataSearch } from "../../../types/api"
 
 const useSearchDataset = (
   inititalState: SearchDatasetState
@@ -19,7 +20,7 @@ const useSearchDataset = (
     const search = async () => {
       try {
         dispatch({ type: "SEARCH_INIT" })
-        const { data } = await axios.get(`/api/mydata-search`, {
+        const { data } = await axios.get<IMyDataSearch>(`/api/mydata-search`, {
           params: {
             q: state.q,
             //dataverse mydata selected_page starts at 1

@@ -47,7 +47,27 @@ describe("searchDatasetReducer", () => {
     expect(
       searchDatasetReducer(initialState, {
         type: "SEARCH_PAGE",
-        payload: { datasets: [{ id: "dataset-2", name: "Dataset 2" }] },
+        payload: {
+          datasets: [
+            {
+              id: "dataset-2",
+              name: "Dataset 2",
+              description: "",
+              citationHtml: "",
+              dataverse: "",
+              dataverseName: "",
+              dataverseServerUrl: "",
+              dateDisplay: "",
+              publicationStatuses: [] as string[],
+              userRoles: [] as string[],
+            },
+          ],
+          totalCount: 2,
+          start: 1,
+          docsPerPage: 1,
+          publicationStatusCount: {},
+          selectedFilters: {},
+        },
       })
     ).toEqual({
       ...initialState,
@@ -71,16 +91,32 @@ describe("searchDatasetReducer", () => {
       searchDatasetReducer(initialState, {
         type: "SEARCH_Q",
         payload: {
-          totalCount: 1,
+          datasets: [
+            {
+              id: "dataset-2",
+              name: "Dataset 2",
+              description: "",
+              citationHtml: "",
+              dataverse: "",
+              dataverseName: "",
+              dataverseServerUrl: "",
+              dateDisplay: "",
+              publicationStatuses: [] as string[],
+              userRoles: [] as string[],
+            },
+          ],
+          totalCount: 2,
+          start: 0,
           docsPerPage: 1,
-          datasets: [{ id: "dataset-2", name: "Dataset 2" }],
+          publicationStatusCount: {},
+          selectedFilters: {},
         },
       })
     ).toEqual({
       ...initialState,
       status: "finished",
       fetchQ: false,
-      totalCount: 1,
+      totalCount: 2,
       currentTotal: 1,
       datasets: [{ id: "dataset-2", name: "Dataset 2" }],
       page: 0,
