@@ -1,4 +1,5 @@
 import { InlineLoadingStatus } from "carbon-components-react"
+import { IMyDataSearch } from "../../../types/api"
 
 import { IAtiProject } from "../../../types/ati"
 
@@ -19,26 +20,31 @@ export interface SearchState {
   fetchPublicationStatus: boolean
 }
 
-export interface Action {
-  type:
-    | "SEARCH_INIT"
-    | "SEARCH_PAGE"
-    | "SEARCH_FAILURE"
-    | "UPDATE_PAGE"
-    | "SEARCH_Q"
-    | "UPDATE_Q"
-    | "UPDATE_SELECTED_PUBLICATION_STATUS"
-    | "NO_RESULTS"
-  payload?: any
-}
+export type Action =
+  | { type: "SEARCH_INIT" }
+  | { type: "SEARCH_FAILURE"; payload: string }
+  | { type: "UPDATE_PAGE"; payload: number }
+  | { type: "SEARCH_PAGE"; payload: IMyDataSearch }
+  | { type: "UPDATE_Q"; payload: string }
+  | { type: "SEARCH_Q"; payload: IMyDataSearch }
+  | { type: "UPDATE_SELECTED_PUBLICATION_STATUS"; payload: { id: string; checked: boolean } }
+  | { type: "NO_RESULTS" }
 
 export function searchReducer(state: SearchState, action: Action): SearchState {
   switch (action.type) {
     case "SEARCH_INIT": {
-      return { ...state, status: "active", error: "" } as SearchState
+      return { ...state, status: "active", error: "" }
+    }
+    case "SEARCH_FAILURE": {
+      return { ...state, status: "error", error: action.payload }
+    }
+    case "UPDATE_PAGE": {
+      const cursor = action.payload * state.perPage
+      const fetchPage = state.currentTotal < state.totalCount && !(cursor in state.atiProjects)
+      return { ...state, page: action.payload, fetchPage }
     }
     case "SEARCH_PAGE": {
-      const atiData = action.payload.datasets as IAtiProject[]
+      const atiData = action.payload.datasets
       const newAtis = atiData.reduce((acc, curr, i) => {
         acc[i + action.payload.start] = curr
         return acc
@@ -49,13 +55,13 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         currentTotal: state.currentTotal + atiData.length,
         status: "finished",
         fetchPage: false,
-      } as SearchState
+      }
     }
-    case "SEARCH_FAILURE": {
-      return { ...state, status: "error", error: action.payload } as SearchState
+    case "UPDATE_Q": {
+      return { ...state, q: action.payload, fetchQ: true }
     }
     case "SEARCH_Q": {
-      const atiData = action.payload.datasets as IAtiProject[]
+      const atiData = action.payload.datasets
       const newAtis = atiData.reduce((acc, curr, i) => {
         acc[i] = curr
         return acc
@@ -82,15 +88,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         perPage: action.payload.docsPerPage,
         fetchQ: false,
         fetchPublicationStatus: false,
-      } as SearchState
-    }
-    case "UPDATE_PAGE": {
-      const cursor = (action.payload as number) * state.perPage
-      const fetchPage = state.currentTotal < state.totalCount && !(cursor in state.atiProjects)
-      return { ...state, page: action.payload, fetchPage } as SearchState
-    }
-    case "UPDATE_Q": {
-      return { ...state, q: action.payload, fetchQ: true } as SearchState
+      }
     }
     case "UPDATE_SELECTED_PUBLICATION_STATUS": {
       return {
@@ -98,9 +96,9 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         fetchPublicationStatus: true,
         selectedPublicationStatuses: {
           ...state.selectedPublicationStatuses,
-          [action.payload.id as string]: action.payload.checked as boolean,
+          [action.payload.id]: action.payload.checked,
         },
-      } as SearchState
+      }
     }
     case "NO_RESULTS": {
       const newPublicationStatusCount = Object.keys(state.publicationStatusCount).reduce(
@@ -119,7 +117,7 @@ export function searchReducer(state: SearchState, action: Action): SearchState {
         fetchPage: false,
         fetchQ: false,
         fetchPublicationStatus: false,
-      } as SearchState
+      }
     }
     default: {
       return state
