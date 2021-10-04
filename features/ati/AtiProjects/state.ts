@@ -1,6 +1,6 @@
 import { InlineLoadingStatus } from "carbon-components-react"
-import { IMyDataSearch } from "../../../types/api"
 
+import { IMyDataSearch } from "../../../types/api"
 import { IAtiProject } from "../../../types/ati"
 
 export interface SearchState {
