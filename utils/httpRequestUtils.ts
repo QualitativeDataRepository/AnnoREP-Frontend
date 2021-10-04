@@ -3,7 +3,7 @@ import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
 import { AnnoRepResponse } from "../types/http"
 
 export const getResponseFromError = (e: unknown, requestDesc?: string): AnnoRepResponse => {
-  const annoRepResposne: AnnoRepResponse = { status: 400, message: "" }
+  const annoRepResponse: AnnoRepResponse = { status: 400, message: "" }
   if (axios.isAxiosError(e)) {
     const requestInfo =
       e.config.headers[REQUEST_DESC_HEADER_NAME] ||
@@ -17,16 +17,16 @@ export const getResponseFromError = (e: unknown, requestDesc?: string): AnnoRepR
         `HTTP ${e.response.status} ${e.response.statusText}`
       failureMessage = `${additional}. ${failureMessage}`
     }
-    annoRepResposne.status = e.response?.status || 400
-    annoRepResposne.message = failureMessage
+    annoRepResponse.status = e.response?.status || 400
+    annoRepResponse.message = failureMessage
   } else if (e instanceof Error) {
-    annoRepResposne.status = 400
-    annoRepResposne.message = `${e.message}${requestDesc ? ` ${requestDesc} failed.` : ""}`
+    annoRepResponse.status = 400
+    annoRepResponse.message = `${e.message}${requestDesc ? ` ${requestDesc} failed.` : ""}`
   } else {
-    annoRepResposne.status = 400
-    annoRepResposne.message = `Unknown error ${e}`
+    annoRepResponse.status = 400
+    annoRepResponse.message = `Unknown error ${e}`
   }
-  return annoRepResposne
+  return annoRepResponse
 }
 
 export const getMessageFromError = (e: unknown): string => {

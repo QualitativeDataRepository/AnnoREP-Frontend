@@ -24,10 +24,8 @@ export interface AtiSettingsProps {
 
 const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
   const router = useRouter()
-  const [
-    deleteAtiModalIsOpen,
-    { setTrue: openDeleteAtiModal, setFalse: closeDeleteAtiModal },
-  ] = useBoolean(false)
+  const [deleteAtiModalIsOpen, { setTrue: openDeleteAtiModal, setFalse: closeDeleteAtiModal }] =
+    useBoolean(false)
   const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [taskDesc, setTaskDesc] = useState<string>("")
 

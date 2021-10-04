@@ -29,16 +29,8 @@ export interface AtiSummaryProps {
 }
 
 const AtiSummary: FC<AtiSummaryProps> = ({ serverUrl, atiProjectDetails }) => {
-  const {
-    id,
-    doi,
-    title,
-    description,
-    zip,
-    subjects,
-    publicationStatuses,
-    citationHtml,
-  } = atiProjectDetails.dataset
+  const { id, doi, title, description, zip, subjects, publicationStatuses, citationHtml } =
+    atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
 
   const router = useRouter()

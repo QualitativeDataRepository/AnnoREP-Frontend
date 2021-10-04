@@ -66,13 +66,47 @@ describe("searchReducer", () => {
     expect(
       searchReducer(initialState, {
         type: "SEARCH_PAGE",
-        payload: { datasets: [{ id: "ati-2", name: "Ati 2" }], start: 1 },
+        payload: {
+          datasets: [
+            {
+              id: "ati-2",
+              name: "Ati 2",
+              description: "",
+              citationHtml: "",
+              dataverse: "",
+              dataverseName: "",
+              dataverseServerUrl: "",
+              dateDisplay: "",
+              publicationStatuses: [] as string[],
+              userRoles: [] as string[],
+            },
+          ],
+          start: 1,
+          totalCount: 2,
+          docsPerPage: 1,
+          selectedFilters: {},
+          publicationStatusCount: {},
+        },
       })
     ).toEqual({
       ...initialState,
       status: "finished",
       currentTotal: 2,
-      atiProjects: { ...initialState.atiProjects, 1: { id: "ati-2", name: "Ati 2" } },
+      atiProjects: {
+        ...initialState.atiProjects,
+        1: {
+          id: "ati-2",
+          name: "Ati 2",
+          description: "",
+          citationHtml: "",
+          dataverse: "",
+          dataverseName: "",
+          dataverseServerUrl: "",
+          dateDisplay: "",
+          publicationStatuses: [] as string[],
+          userRoles: [] as string[],
+        },
+      },
     })
   })
 
@@ -90,8 +124,22 @@ describe("searchReducer", () => {
         type: "SEARCH_Q",
         payload: {
           totalCount: 2,
+          start: 0,
           docsPerPage: 1,
-          datasets: [{ id: "ati-2", name: "Ati 2" }],
+          datasets: [
+            {
+              id: "ati-2",
+              name: "Ati 2",
+              description: "",
+              citationHtml: "",
+              dataverse: "",
+              dataverseName: "",
+              dataverseServerUrl: "",
+              dateDisplay: "",
+              publicationStatuses: [] as string[],
+              userRoles: [] as string[],
+            },
+          ],
           selectedFilters: {
             publication_statuses: ["Draft"],
           },
@@ -105,7 +153,20 @@ describe("searchReducer", () => {
       status: "finished",
       totalCount: 2,
       currentTotal: 1,
-      atiProjects: { 0: { id: "ati-2", name: "Ati 2" } },
+      atiProjects: {
+        0: {
+          id: "ati-2",
+          name: "Ati 2",
+          description: "",
+          citationHtml: "",
+          dataverse: "",
+          dataverseName: "",
+          dataverseServerUrl: "",
+          dateDisplay: "",
+          publicationStatuses: [] as string[],
+          userRoles: [] as string[],
+        },
+      },
       page: 0,
       perPage: 1,
       selectedPublicationStatuses: { Draft: true },

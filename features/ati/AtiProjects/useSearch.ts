@@ -8,6 +8,7 @@ import { getTrueFields } from "./utils"
 
 import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { IMyDataSearch } from "../../../types/api"
 
 const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
@@ -22,7 +23,7 @@ const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] 
         const publicationStatuses = state.fetchQ
           ? PUBLICATION_STATUSES
           : getTrueFields(state.selectedPublicationStatuses)
-        const { data } = await axios.get(`/api/mydata-search`, {
+        const { data } = await axios.get<IMyDataSearch>(`/api/mydata-search`, {
           params: {
             publicationStatuses,
             q: state.q,
