@@ -12,8 +12,8 @@
     "url": "https://github.com/QualitativeDataRepository/AnnoREP-Frontend.git"
   },
   "engines": {
-    "node": "12.x",
-    "npm": "6.x"
+    "node": "16.x",
+    "npm": "7.x"
   },
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--max_old_space_size=2096 next dev",
