@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, KeyboardEventHandler, useState, ChangeEvent } from "react"
+import React, { FC, FormEventHandler, useState, ChangeEvent } from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -65,14 +65,14 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
-  const onSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
+  /* const onSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
     const target = e.target as typeof e.target & {
       value: string
     }
     if (e.key === "Enter") {
       dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
     }
-  }
+  } */
   const [selectedDataset, setSelectedDataset] = useState<{ id: number; label: string } | null>(null)
   const onSelectDataset = (data: any) => {
     setSelectedDataset(data.selectedItem)
@@ -217,7 +217,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
-              onKeyUp={onSearch}
+              /* onKeyUp={onSearch} */
               onChange={onSelectDataset}
             />
             <div>
