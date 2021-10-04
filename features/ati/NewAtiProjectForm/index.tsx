@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, useState, ChangeEvent } from "react"
+import React, { FC, FormEventHandler, useState, ChangeEvent, useRef } from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -12,7 +12,10 @@ import {
   InlineLoadingStatus,
   ComboBox,
   InlineLoading,
+  OverflowMenu,
+  OverflowMenuItem,
 } from "carbon-components-react"
+import { debounce } from "lodash"
 import { useRouter } from "next/router"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
@@ -65,15 +68,16 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
-  /* const onSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    const target = e.target as typeof e.target & {
-      value: string
+  const hasUserInput = useRef<boolean>(false)
+  const onSearchInputChange = (inputValue?: string) => {
+    if (!hasUserInput.current) {
+      hasUserInput.current = inputValue ? true : false
     }
-    if (e.key === "Enter") {
-      dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
+    if (hasUserInput.current) {
+      dispatch({ type: "UPDATE_Q", payload: inputValue ? inputValue.trim() : "" })
     }
-  } */
-  const [selectedDataset, setSelectedDataset] = useState<{ id: number; label: string } | null>(null)
+  }
+  const [selectedDataset, setSelectedDataset] = useState<{ id: string; label: string } | null>(null)
   const onSelectDataset = (data: any) => {
     setSelectedDataset(data.selectedItem)
   }
@@ -217,19 +221,18 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
-              /* onKeyUp={onSearch} */
+              onInputChange={debounce(onSearchInputChange, 200)}
               onChange={onSelectDataset}
             />
             <div>
               {hasMoreDatasets(state) && (
-                <Button
-                  className={styles.moreDatasets}
-                  kind="tertiary"
-                  size="md"
-                  onClick={onShowMore}
-                >
-                  More datasets
-                </Button>
+                <OverflowMenu iconDescription="More options" size="lg">
+                  <OverflowMenuItem
+                    requireTitle
+                    itemText={`Show the next ${state.perPage} dataset(s)`}
+                    onClick={onShowMore}
+                  />
+                </OverflowMenu>
               )}
             </div>
           </div>
