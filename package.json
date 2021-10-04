@@ -43,13 +43,13 @@
     ]
   },
   "dependencies": {
-    "@carbon/icons-react": "^10.33.0",
+    "@carbon/icons-react": "^10.40.0",
     "@prisma/client": "^2.27.0",
-    "@types/carbon-components-react": "^7.34.0",
-    "@types/carbon__icons-react": "^10.31.0",
+    "@types/carbon__icons-react": "^10.31.2",
+    "@types/carbon-components-react": "^7.44.0",
     "axios": "^0.21.1",
-    "carbon-components": "^10.37.0",
-    "carbon-components-react": "^7.37.1",
+    "carbon-components": "^10.45.0",
+    "carbon-components-react": "^7.45.0",
     "carbon-icons": "^7.0.7",
     "form-data": "^4.0.0",
     "formidable": "^1.2.2",
