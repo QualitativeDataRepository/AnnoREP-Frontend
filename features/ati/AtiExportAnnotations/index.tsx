@@ -53,7 +53,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     if (manuscript.id) {
       getAnnotationsJson()
     }
-  }, [manuscript.id])
+  }, [manuscript.id, datasetId])
 
   const onSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
