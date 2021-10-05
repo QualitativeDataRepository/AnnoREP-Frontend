@@ -1,4 +1,12 @@
-import React, { FC, FormEventHandler, useState, ChangeEvent } from "react"
+import React, {
+  FC,
+  FormEventHandler,
+  useState,
+  ChangeEvent,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -12,7 +20,10 @@ import {
   InlineLoadingStatus,
   ComboBox,
   InlineLoading,
+  OverflowMenu,
+  OverflowMenuItem,
 } from "carbon-components-react"
+import { debounce } from "lodash"
 import { useRouter } from "next/router"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
@@ -65,15 +76,25 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
-  /* const onSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
+
+  const debounceSearch = useMemo(
+    () =>
+      debounce((inputValue: string) => dispatch({ type: "UPDATE_Q", payload: inputValue }), 200),
+    [dispatch]
+  )
+  useEffect(() => {
+    // Cancel the searching on unmount
+    return debounceSearch.cancel()
+  }, [debounceSearch])
+  const handleSearch: FormEventHandler<HTMLInputElement> = (e) => {
     const target = e.target as typeof e.target & {
       value: string
     }
-    if (e.key === "Enter") {
-      dispatch({ type: "UPDATE_Q", payload: target.value.trim() })
-    }
-  } */
-  const [selectedDataset, setSelectedDataset] = useState<{ id: number; label: string } | null>(null)
+    debounceSearch(target.value.trim())
+  }
+  const memoizedHandleSearch = useCallback(handleSearch, [debounceSearch])
+
+  const [selectedDataset, setSelectedDataset] = useState<{ id: string; label: string } | null>(null)
   const onSelectDataset = (data: any) => {
     setSelectedDataset(data.selectedItem)
   }
@@ -217,19 +238,18 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
-              /* onKeyUp={onSearch} */
+              onInput={memoizedHandleSearch}
               onChange={onSelectDataset}
             />
             <div>
               {hasMoreDatasets(state) && (
-                <Button
-                  className={styles.moreDatasets}
-                  kind="tertiary"
-                  size="md"
-                  onClick={onShowMore}
-                >
-                  More datasets
-                </Button>
+                <OverflowMenu iconDescription="More options" size="lg">
+                  <OverflowMenuItem
+                    requireTitle
+                    itemText={`Show the next ${state.perPage} dataset(s)`}
+                    onClick={onShowMore}
+                  />
+                </OverflowMenu>
               )}
             </div>
           </div>

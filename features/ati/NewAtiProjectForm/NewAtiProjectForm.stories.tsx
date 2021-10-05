@@ -25,12 +25,13 @@ WithDatasets.args = {
       name: "Dataset 3",
     },
     {
-      id: "dataset-3",
+      id: "dataset-4",
       name: "Dataset 4",
     },
   ],
   serverUrl: "https://test.com",
   initialTotalCount: 4,
+  datasetsPerPage: 10,
 }
 
 export const WithoutDatasets = Template.bind({})
@@ -38,4 +39,18 @@ WithoutDatasets.args = {
   datasets: [],
   serverUrl: "https://test.com",
   initialTotalCount: 0,
+  datasetsPerPage: 10,
+}
+
+export const WithShowMoreDatasets = Template.bind({})
+WithShowMoreDatasets.args = {
+  datasets: [
+    {
+      id: "dataset-1",
+      name: "Dataset 1",
+    },
+  ],
+  serverUrl: "https://test.com",
+  initialTotalCount: 2,
+  datasetsPerPage: 1,
 }

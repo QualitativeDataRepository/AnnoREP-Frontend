@@ -55,7 +55,7 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl, siteUrl }) => {
     if (isLoggedIn) {
       router.push("/")
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, router])
 
   return (
     <Layout isLoggedIn={false} title="AnnoREP - Login">
