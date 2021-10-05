@@ -15,7 +15,6 @@ import {
   Button,
   Form,
   FileUploader,
-  Link,
   InlineNotification,
   InlineLoadingStatus,
   ComboBox,
@@ -183,16 +182,6 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             Link to a Dataverse dataset and upload a manuscript to create a new <abbr>ATI</abbr>{" "}
             project
           </p>
-          <div className={formStyles.item}>
-            <Link
-              href={`${serverUrl}/dataset.xhtml?ownerId=1`}
-              target="_blank"
-              rel="noopener noreferrer"
-              size="lg"
-            >
-              Create dataset
-            </Link>
-          </div>
           {taskStatus !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
@@ -242,15 +231,23 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               onChange={onSelectDataset}
             />
             <div>
-              {hasMoreDatasets(state) && (
-                <OverflowMenu iconDescription="More options" size="lg">
+              <OverflowMenu flipped iconDescription="More options" size="lg">
+                {hasMoreDatasets(state) && (
                   <OverflowMenuItem
                     requireTitle
                     itemText={`Show the next ${state.perPage} dataset(s)`}
                     onClick={onShowMore}
                   />
-                </OverflowMenu>
-              )}
+                )}
+                <OverflowMenuItem
+                  href={`${serverUrl}/dataset.xhtml?ownerId=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  hasDivider
+                  requireTitle
+                  itemText="Create new dataset"
+                />
+              </OverflowMenu>
             </div>
           </div>
           <div className={formStyles.item}>
