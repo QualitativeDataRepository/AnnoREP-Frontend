@@ -1,4 +1,13 @@
-import React, { FC, FormEventHandler, useState, ChangeEvent, useRef } from "react"
+import React, {
+  FC,
+  FormEventHandler,
+  useState,
+  ChangeEvent,
+  KeyboardEventHandler,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react"
 
 import FormData from "form-data"
 import axios from "axios"
@@ -68,15 +77,24 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
-  const hasUserInput = useRef<boolean>(false)
-  const onSearchInputChange = (inputValue?: string) => {
-    if (!hasUserInput.current) {
-      hasUserInput.current = inputValue ? true : false
+
+  const debounceSearch = useMemo(
+    () =>
+      debounce((inputValue: string) => dispatch({ type: "UPDATE_Q", payload: inputValue }), 200),
+    [dispatch]
+  )
+  useEffect(() => {
+    // Cancel the searching on unmount
+    return debounceSearch.cancel()
+  }, [debounceSearch])
+  const handleSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const target = e.target as typeof e.target & {
+      value: string
     }
-    if (hasUserInput.current) {
-      dispatch({ type: "UPDATE_Q", payload: inputValue ? inputValue.trim() : "" })
-    }
+    debounceSearch(target.value.trim())
   }
+  const memoizedHandleSearch = useCallback(handleSearch, [debounceSearch])
+
   const [selectedDataset, setSelectedDataset] = useState<{ id: string; label: string } | null>(null)
   const onSelectDataset = (data: any) => {
     setSelectedDataset(data.selectedItem)
@@ -221,7 +239,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
-              onInputChange={debounce(onSearchInputChange, 200)}
+              onKeyUp={memoizedHandleSearch}
               onChange={onSelectDataset}
             />
             <div>
