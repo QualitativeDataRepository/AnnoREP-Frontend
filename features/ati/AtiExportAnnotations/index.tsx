@@ -40,6 +40,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   const [taskDesc, setTaskDesc] = useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
   useEffect(() => {
+    let didCancel = false
     const getAnnotationsJson = async () => {
       const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
         headers: {
@@ -48,10 +49,16 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       })
       const jsonStrs = data.annotations.map((annotation: any) => JSON.stringify(annotation))
       const arrayStr = encodeURIComponent(`[${jsonStrs.join(",")}]`)
-      setAnnotationsJsonStr(arrayStr)
+      if (!didCancel) {
+        setAnnotationsJsonStr(arrayStr)
+      }
     }
     if (manuscript.id) {
       getAnnotationsJson()
+    }
+
+    return () => {
+      didCancel = true
     }
   }, [manuscript.id, datasetId])
 
