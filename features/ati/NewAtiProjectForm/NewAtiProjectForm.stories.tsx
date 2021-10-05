@@ -25,7 +25,7 @@ WithDatasets.args = {
       name: "Dataset 3",
     },
     {
-      id: "dataset-3",
+      id: "dataset-4",
       name: "Dataset 4",
     },
   ],

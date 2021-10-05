@@ -3,7 +3,6 @@ import React, {
   FormEventHandler,
   useState,
   ChangeEvent,
-  KeyboardEventHandler,
   useCallback,
   useMemo,
   useEffect,
@@ -87,7 +86,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     // Cancel the searching on unmount
     return debounceSearch.cancel()
   }, [debounceSearch])
-  const handleSearch: KeyboardEventHandler<HTMLInputElement> = (e) => {
+  const handleSearch: FormEventHandler<HTMLInputElement> = (e) => {
     const target = e.target as typeof e.target & {
       value: string
     }
@@ -239,7 +238,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
-              onKeyUp={memoizedHandleSearch}
+              onInput={memoizedHandleSearch}
               onChange={onSelectDataset}
             />
             <div>
