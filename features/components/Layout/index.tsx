@@ -21,8 +21,17 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, has
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        {hasPdf && <script key="hypothesis" src="https://hypothes.is/embed.js" async></script>}
       </Head>
+      {hasPdf && (
+        <>
+          <script
+            type="application/json"
+            className="js-hypothesis-config"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify({ openSidebar: true }) }}
+          ></script>
+          <script async src="https://hypothes.is/embed.js"></script>
+        </>
+      )}
       <div className={styles.container}>
         <AppBar isLoggedIn={isLoggedIn} />
         <main className={`${styles.main} ${isFullWidth ? styles.fullMaxWidth : styles.maxWidth}`}>
