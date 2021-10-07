@@ -1,6 +1,7 @@
 import { ReactNode, FC } from "react"
 
 import Head from "next/head"
+import DOMPurify from "isomorphic-dompurify"
 
 import AppBar from "../AppBar"
 
@@ -27,7 +28,9 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, has
           <script
             type="application/json"
             className="js-hypothesis-config"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify({ openSidebar: true }) }}
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(JSON.stringify({ openSidebar: true })),
+            }}
           ></script>
           <script async src="https://hypothes.is/embed.js"></script>
         </>
