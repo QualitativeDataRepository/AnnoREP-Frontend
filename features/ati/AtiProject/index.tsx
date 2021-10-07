@@ -1,8 +1,8 @@
 import React, { FC } from "react"
 
-import NextLink from "next/link"
-
 import { Link, Tag } from "carbon-components-react"
+import NextLink from "next/link"
+import DOMPurify from "isomorphic-dompurify"
 
 import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
@@ -84,7 +84,7 @@ const AtiProject: FC<AtiProjectProps> = ({
         </Link>
       </p>
       <p className={styles.citation}>
-        <span dangerouslySetInnerHTML={{ __html: citationHtml }} />{" "}
+        <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(citationHtml) }} />
       </p>
       <p>{description}</p>
     </section>
