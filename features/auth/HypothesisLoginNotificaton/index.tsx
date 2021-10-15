@@ -9,7 +9,7 @@ const HypothesisLoginNotification: FC = () => {
       lowContrast
       kind="info"
       statusIconDescription="info"
-      title="Use the Annotation sidebar to log in to Hypothes.is and see your annotations"
+      title="Log in to Hypothes.is to see your annotations in the Annotation sidebar."
       actions={<NotificationActionButton>OK</NotificationActionButton>}
     />
   )
