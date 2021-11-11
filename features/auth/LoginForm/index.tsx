@@ -58,9 +58,10 @@ const LoginForm: FC<LoginFormProps> = ({
       <Form onSubmit={onSubmit}>
         <h1 className={formStyles.title}>Login</h1>
         <p className={formStyles.desc}>
-          Give AnnoREP permissions to access your Dataverse resources and to write annotations to
-          Hypothes.is server by providing your Application programming interface (<abbr>API</abbr>)
-          tokens.
+          Give AnnoREP permissions to access your Dataverse resources and write Hypothes.is
+          annotations on your behalf by providing your Application Programming Interface (
+          <abbr>API</abbr>) tokens. Don&apos;t have an <abbr>API</abbr> token? Use the links below
+          to generate an <abbr>API</abbr> token.
         </p>
         <div className={formStyles.item}>
           <TextInput
