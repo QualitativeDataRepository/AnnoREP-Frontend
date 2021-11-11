@@ -18,6 +18,7 @@ import DeleteManuscriptModal from "./DeleteManuscriptModal"
 import IngestPdf from "./IngestPdf"
 import UploadManuscriptModal from "./UploadManuscriptModal"
 import { uploadManuscriptReducer } from "./UploadManuscriptModal/state"
+import HypothesisLoginNotification from "../../auth/HypothesisLoginNotificaton"
 import useBoolean from "../../../hooks/useBoolean"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
@@ -219,6 +220,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         handleUploadManuscript={handleUploadManuscript}
       />
       <div className={styles.tabContainer}>
+        <HypothesisLoginNotification />
         <div className={styles.buttonContainer}>
           <Button
             className={styles.blackButton}
