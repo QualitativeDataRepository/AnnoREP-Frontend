@@ -1,0 +1,52 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 32px;
+}
+
+.heading {
+  padding: 16px;
+  font-weight: 400;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.guide {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  row-gap: 64px;
+}
+
+.guide h2 {
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+
+.guide img {
+  width: 100%;
+}
+
+.guide > div {
+  padding: 16px;
+}
+
+.logos {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 42rem) {
+  .guide {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 64px;
+  }
+}
+
+@media (min-width: 66rem) {
+  .guide {
+    column-gap: 128px;
+  }
+  .guide img {
+    width: 80%;
+  }
+}
