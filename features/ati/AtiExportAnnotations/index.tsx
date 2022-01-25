@@ -14,6 +14,7 @@ import {
   Toggle,
 } from "carbon-components-react"
 
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IManuscript } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -43,6 +44,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     let didCancel = false
     const getAnnotationsJson = async () => {
       const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
+        params: {
+          hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+        },
         headers: {
           Accept: "application/json",
         },
@@ -73,7 +77,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     setTaskStatus("active")
     setTaskDesc("Downloading annotations...")
     await axios
-      .get(`/api/hypothesis/${datasetId}/download-annotations`)
+      .get(`/api/hypothesis/${datasetId}/download-annotations`, {
+        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+      })
       .then(({ data }) => {
         setTaskDesc("Exporting annotations...")
         return axios.post(

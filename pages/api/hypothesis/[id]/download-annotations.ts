@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
-      const { id } = req.query
+      const { id, hypothesisGroup } = req.query
       const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken } = session
@@ -23,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .get(searchEndpoint, {
           params: {
             limit: 1,
+            group: hypothesisGroup,
             uri,
           },
           headers: {
@@ -39,6 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               return axios.get(searchEndpoint, {
                 params: {
                   limit: ANNOTATIONS_MAX_LIMIT,
+                  group: hypothesisGroup,
                   uri,
                   offset,
                 },
