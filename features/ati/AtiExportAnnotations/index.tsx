@@ -85,6 +85,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         return axios.post(
           `/api/hypothesis/${datasetId}/export-annotations`,
           JSON.stringify({
+            isAdminAuthor: false,
             destinationUrl: target.destinationUrl.value,
             annotations: data.annotations,
             destinationHypothesisGroup: target.destinationHypothesisGroup.value,

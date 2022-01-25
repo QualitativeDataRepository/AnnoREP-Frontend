@@ -1,5 +1,5 @@
 import { FC, useState } from "react"
-
+import axios from "axios"
 import {
   UnorderedList,
   ListItem,
@@ -12,23 +12,33 @@ import {
 import { Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
+import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IATIProjectDetails } from "../../../types/dataverse"
+import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
 import atiProjectStyles from "../AtiProject/AtiProject.module.css"
-import axios from "axios"
-import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
 export interface AtiSummaryProps {
+  /** The canonical url of the app */
+  appUrl: string
+  /** The hypothesis groupd id of ATI_Staging */
+  hypothesisAtiStagingGroupId: string
   /** The dataverse server url where the dataset for the ati project is deposited */
   serverUrl: string
   /** The ati project details */
   atiProjectDetails: IATIProjectDetails
 }
 
-const AtiSummary: FC<AtiSummaryProps> = ({ serverUrl, atiProjectDetails }) => {
+const AtiSummary: FC<AtiSummaryProps> = ({
+  serverUrl,
+  atiProjectDetails,
+  appUrl,
+  hypothesisAtiStagingGroupId,
+}) => {
   const { id, doi, title, description, zip, subjects, publicationStatuses, citationHtml } =
     atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
@@ -42,7 +52,29 @@ const AtiSummary: FC<AtiSummaryProps> = ({ serverUrl, atiProjectDetails }) => {
     try {
       setTaskStatus("active")
       setTaskDesc("Submitting project for review...")
-      await axios.post(`/api/datasets/${id}/submit-for-review`)
+      const submitForReviewPromise = axios.post(`/api/datasets/${id}/submit-for-review`)
+      const exportAnnotationsPromise = axios
+        .get(`/api/hypothesis/${id}/download-annotations`, {
+          params: { hypthesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+        })
+        .then(({ data }) => {
+          return axios.post(
+            `/api/hypothesis/${id}/export-annotations`,
+            JSON.stringify({
+              isAdminAuthor: true,
+              destinationUrl: `${appUrl}/ati/${id}/${AtiTab.manuscript.id}`,
+              annotations: data.annotations,
+              destinationHypothesisGroup: hypothesisAtiStagingGroupId,
+              privateAnnotation: false,
+            }),
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        })
+      await Promise.all([submitForReviewPromise, exportAnnotationsPromise])
       setTaskStatus("finished")
       setTaskDesc(`Submitted ${title} for review.`)
       router.reload()
