@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session) {
       const {
         destinationUrl: url,
+        isAdminAuthor,
         annotations,
         destinationHypothesisGroup,
         privateAnnotation,
@@ -40,7 +41,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               //references
             }),
             headers: {
-              Authorization: `Bearer ${hypothesisApiToken}`,
+              Authorization: `Bearer ${
+                isAdminAuthor ? process.env.ADMIN_HYPOTHESIS_API_TOKEN : hypothesisApiToken
+              }`,
               "Content-type": "application/json",
               [REQUEST_DESC_HEADER_NAME]: requestDesc,
             },

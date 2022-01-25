@@ -23,9 +23,17 @@ interface AtiPageProps {
   isLoggedIn: boolean
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
+  appUrl: string
+  hypthesisAtiStagingGroupId: string
 }
 
-const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, serverUrl, atiProjectDetails }) => {
+const AtiPage: FC<AtiPageProps> = ({
+  isLoggedIn,
+  serverUrl,
+  atiProjectDetails,
+  appUrl,
+  hypthesisAtiStagingGroupId,
+}) => {
   return (
     <AtiTab
       isLoggedIn={isLoggedIn}
@@ -33,7 +41,12 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, serverUrl, atiProjectDetails })
       selectedTab={AtiTabConstant.summary.id}
     >
       {atiProjectDetails && (
-        <AtiSummary serverUrl={serverUrl} atiProjectDetails={atiProjectDetails} />
+        <AtiSummary
+          serverUrl={serverUrl}
+          atiProjectDetails={atiProjectDetails}
+          appUrl={appUrl}
+          hypothesisAtiStagingGroupId={hypthesisAtiStagingGroupId}
+        />
       )}
     </AtiTab>
   )
@@ -46,6 +59,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     isLoggedIn: false,
     atiProjectDetails: null,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
+    appUrl: process.env.NEXTAUTH_URL as string,
+    hypthesisAtiStagingGroupId: process.env.HYPOTHESIS_ATI_STAGING_GROUP_ID as string,
   }
   const session = await getSession(context)
   const datasetId = context?.params?.id
