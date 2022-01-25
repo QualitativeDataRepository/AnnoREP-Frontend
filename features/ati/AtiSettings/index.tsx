@@ -7,6 +7,7 @@ import { useRouter } from "next/router"
 
 import DeleteAtiModal from "./DeleteAtiModal"
 
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import useBoolean from "../../../hooks/useBoolean"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -49,7 +50,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
         }
       })
       .then(() => {
-        return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`)
+        return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
+          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+        })
       })
       .then(({ data }) => {
         if (data.total > 0) {

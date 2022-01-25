@@ -22,6 +22,7 @@ import HypothesisLoginNotification from "../../auth/HypothesisLoginNotificaton"
 import useBoolean from "../../../hooks/useBoolean"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -148,6 +149,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             ? axios({
                 method: "GET",
                 url: `/api/hypothesis/${datasetId}/download-annotations`,
+                params: {
+                  hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+                },
               }).then(({ data }) => {
                 if (data.total > 0) {
                   setTaskDesc(
