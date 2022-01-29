@@ -18,7 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken: userHypothesisApiToken } = session
-      const hypothesisApiToken = isAdminAuthor ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
+      const hypothesisApiToken =
+        isAdminAuthor === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
       const requestDesc = `Getting annotations from Hypothes.is server for dataset ${id}`
       await axios
         //Get the total annotations
