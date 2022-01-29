@@ -9,10 +9,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "DELETE") {
     const session = await getSession({ req })
     if (session) {
-      const { id } = req.query
+      const { id, isAdminAuthor } = req.query
       const { annotations } = req.body
       const requestDesc = `Deleting annotations from dataset ${id}`
-      const { hypothesisApiToken } = session
+      const { hypothesisApiToken: userHypothesisApiToken } = session
+      const hypothesisApiToken = isAdminAuthor
+        ? process.env.ADMIN_HYPOTHESIS_API_TOKEN
+        : userHypothesisApiToken
       try {
         const deleteAnns: AxiosPromise<any>[] = annotations.map((annotation: any) => {
           return axios.delete(
