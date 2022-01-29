@@ -151,6 +151,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                 url: `/api/hypothesis/${datasetId}/download-annotations`,
                 params: {
                   hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+                  isAdminAuthor: false,
                 },
               }).then(({ data }) => {
                 if (data.total > 0) {
@@ -161,6 +162,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                     method: "DELETE",
                     url: `/api/hypothesis/${datasetId}/delete-annotations`,
                     data: JSON.stringify({ annotations: data.annotations }),
+                    params: {
+                      isAdminAuthor: false,
+                    },
                     headers: {
                       "Content-Type": "application/json",
                     },

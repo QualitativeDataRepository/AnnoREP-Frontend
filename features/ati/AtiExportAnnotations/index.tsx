@@ -46,6 +46,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
           hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+          isAdminAuthor: false,
         },
         headers: {
           Accept: "application/json",
@@ -78,7 +79,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     setTaskDesc("Downloading annotations...")
     await axios
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
-        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
       })
       .then(({ data }) => {
         setTaskDesc("Exporting annotations...")

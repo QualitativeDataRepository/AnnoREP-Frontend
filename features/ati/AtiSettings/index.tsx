@@ -51,7 +51,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
       })
       .then(() => {
         return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
-          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
         })
       })
       .then(({ data }) => {
@@ -59,6 +59,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
           setTaskDesc("Deleting annotations from Hypothes.is server...")
           return axios.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
             data: JSON.stringify({ annotations: data.annotations }),
+            params: {
+              isAdminAuthor: false,
+            },
             headers: {
               "Content-Type": "application/json",
             },
