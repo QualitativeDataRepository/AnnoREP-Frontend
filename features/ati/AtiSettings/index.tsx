@@ -11,6 +11,7 @@ import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import useBoolean from "../../../hooks/useBoolean"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -96,17 +97,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={
-                  taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-                }
+                kind={getTaskNotificationKind(taskStatus)}
                 subtitle={<span>{taskDesc}</span>}
-                title={
-                  taskStatus === "active"
-                    ? "Status"
-                    : taskStatus === "finished"
-                    ? "Success!"
-                    : "Error!"
-                }
+                title={getTaskStatus(taskStatus)}
               />
             </div>
           )}

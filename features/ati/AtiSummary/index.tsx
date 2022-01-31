@@ -17,6 +17,7 @@ import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
@@ -116,11 +117,9 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         <InlineNotification
           hideCloseButton
           lowContrast
-          kind={taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"}
+          kind={getTaskNotificationKind(taskStatus)}
           subtitle={<span>{taskDesc}</span>}
-          title={
-            taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
-          }
+          title={getTaskStatus(taskStatus)}
         />
       )}
       <div>
