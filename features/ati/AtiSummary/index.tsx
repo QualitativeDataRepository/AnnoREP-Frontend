@@ -59,11 +59,11 @@ const AtiSummary: FC<AtiSummaryProps> = ({
       const getAtiStagingAnnotationsPromise = axios.get(
         `/api/hypothesis/${id}/download-annotations`,
         {
-          params: { hypthesisGroup: hypothesisAtiStagingGroupId, isAdminAuthor: true },
+          params: { hypothesisGroup: hypothesisAtiStagingGroupId, isAdminAuthor: true },
         }
       )
       const getUserAnnotationsPromise = axios.get(`/api/hypothesis/${id}/download-annotations`, {
-        params: { hypthesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
+        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
       })
       const [getAtiStagingAnnotationsResult, getUserAnnotationsResult] = await Promise.all([
         getAtiStagingAnnotationsPromise,
