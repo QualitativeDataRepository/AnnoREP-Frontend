@@ -218,7 +218,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             <TextInput
               readOnly
               aria-readonly
-              id="source-url"
+              id="export-annotations-source-url"
               name="sourceUrl"
               value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
               type="url"
@@ -231,7 +231,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               required
               aria-required
               helperText="Choose the Hypothes.is group from which to export annotations"
-              id="source-hypothesis-group"
+              id="export-annotations-source-hypothesis-group"
               name="sourceHypothesisGroup"
               labelText="Source Hypothes.is group"
               defaultValue={HYPOTHESIS_PUBLIC_GROUP_ID}
@@ -318,7 +318,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             <TextInput
               readOnly
               aria-readonly
-              id="source-url"
+              id="delete-annotations-source-url"
               name="sourceUrl"
               value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
               type="url"
@@ -331,7 +331,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               required
               aria-required
               helperText="Choose the Hypothes.is group from which to delete annotations"
-              id="source-hypothesis-group"
+              id="delete-annotations-source-hypothesis-group"
               name="sourceHypothesisGroup"
               labelText="Source Hypothes.is group"
               defaultValue={HYPOTHESIS_PUBLIC_GROUP_ID}
