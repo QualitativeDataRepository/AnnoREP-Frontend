@@ -25,6 +25,7 @@ export default NextAuth({
         const user = {
           dataverseApiToken: "",
           hypothesisApiToken: "",
+          hypothesisUserId: null,
         }
         /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
         try {
@@ -51,6 +52,7 @@ export default NextAuth({
           })
           if (data.userid !== null) {
             user.hypothesisApiToken = creds.hypothesisApiToken.trim()
+            user.hypothesisUserId = data.userid
           }
         } catch (error) {}
         if (user.dataverseApiToken === "" || user.hypothesisApiToken === "") {
@@ -69,6 +71,7 @@ export default NextAuth({
       if (isSignIn) {
         token.dataverseApiToken = user?.dataverseApiToken
         token.hypothesisApiToken = user?.hypothesisApiToken
+        token.hypothesisUserId = user?.hypothesisUserId
         //token.name = user?.name
         //token.email = user?.email
       }
@@ -77,6 +80,7 @@ export default NextAuth({
     async session(session, user) {
       session.dataverseApiToken = user?.dataverseApiToken
       session.hypothesisApiToken = user?.hypothesisApiToken
+      session.hypothesisUserId = user?.hypothesisUserId
       //session.user = user
       return session
     },
