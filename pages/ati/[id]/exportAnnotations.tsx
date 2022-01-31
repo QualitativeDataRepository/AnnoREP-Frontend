@@ -22,12 +22,13 @@ import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 interface AtiPageProps {
   isLoggedIn: boolean
+  appUrl: string
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
   hypothesisGroups: IHypothesisGroup[]
 }
 
-const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGroups }) => {
+const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGroups, appUrl }) => {
   return (
     <AtiTab
       isLoggedIn={isLoggedIn}
@@ -36,6 +37,7 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGr
     >
       {atiProjectDetails && (
         <AtiExportAnnotations
+          appUrl={appUrl}
           datasetId={atiProjectDetails.dataset.id}
           manuscript={atiProjectDetails.manuscript}
           hypothesisGroups={hypothesisGroups}
@@ -51,6 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const props: AtiPageProps = {
     isLoggedIn: false,
     atiProjectDetails: null,
+    appUrl: process.env.NEXTAUTH_URL as string,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
     hypothesisGroups: [],
   }
