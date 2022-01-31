@@ -17,6 +17,8 @@ import {
 import { AtiTab } from "../../../constants/ati"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { ALL_HYPOTHESIS_GROUPS_ID } from "./constants"
+import DeleteAnnotationsModal from "./DeleteAnnotationsModal"
+import useBoolean from "../../../hooks/useBoolean"
 import { IManuscript } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
@@ -47,6 +49,12 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   const [exportTaskDesc, setExportTaskDesc] = useState<string>("")
   const [deleteTaskStatus, setDeleteTaskStatus] = useState<InlineLoadingStatus>("inactive")
   const [deleteTaskDesc, setDeleteTaskDesc] = useState<string>("")
+  const [
+    deleteAnnotationsModalIsOpen,
+    { setTrue: openDeleteAnnotationsModal, setFalse: closeDeleteAnnotationsModal },
+  ] = useBoolean(false)
+  const [deleteAnnotationsHypothesisGroup, setDeleteAnnotationsHypothesisGroup] =
+    useState<string>("")
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
   useEffect(() => {
     let didCancel = false
@@ -131,20 +139,27 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     const target = e.target as typeof e.target & {
       sourceHypothesisGroup: { value: string }
     }
+    setDeleteAnnotationsHypothesisGroup(
+      target.sourceHypothesisGroup.value === ALL_HYPOTHESIS_GROUPS_ID
+        ? ""
+        : target.sourceHypothesisGroup.value
+    )
+    openDeleteAnnotationsModal()
+  }
+
+  const handleDeleteAnnotations = async () => {
+    closeDeleteAnnotationsModal()
     setDeleteTaskStatus("active")
     setDeleteTaskDesc("Downloading annotations...")
     await axios
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
-          hypothesisGroup:
-            target.sourceHypothesisGroup.value === ALL_HYPOTHESIS_GROUPS_ID
-              ? ""
-              : target.sourceHypothesisGroup.value,
+          hypothesisGroup: deleteAnnotationsHypothesisGroup,
           isAdminAuthor: false,
         },
       })
       .then(({ data }) => {
-        setDeleteTaskDesc(`Deleting ${data.length} annotation(s)...`)
+        setDeleteTaskDesc(`Deleting ${data.annotations.length} annotation(s)...`)
         return axios.delete(`/api/hypothesis/${datasetId}/delete-annotations`, {
           data: JSON.stringify({ annotations: data.annotations }),
           params: {
@@ -345,6 +360,12 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             Delete annotations
           </Button>
         </Form>
+        <DeleteAnnotationsModal
+          manuscriptName={manuscript.name}
+          open={deleteAnnotationsModalIsOpen}
+          closeModal={closeDeleteAnnotationsModal}
+          handleDeleteAnnotations={handleDeleteAnnotations}
+        />
       </div>
     </>
   )
