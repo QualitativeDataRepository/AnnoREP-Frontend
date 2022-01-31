@@ -17,6 +17,7 @@ import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
@@ -52,29 +53,55 @@ const AtiSummary: FC<AtiSummaryProps> = ({
     try {
       setTaskStatus("active")
       setTaskDesc("Submitting project for review...")
+
       const submitForReviewPromise = axios.post(`/api/datasets/${id}/submit-for-review`)
-      const exportAnnotationsPromise = axios
-        .get(`/api/hypothesis/${id}/download-annotations`, {
-          params: { hypthesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
-        })
-        .then(({ data }) => {
-          return axios.post(
-            `/api/hypothesis/${id}/export-annotations`,
-            JSON.stringify({
-              isAdminAuthor: true,
-              destinationUrl: `${appUrl}/ati/${id}/${AtiTab.manuscript.id}`,
-              annotations: data.annotations,
-              destinationHypothesisGroup: hypothesisAtiStagingGroupId,
-              privateAnnotation: false,
-            }),
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          )
-        })
-      await Promise.all([submitForReviewPromise, exportAnnotationsPromise])
+
+      const getAtiStagingAnnotationsPromise = axios.get(
+        `/api/hypothesis/${id}/download-annotations`,
+        {
+          params: { hypothesisGroup: hypothesisAtiStagingGroupId, isAdminAuthor: true },
+        }
+      )
+      const getUserAnnotationsPromise = axios.get(`/api/hypothesis/${id}/download-annotations`, {
+        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
+      })
+      const [getAtiStagingAnnotationsResult, getUserAnnotationsResult] = await Promise.all([
+        getAtiStagingAnnotationsPromise,
+        getUserAnnotationsPromise,
+      ])
+
+      const deleteAtiStagingAnnotationsPromise = axios.delete(
+        `/api/hypothesis/${id}/delete-annotations`,
+        {
+          data: JSON.stringify({ annotations: getAtiStagingAnnotationsResult.data.annotations }),
+          params: {
+            isAdminAuthor: true,
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      const exportUserAnnotationsPromise = axios.post(
+        `/api/hypothesis/${id}/export-annotations`,
+        JSON.stringify({
+          isAdminAuthor: true,
+          destinationUrl: `${appUrl}/ati/${id}/${AtiTab.manuscript.id}`,
+          annotations: getUserAnnotationsResult.data.annotations,
+          destinationHypothesisGroup: hypothesisAtiStagingGroupId,
+          privateAnnotation: false,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      await Promise.all([
+        submitForReviewPromise,
+        deleteAtiStagingAnnotationsPromise,
+        exportUserAnnotationsPromise,
+      ])
       setTaskStatus("finished")
       setTaskDesc(`Submitted ${title} for review.`)
       router.reload()
@@ -90,11 +117,9 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         <InlineNotification
           hideCloseButton
           lowContrast
-          kind={taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"}
+          kind={getTaskNotificationKind(taskStatus)}
           subtitle={<span>{taskDesc}</span>}
-          title={
-            taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
-          }
+          title={getTaskStatus(taskStatus)}
         />
       )}
       <div>

@@ -22,10 +22,10 @@ import HypothesisLoginNotification from "../../auth/HypothesisLoginNotificaton"
 import useBoolean from "../../../hooks/useBoolean"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
-import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiManuscript.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -150,17 +150,19 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                 method: "GET",
                 url: `/api/hypothesis/${datasetId}/download-annotations`,
                 params: {
-                  hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+                  hypothesisGroup: "",
+                  isAdminAuthor: false,
                 },
               }).then(({ data }) => {
                 if (data.total > 0) {
-                  setTaskDesc(
-                    `Deleting ${data.total} current annotation(s) from Hypothes.is server...`
-                  )
+                  setTaskDesc(`Deleting current annotation(s) from Hypothes.is server...`)
                   return axios({
                     method: "DELETE",
                     url: `/api/hypothesis/${datasetId}/delete-annotations`,
                     data: JSON.stringify({ annotations: data.annotations }),
+                    params: {
+                      isAdminAuthor: false,
+                    },
                     headers: {
                       "Content-Type": "application/json",
                     },
@@ -258,13 +260,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           <InlineNotification
             hideCloseButton
             lowContrast
-            kind={
-              taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-            }
+            kind={getTaskNotificationKind(taskStatus)}
             subtitle={<span>{taskDesc}</span>}
-            title={
-              taskStatus === "active" ? "Status" : taskStatus === "finished" ? "Success!" : "Error!"
-            }
+            title={getTaskStatus(taskStatus)}
           />
         )}
         {manuscript.id ? (

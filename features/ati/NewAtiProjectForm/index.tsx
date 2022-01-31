@@ -26,10 +26,7 @@ import { debounce } from "lodash"
 import { useRouter } from "next/router"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
-import { IDatasetOption } from "../../../types/dataverse"
-import { getMimeType } from "../../../utils/fileUtils"
-import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import useSearchDataset from "./useDatasetSearch"
+import { AtiTab } from "../../../constants/ati"
 import {
   getErrorMsg,
   getItems,
@@ -37,8 +34,11 @@ import {
   getSearchPlaceholder,
   hasMoreDatasets,
 } from "./selectors"
-
-import { AtiTab } from "../../../constants/ati"
+import useSearchDataset from "./useDatasetSearch"
+import { IDatasetOption } from "../../../types/dataverse"
+import { getMimeType } from "../../../utils/fileUtils"
+import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./NewAtiProjectForm.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -187,17 +187,9 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={
-                  taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-                }
+                kind={getTaskNotificationKind(taskStatus)}
                 subtitle={<span>{taskDesc}</span>}
-                title={
-                  taskStatus === "active"
-                    ? "Status"
-                    : taskStatus === "finished"
-                    ? "Success!"
-                    : "Error!"
-                }
+                title={getTaskStatus(taskStatus)}
               />
             </div>
           )}

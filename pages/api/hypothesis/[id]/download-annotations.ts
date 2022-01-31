@@ -8,15 +8,18 @@ import { range } from "../../../../utils/arrayUtils"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 const ANNOTATIONS_MAX_LIMIT = 200
+const ADMIN_HYPOTHESIS_API_TOKEN = process.env.ADMIN_HYPOTHESIS_API_TOKEN
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
-      const { id, hypothesisGroup } = req.query
+      const { id, hypothesisGroup, isAdminAuthor } = req.query
       const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
-      const { hypothesisApiToken } = session
+      const { hypothesisApiToken: userHypothesisApiToken } = session
+      const hypothesisApiToken =
+        isAdminAuthor === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
       const requestDesc = `Getting annotations from Hypothes.is server for dataset ${id}`
       await axios
         //Get the total annotations

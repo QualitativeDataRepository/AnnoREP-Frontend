@@ -7,10 +7,10 @@ import { useRouter } from "next/router"
 
 import DeleteAtiModal from "./DeleteAtiModal"
 
-import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import useBoolean from "../../../hooks/useBoolean"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -51,7 +51,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
       })
       .then(() => {
         return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
-          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID },
+          params: { hypothesisGroup: "", isAdminAuthor: false },
         })
       })
       .then(({ data }) => {
@@ -59,6 +59,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
           setTaskDesc("Deleting annotations from Hypothes.is server...")
           return axios.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
             data: JSON.stringify({ annotations: data.annotations }),
+            params: {
+              isAdminAuthor: false,
+            },
             headers: {
               "Content-Type": "application/json",
             },
@@ -93,17 +96,9 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={
-                  taskStatus === "active" ? "info" : taskStatus === "finished" ? "success" : "error"
-                }
+                kind={getTaskNotificationKind(taskStatus)}
                 subtitle={<span>{taskDesc}</span>}
-                title={
-                  taskStatus === "active"
-                    ? "Status"
-                    : taskStatus === "finished"
-                    ? "Success!"
-                    : "Error!"
-                }
+                title={getTaskStatus(taskStatus)}
               />
             </div>
           )}
