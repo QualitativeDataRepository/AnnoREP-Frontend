@@ -1,5 +1,8 @@
 import { FC } from "react"
 
+import { Launch16 } from "@carbon/icons-react"
+import { Link } from "carbon-components-react"
+
 import AppDesc from "../AppDesc"
 
 import styles from "./AppGuide.module.css"
@@ -51,6 +54,15 @@ const AppGuide: FC<AppGuideProps> = ({ isLoggedIn }) => {
             5. Add, edit, or remove <abbr>ATI</abbr> annotations
           </h2>
           <img src="/assets/edit-annotations.png" alt="" />
+          <Link
+            size="lg"
+            href="https://web.hypothes.is/help/annotation-basics"
+            target="_blank"
+            rel="noopener noreferrer"
+            renderIcon={Launch16}
+          >
+            Hypothes.is annotation basics
+          </Link>
         </div>
         <div>
           <h2>

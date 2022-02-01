@@ -17,6 +17,10 @@
   row-gap: 64px;
 }
 
+.guide > div {
+  padding: 16px;
+}
+
 .guide h2 {
   font-weight: 300;
   margin-bottom: 8px;
@@ -26,8 +30,8 @@
   width: 100%;
 }
 
-.guide > div {
-  padding: 16px;
+.guide > div > a {
+  margin-top: 24px;
 }
 
 .logos {
