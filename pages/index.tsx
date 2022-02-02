@@ -8,7 +8,7 @@ import qs from "qs"
 import { InlineNotification } from "carbon-components-react"
 
 import AtiProjects from "../features/ati/AtiProjects"
-import AppDesc from "../features/components/AppDesc"
+import AppGuide from "../features/components/AppGuide"
 import HomePageTitle from "../features/components/HomePageTitle"
 import Layout from "../features/components/Layout"
 
@@ -47,7 +47,7 @@ const Home: FC<HomeProps> = ({
     <Layout isLoggedIn={isLoggedIn} title="AnnoREP - Home">
       <>
         {isLoggedIn ? (
-          <div className={styles.loggedInContainer}>
+          <div className={styles.container}>
             <HomePageTitle />
             {totalCount === 0 || errorMsg ? (
               <InlineNotification
@@ -68,7 +68,7 @@ const Home: FC<HomeProps> = ({
             )}
           </div>
         ) : (
-          <AppDesc />
+          <AppGuide isLoggedIn={isLoggedIn} />
         )}
       </>
     </Layout>

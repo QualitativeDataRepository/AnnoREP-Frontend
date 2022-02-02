@@ -1,10 +1,54 @@
-.callout {
-  display: grid;
-  row-gap: 8px;
-  max-width: 32rem;
-  margin: auto;
+.container {
+  padding: 16px;
 }
 
-.callout p {
-  font-size: 1rem;
+.leadspaceText {
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin-bottom: 4rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 42rem) {
+  .leadspaceText {
+    font-size: 2.25rem;
+    font-weight: 300;
+  }
+}
+
+@media (min-width: 66rem) {
+  .leadspaceText {
+    font-size: 2.625rem;
+  }
+}
+
+@media (min-width: 82rem) {
+  .leadspaceText {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 99rem) {
+  .leadspaceText {
+    font-size: 3.75rem;
+  }
+}
+
+.buttonContainer {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  justify-content: start;
+}
+
+.buttonContainer > a {
+  max-width: unset;
+}
+
+@media (min-width: 42rem) {
+  .buttonContainer {
+    grid-template-columns: auto auto;
+  }
 }
