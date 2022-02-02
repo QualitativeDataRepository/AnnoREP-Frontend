@@ -13,7 +13,7 @@
 .guide {
   display: grid;
   grid-template-columns: 1fr;
-  justify-content: center;
+  justify-content: space-between;
   row-gap: 64px;
 }
 
