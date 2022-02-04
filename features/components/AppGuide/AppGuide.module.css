@@ -6,6 +6,7 @@
 
 .heading {
   padding: 16px;
+  font-size: 1.5rem;
   font-weight: 400;
   border-bottom: 1px solid #dbdbdb;
 }
@@ -14,14 +15,19 @@
   display: grid;
   grid-template-columns: 1fr;
   justify-content: space-between;
-  row-gap: 64px;
+}
+
+.guide > div:first-of-type {
+  margin-top: 0;
 }
 
 .guide > div {
+  margin-top: 64px;
   padding: 16px;
 }
 
 .guide h2 {
+  font-size: 1.25rem;
   font-weight: 300;
   margin-bottom: 8px;
 }
@@ -39,10 +45,49 @@
   grid-template-columns: 1fr;
 }
 
+.copyAnnotations {
+  position: relative;
+}
+
+.copyAnnotations::before {
+  position: absolute;
+  left: 40%;
+  top: -45px;
+  content: "or";
+  font-size: 1.75rem;
+  font-weight: 300;
+}
+
 @media (min-width: 42rem) {
+  .heading {
+    font-size: 2.5rem;
+  }
+
   .guide {
     grid-template-columns: 1fr 1fr;
     column-gap: 64px;
+  }
+
+  .guide h2 {
+    font-size: 2rem;
+  }
+
+  .guide > div:nth-of-type(2) {
+    margin-top: 0;
+  }
+
+  .copyAnnotations {
+    grid-column-end: -1;
+  }
+
+  .copyAnnotations::before {
+    top: -64px;
+  }
+}
+
+@media (min-width: 52rem) {
+  .copyAnnotations::before {
+    top: -75px;
   }
 }
 
@@ -52,5 +97,9 @@
   }
   .guide img {
     width: 80%;
+  }
+
+  .copyAnnotations::before {
+    top: -105px;
   }
 }

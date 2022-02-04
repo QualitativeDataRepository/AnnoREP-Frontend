@@ -70,7 +70,7 @@ const AppGuide: FC<AppGuideProps> = ({ isLoggedIn }) => {
           </h2>
           <img src="./assets/submit.png" alt="" />
         </div>
-        <div>
+        <div className={styles.copyAnnotations}>
           <h2>
             6 b. Copy your <abbr>ATI</abbr> annotations to a copy of your manuscript anywhere on the
             web
