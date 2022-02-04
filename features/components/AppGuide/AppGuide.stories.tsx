@@ -4,7 +4,7 @@ import AppGuide, { AppGuideProps } from "."
 
 export default {
   component: AppGuide,
-  title: "Component/App Guide",
+  title: "Getting Started/App Guide",
 } as Meta
 
 const Template: Story<AppGuideProps> = (args) => <AppGuide {...args} />
