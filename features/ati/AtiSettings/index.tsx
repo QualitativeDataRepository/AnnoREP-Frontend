@@ -1,16 +1,20 @@
-import { FC, FormEventHandler, useState } from "react"
+import { FC, FormEventHandler } from "react"
 
 import axios from "axios"
 import { TrashCan16 } from "@carbon/icons-react"
-import { Button, Form, InlineNotification, InlineLoadingStatus } from "carbon-components-react"
+import { Button, Form, InlineNotification } from "carbon-components-react"
 import { useRouter } from "next/router"
 
 import DeleteAtiModal from "./DeleteAtiModal"
 
 import useBoolean from "../../../hooks/useBoolean"
+import useTask, {
+  TaskActionType,
+  getTaskNotificationKind,
+  getTaskStatus,
+} from "../../../hooks/useTask"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -27,8 +31,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
   const router = useRouter()
   const [deleteAtiModalIsOpen, { setTrue: openDeleteAtiModal, setFalse: closeDeleteAtiModal }] =
     useBoolean(false)
-  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [taskDesc, setTaskDesc] = useState<string>("")
+  const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -37,13 +40,15 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
 
   const handleDeleteAti = async () => {
     closeDeleteAtiModal()
-    setTaskStatus("active")
-    setTaskDesc(`Deleting ATI project...`)
+    taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
     await axios
       .put(`/api/datasets/${dataset.id}/annorep/delete`)
       .then(() => {
         if (manuscript.id) {
-          setTaskDesc(`Deleting manuscript ${manuscript.name}...`)
+          taskDispatch({
+            type: TaskActionType.NEXT_STEP,
+            payload: `Deleting manuscript ${manuscript.name}...`,
+          })
           return axios.delete(`/api/delete-file/${manuscript.id}`)
         } else {
           return Promise.resolve<any>("Skip!")
@@ -56,7 +61,10 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
       })
       .then(({ data }) => {
         if (data.total > 0) {
-          setTaskDesc("Deleting annotations from Hypothes.is server...")
+          taskDispatch({
+            type: TaskActionType.NEXT_STEP,
+            payload: "Deleting annotations from Hypothes.is server...",
+          })
           return axios.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
             data: JSON.stringify({ annotations: data.annotations }),
             params: {
@@ -69,13 +77,14 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
         }
       })
       .then(() => {
-        setTaskStatus("finished")
-        setTaskDesc(`Deleted ATI project from dataset ${dataset.title}.`)
+        taskDispatch({
+          type: TaskActionType.FINISH,
+          payload: `Deleted ATI project from dataset ${dataset.title}.`,
+        })
         router.push("/")
       })
       .catch((error) => {
-        setTaskStatus("error")
-        setTaskDesc(`${getMessageFromError(error)}`)
+        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
       })
   }
 
@@ -91,14 +100,14 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             Unmark the Dataverse dataset as an <abbr>ATI</abbr> project and remove the manuscript
             file.
           </p>
-          {taskStatus !== "inactive" && (
+          {taskState.status !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={getTaskNotificationKind(taskStatus)}
-                subtitle={<span>{taskDesc}</span>}
-                title={getTaskStatus(taskStatus)}
+                kind={getTaskNotificationKind(taskState)}
+                subtitle={<span>{taskState.desc}</span>}
+                title={getTaskStatus(taskState)}
               />
             </div>
           )}

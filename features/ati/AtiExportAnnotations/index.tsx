@@ -8,7 +8,6 @@ import {
   Form,
   Button,
   InlineNotification,
-  InlineLoadingStatus,
   Select,
   SelectItem,
   Toggle,
@@ -19,10 +18,14 @@ import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { ALL_HYPOTHESIS_GROUPS_ID } from "./constants"
 import DeleteAnnotationsModal from "./DeleteAnnotationsModal"
 import useBoolean from "../../../hooks/useBoolean"
+import useTask, {
+  getTaskNotificationKind,
+  getTaskStatus,
+  TaskActionType,
+} from "../../../hooks/useTask"
 import { IManuscript } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiExportAnnotations.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -45,10 +48,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   hypothesisGroups,
 }) => {
-  const [exportTaskStatus, setExportTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [exportTaskDesc, setExportTaskDesc] = useState<string>("")
-  const [deleteTaskStatus, setDeleteTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [deleteTaskDesc, setDeleteTaskDesc] = useState<string>("")
+  const { state: exportTaskState, dispatch: exportTaskDispatch } = useTask({
+    status: "inactive",
+    desc: "",
+  })
+  const { state: deleteTaskState, dispatch: deleteTaskDispatch } = useTask({
+    status: "inactive",
+    desc: "",
+  })
   const [
     deleteAnnotationsModalIsOpen,
     { setTrue: openDeleteAnnotationsModal, setFalse: closeDeleteAnnotationsModal },
@@ -92,8 +99,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       privateAnnotation: { checked: boolean }
     }
 
-    setExportTaskStatus("active")
-    setExportTaskDesc("Downloading annotations...")
+    exportTaskDispatch({ type: TaskActionType.START, payload: "Downloading annotations..." })
     await axios
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
@@ -105,7 +111,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         },
       })
       .then(({ data }) => {
-        setExportTaskDesc("Exporting annotations...")
+        exportTaskDispatch({ type: TaskActionType.NEXT_STEP, payload: "Exporting annotations..." })
         return axios.post(
           `/api/hypothesis/${datasetId}/export-annotations`,
           JSON.stringify({
@@ -123,14 +129,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         )
       })
       .then(({ data }) => {
-        setExportTaskStatus("finished")
-        setExportTaskDesc(
-          `Exported ${data.totalExported} annotation(s) from ${manuscript.name} to ${target.destinationUrl.value}.`
-        )
+        exportTaskDispatch({
+          type: TaskActionType.FINISH,
+          payload: `Exported ${data.totalExported} annotation(s) from ${manuscript.name} to ${target.destinationUrl.value}.`,
+        })
       })
       .catch((e) => {
-        setExportTaskStatus("error")
-        setExportTaskDesc(`${getMessageFromError(e)}`)
+        exportTaskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
       })
   }
 
@@ -149,8 +154,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
   const handleDeleteAnnotations = async () => {
     closeDeleteAnnotationsModal()
-    setDeleteTaskStatus("active")
-    setDeleteTaskDesc("Downloading annotations...")
+    deleteTaskDispatch({ type: TaskActionType.START, payload: "Downloading annotations..." })
     await axios
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
@@ -159,7 +163,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         },
       })
       .then(({ data }) => {
-        setDeleteTaskDesc(`Deleting ${data.annotations.length} annotation(s)...`)
+        deleteTaskDispatch({
+          type: TaskActionType.NEXT_STEP,
+          payload: `Deleting ${data.annotations.length} annotation(s)...`,
+        })
         return axios.delete(`/api/hypothesis/${datasetId}/delete-annotations`, {
           data: JSON.stringify({ annotations: data.annotations }),
           params: {
@@ -171,12 +178,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         })
       })
       .then(({ data }) => {
-        setDeleteTaskStatus("finished")
-        setDeleteTaskDesc(`Deleted ${data.totalDeleted} annotation(s) from ${manuscript.name}.`)
+        deleteTaskDispatch({
+          type: TaskActionType.FINISH,
+          payload: `Deleted ${data.totalDeleted} annotation(s) from ${manuscript.name}.`,
+        })
       })
       .catch((e) => {
-        setDeleteTaskStatus("error")
-        setDeleteTaskDesc(`${getMessageFromError(e)}`)
+        deleteTaskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
       })
   }
 
@@ -203,14 +211,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               )}
             </div>
           )}
-          {exportTaskStatus !== "inactive" && (
+          {exportTaskState.status !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={getTaskNotificationKind(exportTaskStatus)}
-                subtitle={<span>{exportTaskDesc}</span>}
-                title={getTaskStatus(exportTaskStatus)}
+                kind={getTaskNotificationKind(exportTaskState)}
+                subtitle={<span>{exportTaskState.desc}</span>}
+                title={getTaskStatus(exportTaskState)}
               />
             </div>
           )}
@@ -293,7 +301,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             className={formStyles.submitBtn}
             type="submit"
             renderIcon={Export16}
-            disabled={exportTaskStatus === "active"}
+            disabled={exportTaskState.status === "active"}
           >
             Export annotations
           </Button>
@@ -303,14 +311,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
           <p className={formStyles.desc}>
             Note: You must have the required permissions to delete annotations.
           </p>
-          {deleteTaskStatus !== "inactive" && (
+          {deleteTaskState.status !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={getTaskNotificationKind(deleteTaskStatus)}
-                subtitle={<span>{deleteTaskDesc}</span>}
-                title={getTaskStatus(deleteTaskStatus)}
+                kind={getTaskNotificationKind(deleteTaskState)}
+                subtitle={<span>{deleteTaskState.desc}</span>}
+                title={getTaskStatus(deleteTaskState)}
               />
             </div>
           )}
@@ -355,7 +363,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             className={formStyles.submitBtn}
             type="submit"
             renderIcon={TrashCan16}
-            disabled={deleteTaskStatus === "active"}
+            disabled={deleteTaskState.status === "active"}
           >
             Delete annotations
           </Button>
