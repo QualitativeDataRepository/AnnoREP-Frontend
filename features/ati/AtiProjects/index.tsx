@@ -18,6 +18,7 @@ import {
   getLoadingDesc,
   getLoadingIconDesc,
 } from "./selectors"
+import { SearchActionType } from "./state"
 
 import { PUBLICATION_STATUS_NAME } from "../../../constants/dataverse"
 import { IAtiProject } from "../../../types/ati"
@@ -68,16 +69,20 @@ const AtiProjects: FC<AtiProjectsProps> = ({
     publicationStatusCount: publicationStatusCount,
     fetchPublicationStatus: false,
   })
-  const onCurrentPageChange = (page: number) => dispatch({ type: "UPDATE_PAGE", payload: page })
+  const onCurrentPageChange = (page: number) =>
+    dispatch({ type: SearchActionType.UPDATE_PAGE, payload: page })
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
       atiSearch: { value: string }
     }
-    dispatch({ type: "UPDATE_Q", payload: target.atiSearch.value.trim() })
+    dispatch({ type: SearchActionType.UPDATE_Q, payload: target.atiSearch.value.trim() })
   }
   const onFacetFieldChange = (checked: boolean, id: string) =>
-    dispatch({ type: "UPDATE_SELECTED_PUBLICATION_STATUS", payload: { id, checked } })
+    dispatch({
+      type: SearchActionType.UPDATE_SELECTED_PUBLICATION_STATUS,
+      payload: { id, checked },
+    })
 
   const totalPages = getTotalPages(state)
   const loadingDesc = getLoadingDesc(state)

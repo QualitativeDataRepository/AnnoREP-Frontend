@@ -1,11 +1,11 @@
 import { act } from "@testing-library/react"
 
-import { SearchDatasetState } from "../state"
+import { ISearchDatasetState } from "../state"
 import { getItems, getResultDesc } from "../selectors"
 
 describe("getItems", () => {
   test("handles empty array", () => {
-    const initialState: SearchDatasetState = {
+    const initialState: ISearchDatasetState = {
       currentTotal: 0,
       totalCount: 0,
       datasets: [],
@@ -21,7 +21,7 @@ describe("getItems", () => {
   })
 
   test("creates label field", () => {
-    const initialState: SearchDatasetState = {
+    const initialState: ISearchDatasetState = {
       currentTotal: 1,
       totalCount: 1,
       datasets: [
@@ -49,7 +49,7 @@ describe("getItems", () => {
 
 describe("getResultDesc", () => {
   test("shows result desc", () => {
-    let initialState: SearchDatasetState = {
+    let initialState: ISearchDatasetState = {
       currentTotal: 1,
       totalCount: 1,
       datasets: [

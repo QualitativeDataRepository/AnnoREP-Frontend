@@ -33,6 +33,7 @@ import {
   getSearchPlaceholder,
   hasMoreDatasets,
 } from "./selectors"
+import { SearchDatasetActionType } from "./state"
 import useSearchDataset from "./useDatasetSearch"
 import useTask, {
   TaskActionType,
@@ -77,11 +78,15 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     fetchQ: false,
     error: "",
   })
-  const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
+  const onShowMore = () => dispatch({ type: SearchDatasetActionType.UPDATE_PAGE })
 
   const debounceSearch = useMemo(
     () =>
-      debounce((inputValue: string) => dispatch({ type: "UPDATE_Q", payload: inputValue }), 200),
+      debounce(
+        (inputValue: string) =>
+          dispatch({ type: SearchDatasetActionType.UPDATE_Q, payload: inputValue }),
+        200
+      ),
     [dispatch]
   )
   useEffect(() => {

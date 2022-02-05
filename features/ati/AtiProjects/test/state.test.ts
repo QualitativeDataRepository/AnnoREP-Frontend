@@ -1,7 +1,7 @@
-import { searchReducer, SearchState } from "../state"
+import { searchReducer, ISearchState, SearchActionType } from "../state"
 
 describe("searchReducer", () => {
-  const initialState: SearchState = {
+  const initialState: ISearchState = {
     totalCount: 2,
     currentTotal: 1,
     atiProjects: {
@@ -32,14 +32,16 @@ describe("searchReducer", () => {
   }
 
   test("handles init", () => {
-    expect(searchReducer(initialState, { type: "SEARCH_INIT" })).toEqual({
+    expect(searchReducer(initialState, { type: SearchActionType.SEARCH_INIT })).toEqual({
       ...initialState,
       status: "active",
     })
   })
 
   test("handles failure", () => {
-    expect(searchReducer(initialState, { type: "SEARCH_FAILURE", payload: "error" })).toEqual({
+    expect(
+      searchReducer(initialState, { type: SearchActionType.SEARCH_FAILURE, payload: "error" })
+    ).toEqual({
       ...initialState,
       status: "error",
       error: "error",
@@ -47,25 +49,29 @@ describe("searchReducer", () => {
   })
 
   test("handles update page and should fetch projects", () => {
-    expect(searchReducer(initialState, { type: "UPDATE_PAGE", payload: 1 })).toEqual({
-      ...initialState,
-      page: 1,
-      fetchPage: true,
-    })
+    expect(searchReducer(initialState, { type: SearchActionType.UPDATE_PAGE, payload: 1 })).toEqual(
+      {
+        ...initialState,
+        page: 1,
+        fetchPage: true,
+      }
+    )
   })
 
   test("handles update page and shouldn't fetch projects", () => {
-    expect(searchReducer(initialState, { type: "UPDATE_PAGE", payload: 0 })).toEqual({
-      ...initialState,
-      page: 0,
-      fetchPage: false,
-    })
+    expect(searchReducer(initialState, { type: SearchActionType.UPDATE_PAGE, payload: 0 })).toEqual(
+      {
+        ...initialState,
+        page: 0,
+        fetchPage: false,
+      }
+    )
   })
 
   test("handles search page", () => {
     expect(
       searchReducer(initialState, {
-        type: "SEARCH_PAGE",
+        type: SearchActionType.SEARCH_PAGE,
         payload: {
           datasets: [
             {
@@ -111,7 +117,7 @@ describe("searchReducer", () => {
   })
 
   test("handles update q", () => {
-    expect(searchReducer(initialState, { type: "UPDATE_Q", payload: "q" })).toEqual({
+    expect(searchReducer(initialState, { type: SearchActionType.UPDATE_Q, payload: "q" })).toEqual({
       ...initialState,
       q: "q",
       fetchQ: true,
@@ -121,7 +127,7 @@ describe("searchReducer", () => {
   test("handles search q", () => {
     expect(
       searchReducer(initialState, {
-        type: "SEARCH_Q",
+        type: SearchActionType.SEARCH_Q,
         payload: {
           totalCount: 2,
           start: 0,
@@ -184,7 +190,7 @@ describe("searchReducer", () => {
   test("handles update publication statuses - true", () => {
     expect(
       searchReducer(initialState, {
-        type: "UPDATE_SELECTED_PUBLICATION_STATUS",
+        type: SearchActionType.UPDATE_SELECTED_PUBLICATION_STATUS,
         payload: {
           id: "Draft",
           checked: true,
@@ -202,7 +208,7 @@ describe("searchReducer", () => {
   test("handles update publication statuses - false", () => {
     expect(
       searchReducer(initialState, {
-        type: "UPDATE_SELECTED_PUBLICATION_STATUS",
+        type: SearchActionType.UPDATE_SELECTED_PUBLICATION_STATUS,
         payload: {
           id: "Draft",
           checked: false,
@@ -218,7 +224,7 @@ describe("searchReducer", () => {
   })
 
   test("handles no results", () => {
-    expect(searchReducer(initialState, { type: "NO_RESULTS" })).toEqual({
+    expect(searchReducer(initialState, { type: SearchActionType.NO_RESULTS })).toEqual({
       ...initialState,
       totalCount: 0,
       currentTotal: 0,
