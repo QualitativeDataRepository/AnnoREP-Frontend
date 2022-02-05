@@ -1,11 +1,11 @@
 import { act } from "@testing-library/react"
 
 import { getLoadingDesc, getTotalPages } from "../selectors"
-import { SearchState } from "../state"
+import { ISearchState } from "../state"
 
 describe("getTotalPages", () => {
   test("shows total pages", () => {
-    const initialState: SearchState = {
+    const initialState: ISearchState = {
       totalCount: 0,
       currentTotal: 0,
       atiProjects: {},
@@ -48,7 +48,7 @@ describe("getTotalPages", () => {
 
 describe("getLoadingDesc", () => {
   test("shows loading desc", () => {
-    const initialState: SearchState = {
+    const initialState: ISearchState = {
       totalCount: 21,
       currentTotal: 10,
       atiProjects: {},

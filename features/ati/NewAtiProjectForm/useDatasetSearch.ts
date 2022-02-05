@@ -3,15 +3,20 @@ import { Dispatch, useEffect, useReducer } from "react"
 import axios from "axios"
 import qs from "qs"
 
-import { SearchDatasetAction, searchDatasetReducer, SearchDatasetState } from "./state"
+import {
+  ISearchDatasetAction,
+  searchDatasetReducer,
+  ISearchDatasetState,
+  SearchDatasetActionType,
+} from "./state"
 
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
 import { IMyDataSearch } from "../../../types/api"
 
 const useSearchDataset = (
-  inititalState: SearchDatasetState
-): [SearchDatasetState, Dispatch<SearchDatasetAction>] => {
+  inititalState: ISearchDatasetState
+): [ISearchDatasetState, Dispatch<ISearchDatasetAction>] => {
   const [state, dispatch] = useReducer(searchDatasetReducer, inititalState)
 
   useEffect(() => {
@@ -19,7 +24,7 @@ const useSearchDataset = (
 
     const search = async () => {
       try {
-        dispatch({ type: "SEARCH_INIT" })
+        dispatch({ type: SearchDatasetActionType.SEARCH_INIT })
         const { data } = await axios.get<IMyDataSearch>(`/api/mydata-search`, {
           params: {
             q: state.q,
@@ -33,15 +38,17 @@ const useSearchDataset = (
           },
         })
         if (!didCancel) {
-          const actionType = state.fetchPage ? "SEARCH_PAGE" : "SEARCH_Q"
+          const actionType = state.fetchPage
+            ? SearchDatasetActionType.SEARCH_PAGE
+            : SearchDatasetActionType.SEARCH_Q
           dispatch({ type: actionType, payload: data })
         }
       } catch (e) {
         if (!didCancel) {
           const message = getMessageFromError(e)
-          dispatch({ type: "SEARCH_FAILURE", payload: message })
+          dispatch({ type: SearchDatasetActionType.SEARCH_FAILURE, payload: message })
           if (state.fetchQ) {
-            dispatch({ type: "NO_RESULTS" })
+            dispatch({ type: SearchDatasetActionType.NO_RESULTS })
           }
         }
       }

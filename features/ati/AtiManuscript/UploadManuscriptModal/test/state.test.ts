@@ -1,16 +1,20 @@
-import { uploadManuscriptReducer, UploadManuscriptState } from "../state"
+import {
+  uploadManuscriptReducer,
+  IUploadManuscriptState,
+  UploadManuscriptActionType,
+} from "../state"
 
 describe("uploadManuscriptReducer", () => {
-  const initialState: UploadManuscriptState = {
+  const initialState: IUploadManuscriptState = {
     manuscript: null,
     modalIsOpen: false,
     uploadAnnotations: false,
   }
 
-  test("handles upload", () => {
+  test("handles save valid upload config", () => {
     expect(
       uploadManuscriptReducer(initialState, {
-        type: "UPLOAD_MANUSCRIPT",
+        type: UploadManuscriptActionType.SAVE_VALID_UPLOAD_CONFIG,
         payload: { manuscript: new File([new ArrayBuffer(1)], "test"), uploadAnnotations: false },
       })
     ).toEqual({
@@ -20,10 +24,10 @@ describe("uploadManuscriptReducer", () => {
     })
   })
 
-  test("handles set manuscript", () => {
+  test("handles save/clear file selection", () => {
     expect(
       uploadManuscriptReducer(initialState, {
-        type: "SET_MANUSCRIPT",
+        type: UploadManuscriptActionType.SAVE_FILE_SELECTION,
         payload: new File([new ArrayBuffer(1)], "test"),
       })
     ).toEqual({
@@ -33,8 +37,7 @@ describe("uploadManuscriptReducer", () => {
 
     expect(
       uploadManuscriptReducer(initialState, {
-        type: "SET_MANUSCRIPT",
-        payload: null,
+        type: UploadManuscriptActionType.CLEAR_FILE_SELECTION,
       })
     ).toEqual({
       ...initialState,
@@ -42,10 +45,10 @@ describe("uploadManuscriptReducer", () => {
     })
   })
 
-  test("handles toggle modal is open", () => {
+  test("handles toggle modal visibility", () => {
     expect(
       uploadManuscriptReducer(initialState, {
-        type: "TOGGLE_MODAL_IS_OPEN",
+        type: UploadManuscriptActionType.TOGGLE_MODAL_VISIBILITY,
       })
     ).toEqual({
       ...initialState,

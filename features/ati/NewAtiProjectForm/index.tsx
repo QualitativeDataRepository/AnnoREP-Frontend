@@ -16,7 +16,6 @@ import {
   Form,
   FileUploader,
   InlineNotification,
-  InlineLoadingStatus,
   ComboBox,
   InlineLoading,
   OverflowMenu,
@@ -34,11 +33,16 @@ import {
   getSearchPlaceholder,
   hasMoreDatasets,
 } from "./selectors"
+import { SearchDatasetActionType } from "./state"
 import useSearchDataset from "./useDatasetSearch"
+import useTask, {
+  TaskActionType,
+  getTaskNotificationKind,
+  getTaskStatus,
+} from "../../../hooks/useTask"
 import { IDatasetOption } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./NewAtiProjectForm.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -74,11 +78,15 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     fetchQ: false,
     error: "",
   })
-  const onShowMore = () => dispatch({ type: "UPDATE_PAGE" })
+  const onShowMore = () => dispatch({ type: SearchDatasetActionType.UPDATE_PAGE })
 
   const debounceSearch = useMemo(
     () =>
-      debounce((inputValue: string) => dispatch({ type: "UPDATE_Q", payload: inputValue }), 200),
+      debounce(
+        (inputValue: string) =>
+          dispatch({ type: SearchDatasetActionType.UPDATE_Q, payload: inputValue }),
+        200
+      ),
     [dispatch]
   )
   useEffect(() => {
@@ -106,13 +114,11 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     setSelectedManuscript(null)
   }
 
-  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [taskDesc, setTaskDesc] = useState<string>("")
+  const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     if (selectedManuscript === null || selectedManuscript.length === 0) {
-      setTaskStatus("error")
-      setTaskDesc("Please upload a manuscript file.")
+      taskDispatch({ type: TaskActionType.FAIL, payload: "Please upload a manuscript file." })
       return
     }
     const mimeType = await getMimeType(selectedManuscript[0])
@@ -121,8 +127,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
       const msg = selectedManuscript[0].type
         ? `${selectedManuscript[0].type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
-      setTaskStatus("error")
-      setTaskDesc(msg)
+      taskDispatch({ type: TaskActionType.FAIL, payload: msg })
       return
     }
     let manuscript = selectedManuscript[0]
@@ -131,14 +136,13 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     }
     const formData = new FormData()
     formData.append("manuscript", manuscript)
-    setTaskStatus("active")
-    setTaskDesc("Creating ATI project...")
+    taskDispatch({ type: TaskActionType.START, payload: "Creating ATI project..." })
     await axios({
       method: "PUT",
       url: `/api/datasets/${selectedDataset?.id}/annorep`,
     })
       .then(() => {
-        setTaskDesc(`Uploading ${manuscript.name}...`)
+        taskDispatch({ type: TaskActionType.NEXT_STEP, payload: `Uploading ${manuscript.name}...` })
         return axios({
           method: "POST",
           url: `/api/datasets/${selectedDataset?.id}/manuscript`,
@@ -149,7 +153,10 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
         })
       })
       .then(({ data }) => {
-        setTaskDesc(`Extracting annotations from ${manuscript.name}...`)
+        taskDispatch({
+          type: TaskActionType.NEXT_STEP,
+          payload: `Extracting annotations from ${manuscript.name}...`,
+        })
         const manuscriptId = data.data.files[0].dataFile.id
         return axios({
           method: "PUT",
@@ -161,13 +168,14 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
         })
       })
       .then(() => {
-        setTaskStatus("finished")
-        setTaskDesc(`Created ATI project for dataset ${selectedDataset?.label}.`)
+        taskDispatch({
+          type: TaskActionType.FINISH,
+          payload: `Created ATI project for dataset ${selectedDataset?.label}.`,
+        })
         router.push(`/ati/${selectedDataset?.id}/${AtiTab.summary.id}`)
       })
       .catch((error) => {
-        setTaskStatus("error")
-        setTaskDesc(`${getMessageFromError(error)}`)
+        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
       })
   }
   //TODO: is ownerId=1 justified?
@@ -182,14 +190,14 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             Link to a Dataverse dataset and upload a manuscript to create a new <abbr>ATI</abbr>{" "}
             project
           </p>
-          {taskStatus !== "inactive" && (
+          {taskState.status !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
                 hideCloseButton
                 lowContrast
-                kind={getTaskNotificationKind(taskStatus)}
-                subtitle={<span>{taskDesc}</span>}
-                title={getTaskStatus(taskStatus)}
+                kind={getTaskNotificationKind(taskState)}
+                subtitle={<span>{taskState.desc}</span>}
+                title={getTaskStatus(taskState)}
               />
             </div>
           )}

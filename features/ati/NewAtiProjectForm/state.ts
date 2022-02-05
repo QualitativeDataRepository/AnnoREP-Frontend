@@ -3,7 +3,7 @@ import { IMyDataSearch } from "../../../types/api"
 
 import { IDatasetOption } from "../../../types/dataverse"
 
-export interface SearchDatasetState {
+export interface ISearchDatasetState {
   currentTotal: number
   totalCount: number
   datasets: IDatasetOption[]
@@ -16,30 +16,40 @@ export interface SearchDatasetState {
   error?: string
 }
 
-export type SearchDatasetAction =
-  | { type: "SEARCH_INIT" }
-  | { type: "SEARCH_FAILURE"; payload: string }
-  | { type: "UPDATE_PAGE" }
-  | { type: "SEARCH_PAGE"; payload: IMyDataSearch }
-  | { type: "UPDATE_Q"; payload: string }
-  | { type: "SEARCH_Q"; payload: IMyDataSearch }
-  | { type: "NO_RESULTS" }
+export enum SearchDatasetActionType {
+  SEARCH_INIT = "SEARCH_INIT",
+  SEARCH_FAILURE = "SEARCH_FAILURE",
+  UPDATE_PAGE = "UPDATE_PAGE",
+  SEARCH_PAGE = "SEARCH_PAGE",
+  UPDATE_Q = "UPDATE_Q",
+  SEARCH_Q = "SEARCH_Q",
+  NO_RESULTS = "NO_RESULTS",
+}
+
+export type ISearchDatasetAction =
+  | { type: SearchDatasetActionType.SEARCH_INIT }
+  | { type: SearchDatasetActionType.SEARCH_FAILURE; payload: string }
+  | { type: SearchDatasetActionType.UPDATE_PAGE }
+  | { type: SearchDatasetActionType.SEARCH_PAGE; payload: IMyDataSearch }
+  | { type: SearchDatasetActionType.UPDATE_Q; payload: string }
+  | { type: SearchDatasetActionType.SEARCH_Q; payload: IMyDataSearch }
+  | { type: SearchDatasetActionType.NO_RESULTS }
 
 export function searchDatasetReducer(
-  state: SearchDatasetState,
-  action: SearchDatasetAction
-): SearchDatasetState {
+  state: ISearchDatasetState,
+  action: ISearchDatasetAction
+): ISearchDatasetState {
   switch (action.type) {
-    case "SEARCH_INIT": {
+    case SearchDatasetActionType.SEARCH_INIT: {
       return { ...state, status: "active", error: "" }
     }
-    case "SEARCH_FAILURE": {
+    case SearchDatasetActionType.SEARCH_FAILURE: {
       return { ...state, status: "error", error: action.payload }
     }
-    case "UPDATE_PAGE": {
+    case SearchDatasetActionType.UPDATE_PAGE: {
       return { ...state, page: state.page + 1, fetchPage: state.currentTotal < state.totalCount }
     }
-    case "SEARCH_PAGE": {
+    case SearchDatasetActionType.SEARCH_PAGE: {
       const newDatasets: IDatasetOption[] = action.payload.datasets.map(({ id, name }) => {
         return { id, name }
       })
@@ -51,14 +61,14 @@ export function searchDatasetReducer(
         datasets: [...state.datasets, ...newDatasets],
       }
     }
-    case "UPDATE_Q": {
+    case SearchDatasetActionType.UPDATE_Q: {
       return {
         ...state,
         q: action.payload,
         fetchQ: true,
       }
     }
-    case "SEARCH_Q": {
+    case SearchDatasetActionType.SEARCH_Q: {
       const newDatasets: IDatasetOption[] = action.payload.datasets.map(({ id, name }) => {
         return { id, name }
       })
@@ -73,7 +83,7 @@ export function searchDatasetReducer(
         perPage: action.payload.docsPerPage,
       }
     }
-    case "NO_RESULTS": {
+    case SearchDatasetActionType.NO_RESULTS: {
       return {
         ...state,
         totalCount: 0,

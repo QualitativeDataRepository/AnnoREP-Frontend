@@ -1,13 +1,13 @@
-import { SearchDatasetState } from "./state"
+import { ISearchDatasetState } from "./state"
 
-export const getItems = (state: SearchDatasetState): { id: string; label: string }[] => {
+export const getItems = (state: ISearchDatasetState): { id: string; label: string }[] => {
   const items = state.datasets.map((dataset) => {
     return { id: dataset.id, label: dataset.name }
   })
   return items
 }
 
-export const getResultDesc = (state: SearchDatasetState): string => {
+export const getResultDesc = (state: ISearchDatasetState): string => {
   if (["inactive", "finished"].includes(state.status)) {
     if (state.currentTotal < state.totalCount) {
       return `${state.currentTotal} of ${state.totalCount} dataset(s)`
@@ -21,12 +21,12 @@ export const getResultDesc = (state: SearchDatasetState): string => {
   }
 }
 
-export const getErrorMsg = (state: SearchDatasetState): string => {
+export const getErrorMsg = (state: ISearchDatasetState): string => {
   return `${state.error} Please create a new dataset.`
 }
 
-export const hasMoreDatasets = (state: SearchDatasetState): boolean =>
+export const hasMoreDatasets = (state: ISearchDatasetState): boolean =>
   state.currentTotal < state.totalCount
 
-export const getSearchPlaceholder = (state: SearchDatasetState): string =>
+export const getSearchPlaceholder = (state: ISearchDatasetState): string =>
   state.totalCount === 0 ? "Please create a new dataset" : "Please choose a dataset"

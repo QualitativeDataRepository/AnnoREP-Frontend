@@ -3,14 +3,14 @@ import { Dispatch, useEffect, useReducer } from "react"
 import axios from "axios"
 import qs from "qs"
 
-import { Action, searchReducer, SearchState } from "./state"
+import { SearchActionType, ISearchAction, searchReducer, ISearchState } from "./state"
 import { getTrueFields } from "./utils"
 
 import { PUBLICATION_STATUSES } from "../../../constants/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import { IMyDataSearch } from "../../../types/api"
 
-const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] => {
+const useSearch = (inititalState: ISearchState): [ISearchState, Dispatch<ISearchAction>] => {
   const [state, dispatch] = useReducer(searchReducer, inititalState)
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] 
 
     const search = async () => {
       try {
-        dispatch({ type: "SEARCH_INIT" })
+        dispatch({ type: SearchActionType.SEARCH_INIT })
         //if search q use all the publication statuses, else use the selected publication statuses
         const publicationStatuses = state.fetchQ
           ? PUBLICATION_STATUSES
@@ -37,14 +37,16 @@ const useSearch = (inititalState: SearchState): [SearchState, Dispatch<Action>] 
           },
         })
         if (!didCancel) {
-          const actionType = state.fetchPage ? "SEARCH_PAGE" : "SEARCH_Q"
+          const actionType = state.fetchPage
+            ? SearchActionType.SEARCH_PAGE
+            : SearchActionType.SEARCH_Q
           dispatch({ type: actionType, payload: data })
         }
       } catch (e) {
         if (!didCancel) {
           const message = getMessageFromError(e)
-          dispatch({ type: "SEARCH_FAILURE", payload: message })
-          dispatch({ type: "NO_RESULTS" })
+          dispatch({ type: SearchActionType.SEARCH_FAILURE, payload: message })
+          dispatch({ type: SearchActionType.NO_RESULTS })
         }
       }
     }

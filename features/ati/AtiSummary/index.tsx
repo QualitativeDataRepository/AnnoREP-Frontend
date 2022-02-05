@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC } from "react"
 import axios from "axios"
 import {
   UnorderedList,
@@ -6,7 +6,6 @@ import {
   Link,
   Tag,
   Button,
-  InlineLoadingStatus,
   InlineNotification,
 } from "carbon-components-react"
 import { Launch16 } from "@carbon/icons-react"
@@ -15,9 +14,13 @@ import { useRouter } from "next/router"
 import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
+import useTask, {
+  TaskActionType,
+  getTaskNotificationKind,
+  getTaskStatus,
+} from "../../../hooks/useTask"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
@@ -45,14 +48,12 @@ const AtiSummary: FC<AtiSummaryProps> = ({
   const { manuscript, datasources } = atiProjectDetails
 
   const router = useRouter()
-  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [taskDesc, setTaskDesc] = useState<string>("")
+  const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
   const hasSubmittedForReview = publicationStatuses?.includes("In Review")
 
   const submitForReview = async () => {
     try {
-      setTaskStatus("active")
-      setTaskDesc("Submitting project for review...")
+      taskDispatch({ type: TaskActionType.START, payload: "Submitting project for review..." })
 
       const submitForReviewPromise = axios.post(`/api/datasets/${id}/submit-for-review`)
 
@@ -102,24 +103,22 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         deleteAtiStagingAnnotationsPromise,
         exportUserAnnotationsPromise,
       ])
-      setTaskStatus("finished")
-      setTaskDesc(`Submitted ${title} for review.`)
+      taskDispatch({ type: TaskActionType.FINISH, payload: `Submitted ${title} for review.` })
       router.reload()
     } catch (e) {
-      setTaskStatus("error")
-      setTaskDesc(getMessageFromError(e))
+      taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
     }
   }
 
   return (
     <div className={`${layoutStyles.maxWidth} ${styles.sectionContainer}`}>
-      {taskStatus !== "inactive" && (
+      {taskState.status !== "inactive" && (
         <InlineNotification
           hideCloseButton
           lowContrast
-          kind={getTaskNotificationKind(taskStatus)}
-          subtitle={<span>{taskDesc}</span>}
-          title={getTaskStatus(taskStatus)}
+          kind={getTaskNotificationKind(taskState)}
+          subtitle={<span>{taskState.desc}</span>}
+          title={getTaskStatus(taskState)}
         />
       )}
       <div>

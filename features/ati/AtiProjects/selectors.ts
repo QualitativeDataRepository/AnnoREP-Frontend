@@ -1,12 +1,12 @@
-import { SearchState } from "./state"
+import { ISearchState } from "./state"
 
 import { range } from "../../../utils/arrayUtils"
 import { IAtiProject } from "../../../types/ati"
 
-export const getTotalPages = (state: SearchState): number =>
+export const getTotalPages = (state: ISearchState): number =>
   Math.ceil(state.totalCount / state.perPage)
 
-export const getAtis = (state: SearchState): IAtiProject[] => {
+export const getAtis = (state: ISearchState): IAtiProject[] => {
   if (state.status === "active") {
     return []
   }
@@ -19,11 +19,11 @@ export const getAtis = (state: SearchState): IAtiProject[] => {
   return atis.filter((ati) => ati)
 }
 
-export const getShowPagination = (state: SearchState): boolean => {
+export const getShowPagination = (state: ISearchState): boolean => {
   return ["inactive", "finished"].includes(state.status) && getTotalPages(state) > 1
 }
 
-export const getLoadingDesc = (state: SearchState): string | undefined => {
+export const getLoadingDesc = (state: ISearchState): string | undefined => {
   if (["inactive", "finished"].includes(state.status)) {
     if (state.totalCount <= state.perPage) {
       return `${state.totalCount} project(s)`
@@ -39,7 +39,7 @@ export const getLoadingDesc = (state: SearchState): string | undefined => {
   }
 }
 
-export const getLoadingIconDesc = (state: SearchState): string => {
+export const getLoadingIconDesc = (state: ISearchState): string => {
   if (state.status == "inactive") {
     return "Inactive!"
   } else if (state.status === "finished") {

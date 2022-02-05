@@ -1,7 +1,12 @@
-import { searchDatasetReducer, SearchDatasetState, SearchDatasetAction } from "../state"
+import {
+  searchDatasetReducer,
+  ISearchDatasetState,
+  ISearchDatasetAction,
+  SearchDatasetActionType,
+} from "../state"
 
 describe("searchDatasetReducer", () => {
-  const initialState: SearchDatasetState = {
+  const initialState: ISearchDatasetState = {
     currentTotal: 1,
     totalCount: 2,
     datasets: [
@@ -19,11 +24,13 @@ describe("searchDatasetReducer", () => {
     error: "",
   }
   test("has initial state", () => {
-    expect(searchDatasetReducer(initialState, {} as SearchDatasetAction)).toEqual(initialState)
+    expect(searchDatasetReducer(initialState, {} as ISearchDatasetAction)).toEqual(initialState)
   })
 
   test("handles init", () => {
-    expect(searchDatasetReducer(initialState, { type: "SEARCH_INIT" })).toEqual({
+    expect(
+      searchDatasetReducer(initialState, { type: SearchDatasetActionType.SEARCH_INIT })
+    ).toEqual({
       ...initialState,
       status: "active",
     })
@@ -31,12 +38,17 @@ describe("searchDatasetReducer", () => {
 
   test("handles failure", () => {
     expect(
-      searchDatasetReducer(initialState, { type: "SEARCH_FAILURE", payload: "error" })
+      searchDatasetReducer(initialState, {
+        type: SearchDatasetActionType.SEARCH_FAILURE,
+        payload: "error",
+      })
     ).toEqual({ ...initialState, status: "error", error: "error" })
   })
 
   test("handles update page and should fetch datasets", () => {
-    expect(searchDatasetReducer(initialState, { type: "UPDATE_PAGE" })).toEqual({
+    expect(
+      searchDatasetReducer(initialState, { type: SearchDatasetActionType.UPDATE_PAGE })
+    ).toEqual({
       ...initialState,
       page: 1,
       fetchPage: true,
@@ -46,7 +58,7 @@ describe("searchDatasetReducer", () => {
   test("handles search page", () => {
     expect(
       searchDatasetReducer(initialState, {
-        type: "SEARCH_PAGE",
+        type: SearchDatasetActionType.SEARCH_PAGE,
         payload: {
           datasets: [
             {
@@ -79,7 +91,9 @@ describe("searchDatasetReducer", () => {
   })
 
   test("handles update q", () => {
-    expect(searchDatasetReducer(initialState, { type: "UPDATE_Q", payload: "q" })).toEqual({
+    expect(
+      searchDatasetReducer(initialState, { type: SearchDatasetActionType.UPDATE_Q, payload: "q" })
+    ).toEqual({
       ...initialState,
       q: "q",
       fetchQ: true,
@@ -89,7 +103,7 @@ describe("searchDatasetReducer", () => {
   test("handles search q", () => {
     expect(
       searchDatasetReducer(initialState, {
-        type: "SEARCH_Q",
+        type: SearchDatasetActionType.SEARCH_Q,
         payload: {
           datasets: [
             {
@@ -125,7 +139,9 @@ describe("searchDatasetReducer", () => {
   })
 
   test("handles no results", () => {
-    expect(searchDatasetReducer(initialState, { type: "NO_RESULTS" })).toEqual({
+    expect(
+      searchDatasetReducer(initialState, { type: SearchDatasetActionType.NO_RESULTS })
+    ).toEqual({
       ...initialState,
       totalCount: 0,
       currentTotal: 0,

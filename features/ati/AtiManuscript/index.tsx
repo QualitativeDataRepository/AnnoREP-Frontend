@@ -1,14 +1,7 @@
-import { FC, FormEventHandler, useReducer, useState, ChangeEvent } from "react"
+import { FC, FormEventHandler, useReducer, ChangeEvent } from "react"
 
 import axios from "axios"
-import {
-  Button,
-  Form,
-  FileUploader,
-  InlineNotification,
-  InlineLoadingStatus,
-  Toggle,
-} from "carbon-components-react"
+import { Button, Form, FileUploader, InlineNotification, Toggle } from "carbon-components-react"
 import FormData from "form-data"
 import { Document20, TrashCan20, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
@@ -17,15 +10,19 @@ import DatasourceModal from "./DatasourceModal"
 import DeleteManuscriptModal from "./DeleteManuscriptModal"
 import IngestPdf from "./IngestPdf"
 import UploadManuscriptModal from "./UploadManuscriptModal"
-import { uploadManuscriptReducer } from "./UploadManuscriptModal/state"
+import { uploadManuscriptReducer, UploadManuscriptActionType } from "./UploadManuscriptModal/state"
 import HypothesisLoginNotification from "../../auth/HypothesisLoginNotificaton"
 import useBoolean from "../../../hooks/useBoolean"
+import useTask, {
+  TaskActionType,
+  getTaskNotificationKind,
+  getTaskStatus,
+} from "../../../hooks/useTask"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { getTaskNotificationKind, getTaskStatus } from "../../../utils/taskStatusUtils"
 
 import styles from "./AtiManuscript.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -59,13 +56,15 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     deleteManuscriptModalIsOpen,
     { setTrue: openDeleteManuscriptModal, setFalse: closeDeleteManuscriptModal },
   ] = useBoolean(false)
-  const [uploadManuscript, dispatch] = useReducer(uploadManuscriptReducer, {
-    manuscript: null,
-    modalIsOpen: false,
-    uploadAnnotations: false,
-  })
-  const [taskStatus, setTaskStatus] = useState<InlineLoadingStatus>("inactive")
-  const [taskDesc, setTaskDesc] = useState<string>("")
+  const [uploadManuscriptTaskState, uploadManuscriptTaskDispatch] = useReducer(
+    uploadManuscriptReducer,
+    {
+      manuscript: null,
+      modalIsOpen: false,
+      uploadAnnotations: false,
+    }
+  )
+  const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
 
   const onClickDeleteManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -73,26 +72,30 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   }
   const handleDeleteManuscript = async () => {
     closeDeleteManuscriptModal()
-    setTaskStatus("active")
-    setTaskDesc("Deleting manuscript...")
+    taskDispatch({ type: TaskActionType.START, payload: "Deleting manuscript..." })
     await axios
       .delete(`/api/delete-file/${manuscript.id}`)
       .then(() => {
-        setTaskStatus("finished")
-        setTaskDesc(`Deleted ${manuscript.name}.`)
+        taskDispatch({ type: TaskActionType.FINISH, payload: `Deleted ${manuscript.name}.` })
         router.reload()
       })
       .catch((error) => {
-        setTaskStatus("error")
-        setTaskDesc(`${getMessageFromError(error)}`)
+        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
       })
   }
 
   const onChangeFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: "SET_MANUSCRIPT", payload: e.target.files ? e.target.files[0] : null })
+    if (e.target.files && e.target.files.length > 0) {
+      uploadManuscriptTaskDispatch({
+        type: UploadManuscriptActionType.SAVE_FILE_SELECTION,
+        payload: e.target.files[0],
+      })
+    } else {
+      uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.CLEAR_FILE_SELECTION })
+    }
   }
   const onClearFile = () => {
-    dispatch({ type: "SET_MANUSCRIPT", payload: null })
+    uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.CLEAR_FILE_SELECTION })
   }
 
   const onClickUploadManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -100,27 +103,29 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     const target = e.target as typeof e.target & {
       uploadAnnotations: { checked: boolean }
     }
-    if (uploadManuscript.manuscript === null) {
-      setTaskStatus("error")
-      setTaskDesc("Please upload a manuscript file.")
+    if (uploadManuscriptTaskState.manuscript === null) {
+      // no manuscript file found
+      taskDispatch({ type: TaskActionType.FAIL, payload: "Please upload a manuscript file." })
       return
     }
-    const mimeType = await getMimeType(uploadManuscript.manuscript)
+    const mimeType = await getMimeType(uploadManuscriptTaskState.manuscript)
     const acceptedMimeTypes = Object.values(ManuscriptMimeType) as string[]
     if (!acceptedMimeTypes.includes(mimeType)) {
-      const msg = uploadManuscript.manuscript.type
-        ? `${uploadManuscript.manuscript.type} is not a supported file type.`
+      const msg = uploadManuscriptTaskState.manuscript.type
+        ? `${uploadManuscriptTaskState.manuscript.type} is not a supported file type.`
         : "Unable to determine the file type of the uploaded file."
-      setTaskStatus("error")
-      setTaskDesc(msg)
+      // manuscript file is not an acceptable mimetype
+      taskDispatch({ type: TaskActionType.FAIL, payload: msg })
       return
     }
-    let manuscript = uploadManuscript.manuscript
-    if (uploadManuscript.manuscript.type === "") {
+    let manuscript = uploadManuscriptTaskState.manuscript
+    if (uploadManuscriptTaskState.manuscript.type === "") {
+      // use the calculated mimetype
       manuscript = new File([manuscript], manuscript.name, { type: mimeType })
     }
-    dispatch({
-      type: "UPLOAD_MANUSCRIPT",
+    // opens the modal to get user confirmation to upload
+    uploadManuscriptTaskDispatch({
+      type: UploadManuscriptActionType.SAVE_VALID_UPLOAD_CONFIG,
       payload: {
         manuscript: manuscript,
         uploadAnnotations: target.uploadAnnotations.checked,
@@ -129,12 +134,15 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   }
 
   const handleUploadManuscript = async () => {
-    dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })
-    if (uploadManuscript.manuscript) {
+    // closes the modal if click `continue`
+    uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.TOGGLE_MODAL_VISIBILITY })
+    if (uploadManuscriptTaskState.manuscript) {
       const formData = new FormData()
-      formData.append("manuscript", uploadManuscript.manuscript)
-      setTaskStatus("active")
-      setTaskDesc(`Uploading ${uploadManuscript.manuscript.name}...`)
+      formData.append("manuscript", uploadManuscriptTaskState.manuscript)
+      taskDispatch({
+        type: TaskActionType.START,
+        payload: `Uploading ${uploadManuscriptTaskState.manuscript.name}...`,
+      })
       await axios({
         method: "POST",
         url: `/api/datasets/${datasetId}/manuscript`,
@@ -145,7 +153,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
         .then(async ({ data }) => {
           const newManuscriptId = data.data.files[0].dataFile.id
-          const deleteAnnotationsPromise = uploadManuscript.uploadAnnotations
+          const deleteAnnotationsPromise = uploadManuscriptTaskState.uploadAnnotations
             ? axios({
                 method: "GET",
                 url: `/api/hypothesis/${datasetId}/download-annotations`,
@@ -155,7 +163,10 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                 },
               }).then(({ data }) => {
                 if (data.total > 0) {
-                  setTaskDesc(`Deleting current annotation(s) from Hypothes.is server...`)
+                  taskDispatch({
+                    type: TaskActionType.NEXT_STEP,
+                    payload: `Deleting current annotation(s) from Hypothes.is server...`,
+                  })
                   return axios({
                     method: "DELETE",
                     url: `/api/hypothesis/${datasetId}/delete-annotations`,
@@ -171,35 +182,36 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
               })
             : Promise.resolve("Skip!")
           return await deleteAnnotationsPromise.then(() => {
-            setTaskDesc(
-              `${
-                uploadManuscript.uploadAnnotations
+            taskDispatch({
+              type: TaskActionType.NEXT_STEP,
+              payload: `${
+                uploadManuscriptTaskState.uploadAnnotations
                   ? "Extracting annotations"
                   : "Creating ingest PDF"
-              } from ${uploadManuscript.manuscript?.name}...`
-            )
+              } from ${uploadManuscriptTaskState.manuscript?.name}...`,
+            })
             return axios({
               method: "PUT",
               url: `/api/arcore/${newManuscriptId}`,
               params: {
                 datasetId: datasetId,
-                uploadAnnotations: uploadManuscript.uploadAnnotations,
+                uploadAnnotations: uploadManuscriptTaskState.uploadAnnotations,
               },
             })
           })
         })
         .then(() => {
-          setTaskStatus("finished")
-          setTaskDesc(`Uploaded ${uploadManuscript.manuscript?.name}.`)
+          taskDispatch({
+            type: TaskActionType.FINISH,
+            payload: `Uploaded ${uploadManuscriptTaskState.manuscript?.name}.`,
+          })
           router.reload()
         })
         .catch((error) => {
-          setTaskStatus("error")
-          setTaskDesc(`${getMessageFromError(error)}`)
+          taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
         })
     } else {
-      setTaskStatus("error")
-      setTaskDesc("Please upload a manuscript file.")
+      taskDispatch({ type: TaskActionType.FAIL, payload: "Please upload a manuscript file." })
     }
   }
 
@@ -219,10 +231,12 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         handleDeleteManuscript={handleDeleteManuscript}
       />
       <UploadManuscriptModal
-        manuscriptName={uploadManuscript.manuscript?.name as string}
-        uploadAnnotations={uploadManuscript.uploadAnnotations}
-        open={uploadManuscript.modalIsOpen}
-        closeModal={() => dispatch({ type: "TOGGLE_MODAL_IS_OPEN" })}
+        manuscriptName={uploadManuscriptTaskState.manuscript?.name as string}
+        uploadAnnotations={uploadManuscriptTaskState.uploadAnnotations}
+        open={uploadManuscriptTaskState.modalIsOpen}
+        closeModal={() =>
+          uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.TOGGLE_MODAL_VISIBILITY })
+        }
         handleUploadManuscript={handleUploadManuscript}
       />
       <div className={styles.tabContainer}>
@@ -256,13 +270,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             </Form>
           )}
         </div>
-        {taskStatus !== "inactive" && (
+        {taskState.status !== "inactive" && (
           <InlineNotification
             hideCloseButton
             lowContrast
-            kind={getTaskNotificationKind(taskStatus)}
-            subtitle={<span>{taskDesc}</span>}
-            title={getTaskStatus(taskStatus)}
+            kind={getTaskNotificationKind(taskState)}
+            subtitle={<span>{taskState.desc}</span>}
+            title={getTaskStatus(taskState)}
           />
         )}
         {manuscript.id ? (
