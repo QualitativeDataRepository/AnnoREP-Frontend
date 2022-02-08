@@ -1,0 +1,58 @@
+.sectionContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 24px;
+}
+
+.about {
+  display: grid;
+  grid-template-columns: auto;
+  row-gap: 8px;
+}
+
+.aboutContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 8px;
+}
+
+.buttonSet {
+  display: grid;
+  grid-template-columns: 0.5fr 0.5fr;
+  justify-content: start;
+  align-items: stretch;
+  gap: 1px;
+}
+
+.buttonSet > * {
+  padding: 0px 8px;
+  max-width: unset;
+  display: flex;
+  justify-content: center;
+}
+
+.descriptionList {
+  display: grid;
+  row-gap: 8px;
+}
+
+.descriptionList dt {
+  font-weight: 600;
+}
+
+.descriptionList dd {
+  margin-left: 16px;
+}
+
+@media (min-width: 42rem) {
+  .aboutContainer {
+    grid-template-columns: 0.75fr 0.2fr;
+    justify-content: start;
+    align-items: start;
+    column-gap: 64px;
+  }
+  .buttonSet {
+    order: 1;
+    grid-template-columns: 1fr;
+  }
+}

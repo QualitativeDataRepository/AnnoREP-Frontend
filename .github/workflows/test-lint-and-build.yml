@@ -3,7 +3,7 @@ name: Test, Lint, and Build
 on: pull_request
 
 jobs:
-  test:
+  test-unit:
     runs-on: ubuntu-latest
 
     steps:
@@ -11,13 +11,13 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: '14.x'
     - name: Install Dependencies
       run: |
         npm i
-    - name: Run Tests
+    - name: Run Unit Tests
       run: |
-        CI=true npm run test
+        CI=true npm run test:all-unit
 
   lint:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "14.x"
       - name: Install Dependencies
         run: |
           npm i
@@ -46,7 +46,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "14.x"
       - name: Install Dependencies
         run: |
           npm i

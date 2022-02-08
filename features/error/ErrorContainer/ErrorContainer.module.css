@@ -1,0 +1,14 @@
+.container {
+  display: grid;
+  grid-template-columns: auto;
+  row-gap: 16px;
+}
+
+.title {
+  padding: 16px 0;
+  border-bottom: 1px solid #c7c7c7;
+}
+
+.button {
+  padding-right: 15px;
+}

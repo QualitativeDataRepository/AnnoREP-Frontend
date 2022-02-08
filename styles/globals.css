@@ -1,13 +1,12 @@
 html,
 body {
+  height: 100%;
+  width: 100%;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
-    Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
-  color: inherit;
   text-decoration: none;
 }
 
@@ -15,27 +14,32 @@ a {
   box-sizing: border-box;
 }
 
-.ar--form-container {
-  max-width: 800px;
-  margin: 0 auto;
+.bx--inline-notification {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
-.ar--form-title {
-  margin-bottom: 0.25rem;
+.react-pdf__Page__textContent span {
+  opacity: 0.25;
 }
 
-.ar--form-desc {
-  margin-bottom: 2rem;
+.react-pdf__Page__textContent span::selection {
+  background-color: blue;
 }
 
-.ar--form-item {
-  margin-bottom: 1.5rem;
+.react-pdf__Document {
+  line-height: 1;
 }
 
-.ar--form-submit-btn {
-  margin-top: 2rem;
+.hypothesis-highlight {
+  background-color: yellow !important;
 }
 
-.ar--secondary-text {
-  color: #525252;
+.hypothesis-highlight::selection {
+  background-color: blue;
+}
+
+/*Dont hide the scrollbar when modal is open. Prevent manuscript's width from changing and removing highlights*/
+body.bx--body--with-modal-open {
+  overflow: auto;
 }
