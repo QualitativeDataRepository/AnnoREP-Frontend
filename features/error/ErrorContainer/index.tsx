@@ -25,7 +25,7 @@ const ErrorContainer: FC<ErrorContainerProps> = ({ error }) => {
             as="a"
             target="_blank"
             rel="noopener noreferrer"
-            href={`https://github.com/adam3smith/AnnoREP-Frontend/issues/new?assignees=&labels=&template=bug_report.md&title=`}
+            href={`https://github.com/QualitativeDataRepository/AnnoREP-Frontend/issues/new?assignees=&labels=&template=bug_report.md&title=`}
             kind="tertiary"
           >
             Report the issue
