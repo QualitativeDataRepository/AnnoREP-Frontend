@@ -58,7 +58,7 @@ const LoginForm: FC<LoginFormProps> = ({
       <Form onSubmit={onSubmit}>
         <h1 className={formStyles.title}>Login</h1>
         <p className={formStyles.desc}>
-          Give AnnoREP permissions to access your Dataverse resources and write Hypothes.is
+          Give AnnoREP permissions to access your <abbr>QDR</abbr> resources and write Hypothes.is
           annotations on your behalf by providing your Application Programming Interface (
           <abbr>API</abbr>) tokens. Don&apos;t have an <abbr>API</abbr> token? Use the links below
           to generate an <abbr>API</abbr> token.
@@ -69,7 +69,7 @@ const LoginForm: FC<LoginFormProps> = ({
             name="dataverseApiToken"
             labelText={
               <div>
-                Dataverse <abbr>API</abbr> token
+                <abbr>QDR</abbr> <abbr>API</abbr> token
               </div>
             }
             helperText={
@@ -80,7 +80,9 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Login to a Dataverse
+                  <span>
+                    Login to <abbr>QDR</abbr>
+                  </span>
                 </Link>{" "}
                 and get your{" "}
                 <Link
@@ -89,7 +91,9 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Dataverse API token
+                  <span>
+                    <abbr>QDR</abbr> <abbr>API</abbr> token
+                  </span>
                 </Link>
               </div>
             }
@@ -97,7 +101,7 @@ const LoginForm: FC<LoginFormProps> = ({
             invalidText={dataverseApiTokenInvalidText}
             required={true}
             aria-required={true}
-            placeholder="Enter your Dataverse API token"
+            placeholder="Enter your QDR API token"
             size="xl"
             type="text"
             autoComplete="on"
@@ -131,7 +135,9 @@ const LoginForm: FC<LoginFormProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Hypothes.is API token
+                  <span>
+                    Hypothes.is <abbr>API</abbr> token
+                  </span>
                 </Link>
               </div>
             }
