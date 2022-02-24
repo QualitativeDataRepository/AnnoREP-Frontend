@@ -83,7 +83,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             return qs.stringify(params, { indices: false })
           },
           headers: {
-            [REQUEST_DESC_HEADER_NAME]: `Searching for non ${ANNOREP_METADATA_VALUE} datasets`,
+            [REQUEST_DESC_HEADER_NAME]: `Searching for non ${ANNOREP_METADATA_VALUE} data projects`,
           },
         }
       )

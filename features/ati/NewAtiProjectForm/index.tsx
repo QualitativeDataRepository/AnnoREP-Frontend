@@ -170,7 +170,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
       .then(() => {
         taskDispatch({
           type: TaskActionType.FINISH,
-          payload: `Created ATI project for dataset ${selectedDataset?.label}.`,
+          payload: `Created ATI project for data project ${selectedDataset?.label}.`,
         })
         router.push(`/ati/${selectedDataset?.id}/${AtiTab.summary.id}`)
       })
@@ -187,8 +187,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             New <abbr>ATI</abbr> Project
           </h1>
           <p className={formStyles.desc}>
-            Link to a Dataverse dataset and upload a manuscript to create a new <abbr>ATI</abbr>{" "}
-            project
+            Link to a <abbr>QDR</abbr> data project and upload a manuscript to create a new{" "}
+            <abbr>ATI</abbr> project
           </p>
           {taskState.status !== "inactive" && (
             <div className={formStyles.item}>
@@ -212,7 +212,9 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               placeholder={getSearchPlaceholder(state)}
               titleText={
                 <div className={styles.searchTitle}>
-                  <div>{"Link to a Dataverse dataset"}</div>
+                  <div>
+                    Link to a <abbr>QDR</abbr> data project
+                  </div>
                   <div>
                     {state.status !== "error" && (
                       <InlineLoading
@@ -224,7 +226,12 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
                   </div>
                 </div>
               }
-              helperText="If your dataset is already stored in a Dataverse, choose a dataset to link to your ATI project."
+              helperText={
+                <span>
+                  If your data project is already stored on <abbr>QDR</abbr>, choose a data project
+                  to link to your <abbr>ATI</abbr> project.
+                </span>
+              }
               invalid={state.error !== ""}
               invalidText={getErrorMsg(state)}
               onInput={memoizedHandleSearch}
@@ -233,11 +240,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             <div>
               <OverflowMenu flipped iconDescription="More options" size="lg">
                 {hasMoreDatasets(state) && (
-                  <OverflowMenuItem
-                    requireTitle
-                    itemText={`Show the next ${state.perPage} dataset(s)`}
-                    onClick={onShowMore}
-                  />
+                  <OverflowMenuItem requireTitle itemText={`Show more`} onClick={onShowMore} />
                 )}
                 <OverflowMenuItem
                   href={`${serverUrl}/dataset.xhtml?ownerId=1`}
@@ -245,7 +248,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
                   rel="noopener noreferrer"
                   hasDivider
                   requireTitle
-                  itemText="Create new dataset"
+                  itemText="Create new"
                 />
               </OverflowMenu>
             </div>

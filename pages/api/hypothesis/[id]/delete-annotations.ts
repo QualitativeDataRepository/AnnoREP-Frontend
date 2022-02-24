@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session) {
       const { id, isAdminAuthor } = req.query
       const { annotations } = req.body
-      const requestDesc = `Deleting annotations from dataset ${id}`
+      const requestDesc = `Deleting annotations from data project ${id}`
       const { hypothesisApiToken: userHypothesisApiToken, hypothesisUserId: userHypothesisUserId } =
         session
       let hypothesisApiToken = userHypothesisApiToken

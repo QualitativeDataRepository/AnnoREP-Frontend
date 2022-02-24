@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const requestDesc = `Deleting ${ANNOREP_METADATA_VALUE} metadata from dataset ${id}`
+      const requestDesc = `Deleting ${ANNOREP_METADATA_VALUE} metadata from data project ${id}`
       try {
         const { status, data } = await axios({
           method: "PUT",

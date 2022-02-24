@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const requestDesc = `Submitting dataset ${id} for review`
+      const requestDesc = `Submitting data project ${id} for review`
       try {
         const { status, data } = await axios({
           method: "POST",
