@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return new Promise<void>((resolve) => {
         const { id } = req.query
         const { dataverseApiToken } = session
-        const requestDesc = `Adding manuscript to dataset ${id}`
+        const requestDesc = `Adding manuscript to data project ${id}`
         const form = formidable({ multiples: false })
         form.parse(req, async (err, _, files) => {
           const manuscript = files.manuscript as formidable.File

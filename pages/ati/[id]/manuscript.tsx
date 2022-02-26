@@ -68,7 +68,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-          [REQUEST_DESC_HEADER_NAME]: `Getting JSON for dataset ${datasetId}`,
+          [REQUEST_DESC_HEADER_NAME]: `Getting JSON for data project ${datasetId}`,
           Accept: "application/json",
         },
       })

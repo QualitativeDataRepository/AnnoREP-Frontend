@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
-      const requestDesc = `Adding ${ANNOREP_METADATA_VALUE} metadata to dataset ${id}`
+      const requestDesc = `Adding ${ANNOREP_METADATA_VALUE} metadata to data project ${id}`
       try {
         const { status, data } = await axios({
           method: "PUT",

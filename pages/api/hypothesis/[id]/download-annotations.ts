@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { hypothesisApiToken: userHypothesisApiToken } = session
       const hypothesisApiToken =
         isAdminAuthor === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
-      const requestDesc = `Getting annotations from Hypothes.is server for dataset ${id}`
+      const requestDesc = `Getting annotations from Hypothes.is server for data project ${id}`
       await axios
         //Get the total annotations
         .get(searchEndpoint, {

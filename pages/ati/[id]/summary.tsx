@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-          [REQUEST_DESC_HEADER_NAME]: `Getting JSON for dataset ${datasetId}`,
+          [REQUEST_DESC_HEADER_NAME]: `Getting JSON for data project ${datasetId}`,
           Accept: "application/json",
         },
       })
@@ -97,7 +97,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               return qs.stringify(params, { indices: false })
             },
             headers: {
-              [REQUEST_DESC_HEADER_NAME]: `Searching for dataset ${dsPersistentId}`,
+              [REQUEST_DESC_HEADER_NAME]: `Searching for data project ${dsPersistentId}`,
             },
           }),
         ]
@@ -109,7 +109,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               responseType: "arraybuffer",
               headers: {
                 [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-                [REQUEST_DESC_HEADER_NAME]: `Getting the zip for dataset ${datasetId}`,
+                [REQUEST_DESC_HEADER_NAME]: `Getting the zip for data project ${datasetId}`,
                 Accept: "application/zip",
               },
             })

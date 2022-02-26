@@ -79,7 +79,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
       .then(() => {
         taskDispatch({
           type: TaskActionType.FINISH,
-          payload: `Deleted ATI project from dataset ${dataset.title}.`,
+          payload: `Deleted ATI project from data project ${dataset.title}.`,
         })
         router.push("/")
       })
@@ -97,8 +97,8 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             Delete <abbr>ATI</abbr> project
           </div>
           <p className={styles.desc}>
-            Unmark the Dataverse dataset as an <abbr>ATI</abbr> project and remove the manuscript
-            file.
+            Unmark the <abbr>QDR</abbr> data project as an <abbr>ATI</abbr> project and remove the
+            manuscript file.
           </p>
           {taskState.status !== "inactive" && (
             <div className={formStyles.item}>

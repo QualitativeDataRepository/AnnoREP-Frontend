@@ -66,7 +66,7 @@ describe("getResultDesc", () => {
       fetchQ: false,
       error: "",
     }
-    expect(getResultDesc(initialState)).toEqual("1 dataset(s)")
+    expect(getResultDesc(initialState)).toEqual("1 data project(s)")
 
     act(() => {
       initialState = {
@@ -75,7 +75,7 @@ describe("getResultDesc", () => {
         totalCount: 11,
       }
     })
-    expect(getResultDesc(initialState)).toEqual("10 of 11 dataset(s)")
+    expect(getResultDesc(initialState)).toEqual("10 of 11 data project(s)")
 
     act(() => {
       initialState.status = "active"

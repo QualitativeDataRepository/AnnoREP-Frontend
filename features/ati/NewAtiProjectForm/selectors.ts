@@ -10,9 +10,9 @@ export const getItems = (state: ISearchDatasetState): { id: string; label: strin
 export const getResultDesc = (state: ISearchDatasetState): string => {
   if (["inactive", "finished"].includes(state.status)) {
     if (state.currentTotal < state.totalCount) {
-      return `${state.currentTotal} of ${state.totalCount} dataset(s)`
+      return `${state.currentTotal} of ${state.totalCount} data project(s)`
     } else {
-      return `${state.totalCount} dataset(s)`
+      return `${state.totalCount} data project(s)`
     }
   } else if (state.status === "active") {
     return "Searching..."
@@ -22,11 +22,11 @@ export const getResultDesc = (state: ISearchDatasetState): string => {
 }
 
 export const getErrorMsg = (state: ISearchDatasetState): string => {
-  return `${state.error} Please create a new dataset.`
+  return `${state.error} Please create a new data project.`
 }
 
 export const hasMoreDatasets = (state: ISearchDatasetState): boolean =>
   state.currentTotal < state.totalCount
 
 export const getSearchPlaceholder = (state: ISearchDatasetState): string =>
-  state.totalCount === 0 ? "Please create a new dataset" : "Please choose a dataset"
+  state.totalCount === 0 ? "Please create a new data project" : "Please choose a data project"

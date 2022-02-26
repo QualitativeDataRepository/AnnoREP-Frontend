@@ -31,7 +31,7 @@ Invalid.args = {
   dataverseSiteUrl: "https://dev-aws.qdr.org",
   dataverseApiToken: "123",
   dataverseApiTokenIsInvalid: true,
-  dataverseApiTokenInvalidText: "A valid Dataverse API token is required.",
+  dataverseApiTokenInvalidText: "A valid QDR API token is required.",
   hypothesisApiToken: "123",
   hypothesisApiTokenIsInvalid: true,
   hypothesisApiTokenInvalidText: "A valid Hypothes.is API token is required.",
