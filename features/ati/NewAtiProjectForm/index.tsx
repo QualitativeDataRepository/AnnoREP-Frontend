@@ -172,7 +172,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           type: TaskActionType.FINISH,
           payload: `Created ATI project for data project ${selectedDataset?.label}.`,
         })
-        router.push(`/ati/${selectedDataset?.id}/${AtiTab.summary.id}`)
+        router.push(`/ati/${selectedDataset?.id}/${AtiTab.manuscript.id}`)
       })
       .catch((error) => {
         taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
