@@ -71,9 +71,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
         )}
         {datasources.map(({ id, name, uri }) => (
           <div key={id} className={styles.datasource}>
-            <Link target="_blank" rel="noopener noreferrer" size="lg" href={uri}>
-              {name}
-            </Link>
+            <p>{name}</p>
             <CopyToClipboard key={id} text={uri}>
               <CopyButton
                 feedback="Copied!"
