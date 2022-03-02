@@ -8,8 +8,6 @@ import formStyles from "../../../styles/Form.module.css"
 export interface LoginFormProps {
   /**The dataverse server url */
   dataverseServerUrl: string
-  /**The dataverse site url */
-  dataverseSiteUrl: string
   /**The dataverse api token */
   dataverseApiToken: string
   /**Is the dataverse api token valid? */
@@ -33,7 +31,6 @@ export interface LoginFormProps {
 /** Login Form */
 const LoginForm: FC<LoginFormProps> = ({
   dataverseServerUrl,
-  dataverseSiteUrl,
   dataverseApiToken,
   dataverseApiTokenIsInvalid,
   dataverseApiTokenInvalidText,
@@ -74,17 +71,7 @@ const LoginForm: FC<LoginFormProps> = ({
             }
             helperText={
               <div>
-                <Link
-                  size="sm"
-                  href={`${dataverseSiteUrl}/user/login`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    Login to <abbr>QDR</abbr>
-                  </span>
-                </Link>{" "}
-                and get your{" "}
+                Get your{" "}
                 <Link
                   size="sm"
                   href={`${dataverseServerUrl}/dataverseuser.xhtml#dataverseUserForm:dataRelatedToMeView:apiTokenTab`}
@@ -120,15 +107,7 @@ const LoginForm: FC<LoginFormProps> = ({
             }
             helperText={
               <div>
-                <Link
-                  size="sm"
-                  href="https://hypothes.is/login"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Login to Hypothes.is
-                </Link>{" "}
-                and get your{" "}
+                Get your{" "}
                 <Link
                   size="sm"
                   href="https://hypothes.is/account/developer"
