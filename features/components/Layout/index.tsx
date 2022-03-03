@@ -25,8 +25,8 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, has
       const hClient = document.createElement("script")
       hClient.src = "https://hypothes.is/embed.js"
       hClient.async = true
-      document.body.appendChild(hClientConfig)
-      document.body.appendChild(hClient)
+      document.head.appendChild(hClientConfig)
+      document.head.appendChild(hClient)
     }
   }, [hasPdf])
 
