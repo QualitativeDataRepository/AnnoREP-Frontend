@@ -74,7 +74,7 @@ const LoginForm: FC<LoginFormProps> = ({
                 Get your{" "}
                 <Link
                   size="sm"
-                  href={`${dataverseServerUrl}/dataverseuser.xhtml#dataverseUserForm:dataRelatedToMeView:apiTokenTab`}
+                  href={`${dataverseServerUrl}/dataverseuser.xhtml?selectTab=apiTokenTab`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
