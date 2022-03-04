@@ -15,11 +15,10 @@ import {
 
 interface LoginProps {
   serverUrl: string
-  siteUrl: string
   isLoggedIn: boolean
 }
 
-const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl, siteUrl }) => {
+const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
   const router = useRouter()
 
   const [dataverseApiToken, setDataverseApiToken] = useState<string>("")
@@ -61,7 +60,6 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl, siteUrl }) => {
     <Layout isLoggedIn={false} title="AnnoREP - Login">
       <LoginForm
         dataverseServerUrl={serverUrl}
-        dataverseSiteUrl={siteUrl}
         dataverseApiToken={dataverseApiToken}
         dataverseApiTokenIsInvalid={dataverseApiTokenIsInvalid}
         dataverseApiTokenInvalidText={dataverseApiTokenInvalidText}
@@ -84,7 +82,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       isLoggedIn: session ? true : false,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
-      siteUrl: process.env.DATAVERSE_SITE_URL,
     },
   }
 }
