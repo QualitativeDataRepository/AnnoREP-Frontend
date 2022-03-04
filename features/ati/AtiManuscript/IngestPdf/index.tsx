@@ -42,6 +42,7 @@ const IngestPdf: FC<IngestPdfProps> = ({ pdf }) => {
               width={size.width as number}
               renderMode="canvas"
               renderAnnotationLayer={false}
+              loading=""
             />
           ))}
         </Document>

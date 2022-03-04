@@ -1,7 +1,7 @@
-import { ReactNode, FC } from "react"
+import { ReactNode, FC, useEffect } from "react"
 
-import Head from "next/head"
 import DOMPurify from "isomorphic-dompurify"
+import Head from "next/head"
 
 import AppBar from "../AppBar"
 
@@ -16,6 +16,20 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, hasPdf }) => {
+  useEffect(() => {
+    if (hasPdf) {
+      const hClientConfig = document.createElement("script")
+      hClientConfig.type = "application/json"
+      hClientConfig.className = "js-hypothesis-config"
+      hClientConfig.innerHTML = DOMPurify.sanitize(JSON.stringify({ openSidebar: true }))
+      const hClient = document.createElement("script")
+      hClient.src = "https://hypothes.is/embed.js"
+      hClient.async = true
+      document.head.appendChild(hClientConfig)
+      document.head.appendChild(hClient)
+    }
+  }, [hasPdf])
+
   return (
     <>
       <Head>
@@ -23,18 +37,6 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, has
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      {hasPdf && (
-        <>
-          <script
-            type="application/json"
-            className="js-hypothesis-config"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(JSON.stringify({ openSidebar: true })),
-            }}
-          ></script>
-          <script async src="https://hypothes.is/embed.js"></script>
-        </>
-      )}
       <div className={styles.container}>
         <AppBar isLoggedIn={isLoggedIn} />
         <main className={`${styles.main} ${isFullWidth ? styles.fullMaxWidth : styles.maxWidth}`}>
