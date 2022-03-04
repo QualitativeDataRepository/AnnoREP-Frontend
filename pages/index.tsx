@@ -1,11 +1,11 @@
 import { FC } from "react"
 
 import axios from "axios"
+import { InlineNotification, NotificationActionButton } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
+import { useRouter } from "next/router"
 import qs from "qs"
-
-import { InlineNotification } from "carbon-components-react"
 
 import AtiProjects from "../features/ati/AtiProjects"
 import AppGuide from "../features/components/AppGuide"
@@ -43,6 +43,7 @@ const Home: FC<HomeProps> = ({
   publicationStatusCount,
   selectedFilters,
 }) => {
+  const router = useRouter()
   return (
     <Layout isLoggedIn={isLoggedIn} title="AnnoREP - Home">
       <>
@@ -54,8 +55,12 @@ const Home: FC<HomeProps> = ({
                 hideCloseButton
                 lowContrast
                 kind={errorMsg ? "error" : "info"}
-                subtitle={<span>{errorMsg ? errorMsg : "No ATI projects found."}</span>}
-                title={errorMsg ? "Error!" : "Status"}
+                title={errorMsg ? errorMsg : "You have no ATI projects."}
+                actions={
+                  <NotificationActionButton onClick={() => router.push("/new")}>
+                    Create new
+                  </NotificationActionButton>
+                }
               />
             ) : (
               <AtiProjects
@@ -121,8 +126,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props.atisPerPage = data.data.pagination.docsPerPage
         props.publicationStatusCount = data.data.pubstatus_counts
         props.selectedFilters = data.data.selected_filters
-      } else {
-        props.errorMsg = data.error_message
       }
     } catch (e) {
       const { message } = getResponseFromError(e)
