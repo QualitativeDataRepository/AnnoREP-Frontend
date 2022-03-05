@@ -26,7 +26,7 @@ const HypothesisLoginNotification: FC = () => {
         lowContrast
         kind="warning-alt"
         statusIconDescription="warning"
-        title="Log in to Hypothes.is to see your annotations in the Annotation sidebar on the right."
+        title="Log in to Hypothes.is in the Annotation sidebar to the right to see your annotations."
         actions={<NotificationActionButton onClick={onClickOK}>OK</NotificationActionButton>}
       />
     )
