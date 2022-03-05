@@ -43,13 +43,13 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
     >
       <ModalHeader
         id="datasources-modal-header"
-        label="Datasources"
-        title="Copy datasource URL"
+        label="Data sources"
+        title="Copy the data source URL and paste it into an annotation on the right"
         iconDescription="Close"
       />
       <ModalBody
         id="datasources-modal-body"
-        aria-label="Datasource URLs"
+        aria-label="Data source URLs"
         hasScrollingContent={true}
       >
         <Link
@@ -58,15 +58,14 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
           rel="noopener noreferrer"
           size="lg"
         >
-          Modify datasources
+          Add/remove associated data sources
         </Link>
         {datasources.length === 0 && (
           <InlineNotification
             hideCloseButton
             lowContrast
             kind="info"
-            subtitle={<span>No datasource(s) found.</span>}
-            title="Not Found!"
+            title="This project has no data sources."
           />
         )}
         {datasources.map(({ id, name, uri }) => (

@@ -3,7 +3,7 @@ import { FC, FormEventHandler, useReducer, ChangeEvent } from "react"
 import axios from "axios"
 import { Button, Form, FileUploader, InlineNotification, Toggle } from "carbon-components-react"
 import FormData from "form-data"
-import { Document20, TrashCan20, Upload16 } from "@carbon/icons-react"
+import { DocumentAdd20, TrashCan20, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
 import DatasourceModal from "./DatasourceModal"
@@ -66,8 +66,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   )
   const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
 
-  const onClickDeleteManuscript: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault()
+  const onClickDeleteManuscript = () => {
     openDeleteManuscriptModal()
   }
   const handleDeleteManuscript = async () => {
@@ -243,31 +242,22 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         <HypothesisLoginNotification />
         <div className={styles.buttonContainer}>
           <Button
-            className={styles.blackButton}
-            kind="ghost"
+            kind="tertiary"
             size="md"
-            hasIconOnly
-            iconDescription="Show datasources"
-            tooltipPosition="top"
-            tooltipAlignment="start"
             onClick={openDatasourcesModal}
+            renderIcon={DocumentAdd20}
           >
-            <Document20 />
+            Add data sources
           </Button>
           {manuscript.id && (
-            <Form onSubmit={onClickDeleteManuscript} className={styles.deleteManuscript}>
-              <Button
-                className="bx--btn--danger"
-                type="submit"
-                size="md"
-                hasIconOnly
-                iconDescription="Delete manuscript and upload another file"
-                tooltipPosition="top"
-                tooltipAlignment="end"
-              >
-                <TrashCan20 />
-              </Button>
-            </Form>
+            <Button
+              kind="danger"
+              size="md"
+              renderIcon={TrashCan20}
+              onClick={onClickDeleteManuscript}
+            >
+              Delete manuscript
+            </Button>
           )}
         </div>
         {taskState.status !== "inactive" && (

@@ -2,21 +2,16 @@
   min-height: 100vh;
 }
 
-.blackButton > svg {
-  color: black;
-}
-
 .buttonContainer {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0px;
-  justify-content: start;
+  grid-template-columns: 1fr;
+  row-gap: 4px;
   align-items: center;
   background-color: whitesmoke;
 }
 
-.deleteManuscript {
-  justify-self: end;
+.buttonContainer > button {
+  max-width: unset;
 }
 
 .tabContainer {
@@ -34,5 +29,10 @@
 @media (min-width: 42rem) {
   .centerUploadManuscript {
     padding-top: 15vh;
+  }
+
+  .buttonContainer {
+    grid-template-columns: auto auto;
+    justify-content: space-between;
   }
 }
