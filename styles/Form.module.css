@@ -4,17 +4,17 @@
 }
 
 .title {
-  margin-bottom: 4px;
+  margin-bottom: 0.5rem;
 }
 
 .desc {
-  margin-bottom: 32px;
+  margin-bottom: 2.5rem;
 }
 
 .item {
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
 }
 
 .submitBtn {
-  margin-top: 32px;
+  margin-top: 1rem;
 }
