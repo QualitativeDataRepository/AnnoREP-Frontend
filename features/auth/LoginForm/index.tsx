@@ -107,7 +107,16 @@ const LoginForm: FC<LoginFormProps> = ({
             }
             helperText={
               <div>
-                Get your{" "}
+                <Link
+                  size="sm"
+                  href="https://hypothes.is/login"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Login to Hypothes.is
+                </Link>
+                {", "}
+                then get your{" "}
                 <Link
                   size="sm"
                   href="https://hypothes.is/account/developer"
