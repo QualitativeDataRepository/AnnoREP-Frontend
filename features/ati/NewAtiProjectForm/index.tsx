@@ -10,7 +10,7 @@ import React, {
 
 import FormData from "form-data"
 import axios from "axios"
-import { Add16 } from "@carbon/icons-react"
+import { Add16, OverflowMenuVertical24 } from "@carbon/icons-react"
 import {
   Button,
   Form,
@@ -18,8 +18,6 @@ import {
   InlineNotification,
   ComboBox,
   InlineLoading,
-  OverflowMenu,
-  OverflowMenuItem,
 } from "carbon-components-react"
 import { debounce } from "lodash"
 import { useRouter } from "next/router"
@@ -201,6 +199,26 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               />
             </div>
           )}
+          <div className={formStyles.item}>
+            <p className="bx--label">
+              Don&apos;t have a <abbr>QDR</abbr> data project?
+            </p>
+            <div>
+              <Button
+                kind="ghost"
+                size="sm"
+                as="a"
+                href={`${serverUrl}/dataset.xhtml?ownerId=1`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Create new
+              </Button>
+              <Button kind="ghost" size="sm" onClick={() => router.reload()}>
+                Refresh page
+              </Button>
+            </div>
+          </div>
           <div className={`${formStyles.item} ${styles.searchBox}`}>
             <ComboBox
               id="dataset-search"
@@ -237,21 +255,19 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               onInput={memoizedHandleSearch}
               onChange={onSelectDataset}
             />
-            <div>
-              <OverflowMenu flipped iconDescription="More options" size="lg">
-                {hasMoreDatasets(state) && (
-                  <OverflowMenuItem requireTitle itemText={`Show more`} onClick={onShowMore} />
-                )}
-                <OverflowMenuItem
-                  href={`${serverUrl}/dataset.xhtml?ownerId=1`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  hasDivider
-                  requireTitle
-                  itemText="Create new"
-                />
-              </OverflowMenu>
-            </div>
+            {hasMoreDatasets(state) && (
+              <Button
+                hasIconOnly
+                kind="tertiary"
+                size="md"
+                iconDescription="More data projects"
+                tooltipPosition="bottom"
+                tooltipAlignment="end"
+                onClick={onShowMore}
+              >
+                <OverflowMenuVertical24 />
+              </Button>
+            )}
           </div>
           <div className={formStyles.item}>
             <FileUploader
