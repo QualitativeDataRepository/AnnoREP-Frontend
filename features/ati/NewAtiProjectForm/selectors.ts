@@ -27,6 +27,3 @@ export const getErrorMsg = (state: ISearchDatasetState): string => {
 
 export const hasMoreDatasets = (state: ISearchDatasetState): boolean =>
   state.currentTotal < state.totalCount
-
-export const getSearchPlaceholder = (state: ISearchDatasetState): string =>
-  state.totalCount === 0 ? "Please create a new data project" : "Please choose a data project"
