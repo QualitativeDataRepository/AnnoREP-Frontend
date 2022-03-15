@@ -77,6 +77,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: SearchDatasetActionType.UPDATE_PAGE })
+  const onRefreshDataProjects = () =>
+    dispatch({ type: SearchDatasetActionType.UPDATE_Q, payload: "" })
 
   const debounceSearch = useMemo(
     () =>
@@ -214,8 +216,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               >
                 Create new
               </Button>
-              <Button kind="ghost" size="sm" onClick={() => router.reload()}>
-                Refresh page
+              <Button kind="ghost" size="sm" onClick={onRefreshDataProjects}>
+                Refresh data projects
               </Button>
             </div>
           </div>
