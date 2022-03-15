@@ -1,17 +1,17 @@
-import { FC, useState, useEffect } from "react"
+import { FC, useEffect } from "react"
 
 import { GetServerSideProps } from "next"
-import { getSession, signIn, SignInResponse } from "next-auth/client"
+import { getSession, signIn } from "next-auth/client"
 import { useRouter } from "next/router"
+
+import useCredential, {
+  initialCredentialState,
+  CredentialActionType,
+} from "../../hooks/useCredential"
 
 import Layout from "../../features/components/Layout"
 import LoginForm from "../../features/auth/LoginForm"
-import {
-  INVALID_DATAVERSE_API_TOKEN,
-  INVALID_HYPOTHESIS_API_TOKEN,
-  LOGIN_ID,
-  SEPARATOR,
-} from "../../features/auth/constants"
+import { LOGIN_ID } from "../../features/auth/constants"
 
 interface LoginProps {
   serverUrl: string
@@ -21,31 +21,36 @@ interface LoginProps {
 const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
   const router = useRouter()
 
-  const [dataverseApiToken, setDataverseApiToken] = useState<string>("")
-  const [dataverseApiTokenIsInvalid, setDataverseApiTokenIsInvalid] = useState<boolean>(false)
-  const [dataverseApiTokenInvalidText, setDataverseApiTokenInvalidText] = useState<string>("")
-  const handleDataverseApiTokenChange = (apiToken: string) => setDataverseApiToken(apiToken)
+  const { state: dataverseApiTokenState, dispatch: dataverseApiTokenDispatch } =
+    useCredential(initialCredentialState)
+  const { state: hypothesisApiTokenState, dispatch: hypothesisApiTokenDispatch } =
+    useCredential(initialCredentialState)
 
-  const [hypothesisApiToken, setHypothesisApiToken] = useState<string>("")
-  const [hypothesisApiTokenIsInvalid, setHypothesisApiTokenIsInvalid] = useState<boolean>(false)
-  const [hypothesisApiTokenInvalidText, setHypothesisApiTokenInvalidText] = useState<string>("")
-  const handleHypothesisApiTokenChange = (apiToken: string) => setHypothesisApiToken(apiToken)
+  const handleDataverseApiTokenChange = (apiToken: string) =>
+    dataverseApiTokenDispatch({ type: CredentialActionType.UPDATE, payload: apiToken })
+  const handleHypothesisApiTokenChange = (apiToken: string) =>
+    hypothesisApiTokenDispatch({ type: CredentialActionType.UPDATE, payload: apiToken })
 
   const handleLogin = () => {
-    signIn(LOGIN_ID, { redirect: false, dataverseApiToken, hypothesisApiToken }).then((res) => {
-      const loginRes = res as unknown as SignInResponse
-      if (loginRes.error) {
-        const [dataverseIsInvalid, hypothesisIsInvalid] = loginRes.error.split(SEPARATOR)
-        if (JSON.parse(dataverseIsInvalid)) {
-          setDataverseApiTokenIsInvalid(true)
-          setDataverseApiTokenInvalidText(INVALID_DATAVERSE_API_TOKEN)
+    signIn(LOGIN_ID, {
+      redirect: false,
+      dataverseApiToken: dataverseApiTokenState.credential,
+      hypothesisApiToken: hypothesisApiTokenState.credential,
+    }).then((loginRes) => {
+      if (loginRes) {
+        if (loginRes.error) {
+          const errorJson = JSON.parse(loginRes.error)
+          dataverseApiTokenDispatch({
+            type: CredentialActionType.VALIDATE,
+            payload: { isInvalid: errorJson[0].hasError, invalidText: errorJson[0].errorMsg },
+          })
+          hypothesisApiTokenDispatch({
+            type: CredentialActionType.VALIDATE,
+            payload: { isInvalid: errorJson[1].hasError, invalidText: errorJson[1].errorMsg },
+          })
+        } else {
+          router.push("/")
         }
-        if (JSON.parse(hypothesisIsInvalid)) {
-          setHypothesisApiTokenIsInvalid(true)
-          setHypothesisApiTokenInvalidText(INVALID_HYPOTHESIS_API_TOKEN)
-        }
-      } else {
-        router.push("/")
       }
     })
   }
@@ -60,12 +65,12 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
     <Layout isLoggedIn={false} title="AnnoREP - Login">
       <LoginForm
         dataverseServerUrl={serverUrl}
-        dataverseApiToken={dataverseApiToken}
-        dataverseApiTokenIsInvalid={dataverseApiTokenIsInvalid}
-        dataverseApiTokenInvalidText={dataverseApiTokenInvalidText}
-        hypothesisApiToken={hypothesisApiToken}
-        hypothesisApiTokenIsInvalid={hypothesisApiTokenIsInvalid}
-        hypothesisApiTokenInvalidText={hypothesisApiTokenInvalidText}
+        dataverseApiToken={dataverseApiTokenState.credential}
+        dataverseApiTokenIsInvalid={dataverseApiTokenState.isInvalid}
+        dataverseApiTokenInvalidText={dataverseApiTokenState.invalidText}
+        hypothesisApiToken={hypothesisApiTokenState.credential}
+        hypothesisApiTokenIsInvalid={hypothesisApiTokenState.isInvalid}
+        hypothesisApiTokenInvalidText={hypothesisApiTokenState.invalidText}
         handleDataverseApiTokenChange={handleDataverseApiTokenChange}
         handleHypothesisApiTokenChange={handleHypothesisApiTokenChange}
         handleLogin={handleLogin}
