@@ -206,7 +206,6 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             <legend className="bx--file--label">
               1. <abbr>QDR</abbr> data project
             </legend>
-
             <div className={`${formStyles.item} ${styles.searchBox}`}>
               <ComboBox
                 id="dataset-search"
