@@ -53,6 +53,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
       .get(`/api/datasets/${datasetId}/data-files`)
       .then(({ data }) => {
         taskDispatch({ type: TaskActionType.FINISH, payload: "" })
+        setTimeout(() => taskDispatch({ type: TaskActionType.RESET }), 2000 /** 2s */)
         setDatasourcesState(data)
       })
       .catch((error) => {
@@ -95,7 +96,6 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
               style={{ marginRight: "0.25rem" }}
               status={taskState.status}
               description={taskState.desc}
-              successDelay={2000 /** 2s */}
             />
           ) : (
             <Button
@@ -110,7 +110,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
             />
           )}
         </div>
-        {datasources.length === 0 && (
+        {datasourcesState.length === 0 && (
           <InlineNotification
             hideCloseButton
             lowContrast
