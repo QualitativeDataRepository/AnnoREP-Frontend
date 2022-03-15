@@ -19,6 +19,13 @@
   max-height: 100%;
 }
 
+.datasourceActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 @media (min-width: 42rem) {
   .datasourceModal {
     width: 320px;

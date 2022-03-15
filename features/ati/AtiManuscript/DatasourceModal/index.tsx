@@ -1,5 +1,7 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 
+import axios from "axios"
+import { Renew20 } from "@carbon/icons-react"
 import {
   ComposedModal,
   ModalBody,
@@ -7,14 +9,21 @@ import {
   Link,
   InlineNotification,
   CopyButton,
+  Button,
+  InlineLoading,
 } from "carbon-components-react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
+import useTask, { TaskActionType } from "../../../../hooks/useTask"
+
 import { IDatasource } from "../../../../types/dataverse"
+import { getMessageFromError } from "../../../../utils/httpRequestUtils"
 
 import styles from "./DatasourceModal.module.css"
 
 export interface DatasourceModalProps {
+  /** The id of the dataset */
+  datasetId: string
   /** Is the datasource modal open? */
   open: boolean
   /** The list of datasources */
@@ -28,12 +37,31 @@ export interface DatasourceModalProps {
 }
 
 const DatasourceModal: FC<DatasourceModalProps> = ({
+  datasetId,
   open,
   datasources,
   serverUrl,
   datasetDoi,
   closeModal,
 }) => {
+  const { state: taskState, dispatch: taskDispatch } = useTask({ status: "inactive", desc: "" })
+  const [datasourcesState, setDatasourcesState] = useState(datasources)
+
+  const handleRefreshDatasources = async () => {
+    taskDispatch({ type: TaskActionType.START, payload: "" })
+    await axios
+      .get(`/api/datasets/${datasetId}/data-files`)
+      .then(({ data }) => {
+        taskDispatch({ type: TaskActionType.FINISH, payload: "" })
+        setDatasourcesState(data)
+      })
+      .catch((error) => {
+        console.warn(getMessageFromError(error))
+        taskDispatch({ type: TaskActionType.FAIL, payload: "" })
+        setTimeout(() => taskDispatch({ type: TaskActionType.RESET }), 3000 /** 3s */)
+      })
+  }
+
   return (
     <ComposedModal
       className={styles.datasourceModal}
@@ -52,14 +80,36 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
         aria-label="Data source URLs"
         hasScrollingContent={true}
       >
-        <Link
-          href={`${serverUrl}/dataset.xhtml?persistentId=${datasetDoi}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          size="lg"
-        >
-          Add/remove associated data sources
-        </Link>
+        <div className={styles.datasourceActions} aria-live="assertive">
+          <Link
+            href={`${serverUrl}/dataset.xhtml?persistentId=${datasetDoi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            size="lg"
+            disabled={taskState.status === "active"}
+          >
+            Add/remove associated data sources
+          </Link>
+          {taskState.status !== "inactive" ? (
+            <InlineLoading
+              style={{ marginRight: "0.25rem" }}
+              status={taskState.status}
+              description={taskState.desc}
+              successDelay={2000 /** 2s */}
+            />
+          ) : (
+            <Button
+              hasIconOnly
+              kind="ghost"
+              size="md"
+              iconDescription="Refresh"
+              tooltipPosition="bottom"
+              tooltipAlignment="center"
+              renderIcon={Renew20}
+              onClick={() => handleRefreshDatasources()}
+            />
+          )}
+        </div>
         {datasources.length === 0 && (
           <InlineNotification
             hideCloseButton
@@ -68,8 +118,13 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
             title="This project has no data sources."
           />
         )}
-        {datasources.map(({ id, name, uri }) => (
-          <div key={id} className={styles.datasource}>
+        {datasourcesState.map(({ id, name, uri }) => (
+          <div
+            key={id}
+            className={styles.datasource}
+            aria-live="assertive"
+            aria-relevant="additions removals"
+          >
             <p>{name}</p>
             <CopyToClipboard key={id} text={uri}>
               <CopyButton

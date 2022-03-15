@@ -36,4 +36,12 @@ describe("taskReducer", () => {
       desc: "test",
     })
   })
+
+  test("handles reset", () => {
+    expect(taskReducer(initialState, { type: TaskActionType.RESET })).toEqual({
+      ...initialState,
+      status: "inactive",
+      desc: "",
+    })
+  })
 })

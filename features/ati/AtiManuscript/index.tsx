@@ -217,6 +217,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   return (
     <>
       <DatasourceModal
+        datasetId={datasetId}
         datasources={datasources}
         serverUrl={serverUrl}
         datasetDoi={doi}

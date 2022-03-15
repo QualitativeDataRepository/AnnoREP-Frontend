@@ -10,6 +10,7 @@ export enum TaskActionType {
   FINISH = "FINISH",
   FAIL = "FAIL",
   NEXT_STEP = "NEXT_STEP",
+  RESET = "RESET",
 }
 
 export type ITaskAction =
@@ -17,6 +18,7 @@ export type ITaskAction =
   | { type: TaskActionType.FINISH; payload: string }
   | { type: TaskActionType.FAIL; payload: string }
   | { type: TaskActionType.NEXT_STEP; payload: string }
+  | { type: TaskActionType.RESET }
 
 export function taskReducer(state: ITaskState, action: ITaskAction): ITaskState {
   switch (action.type) {
@@ -45,6 +47,13 @@ export function taskReducer(state: ITaskState, action: ITaskAction): ITaskState 
       return {
         ...state,
         desc: action.payload,
+      }
+    }
+    case TaskActionType.RESET: {
+      return {
+        ...state,
+        status: "inactive",
+        desc: "",
       }
     }
     default: {
