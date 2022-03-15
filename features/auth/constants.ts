@@ -1,4 +1,4 @@
-export const LOGIN_ID = "login-id"
+export const LOGIN_ID = "credentials"
 
 export const INVALID_DATAVERSE_API_TOKEN = "The QDR API token is invalid."
 
