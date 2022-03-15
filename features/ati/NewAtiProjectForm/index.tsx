@@ -18,19 +18,15 @@ import {
   InlineNotification,
   ComboBox,
   InlineLoading,
+  OrderedList,
+  ListItem,
 } from "carbon-components-react"
 import { debounce } from "lodash"
 import { useRouter } from "next/router"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
 import { AtiTab } from "../../../constants/ati"
-import {
-  getErrorMsg,
-  getItems,
-  getResultDesc,
-  getSearchPlaceholder,
-  hasMoreDatasets,
-} from "./selectors"
+import { getErrorMsg, getItems, getResultDesc, hasMoreDatasets } from "./selectors"
 import { SearchDatasetActionType } from "./state"
 import useSearchDataset from "./useDatasetSearch"
 import useTask, {
@@ -77,6 +73,8 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     error: "",
   })
   const onShowMore = () => dispatch({ type: SearchDatasetActionType.UPDATE_PAGE })
+  const onRefreshDataProjects = () =>
+    dispatch({ type: SearchDatasetActionType.UPDATE_Q, payload: "" })
 
   const debounceSearch = useMemo(
     () =>
@@ -185,8 +183,13 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             New <abbr>ATI</abbr> Project
           </h1>
           <p className={formStyles.desc}>
-            Link to a <abbr>QDR</abbr> data project and upload a manuscript to create a new{" "}
-            <abbr>ATI</abbr> project
+            An <abbr>ATI</abbr> project has two components:
+            <OrderedList native isExpressive>
+              <ListItem>
+                A <abbr>QDR</abbr> data project that holds all metadata as well as any data files
+              </ListItem>
+              <ListItem>A manuscript to annotate</ListItem>
+            </OrderedList>
           </p>
           {taskState.status !== "inactive" && (
             <div className={formStyles.item}>
@@ -199,76 +202,81 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               />
             </div>
           )}
-          <div className={formStyles.item}>
-            <p className="bx--label">
-              Don&apos;t have a <abbr>QDR</abbr> data project?
-            </p>
-            <div>
-              <Button
-                kind="ghost"
-                size="sm"
-                as="a"
-                href={`${serverUrl}/dataset.xhtml?ownerId=1`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Create new
-              </Button>
-              <Button kind="ghost" size="sm" onClick={() => router.reload()}>
-                Refresh page
-              </Button>
+          <fieldset>
+            <legend className="bx--file--label">
+              1. <abbr>QDR</abbr> data project
+            </legend>
+            <div className={`${formStyles.item} ${styles.searchBox}`}>
+              <ComboBox
+                id="dataset-search"
+                name="dataset"
+                required={true}
+                aria-required={true}
+                items={getItems(state)}
+                itemToString={(item) => item?.label || ""}
+                placeholder="Please choose a data project"
+                titleText={
+                  <div className={styles.searchTitle}>
+                    <div>
+                      Link to a <abbr>QDR</abbr> data project
+                    </div>
+                    <div>
+                      {state.status !== "error" && (
+                        <InlineLoading
+                          className={styles.searchLoader}
+                          status={state.status}
+                          description={getResultDesc(state)}
+                        />
+                      )}
+                    </div>
+                  </div>
+                }
+                helperText={
+                  <span>
+                    If your data project is already stored on <abbr>QDR</abbr>, choose a data
+                    project to link to your <abbr>ATI</abbr> project.
+                  </span>
+                }
+                invalid={state.error !== ""}
+                invalidText={getErrorMsg(state)}
+                onInput={memoizedHandleSearch}
+                onChange={onSelectDataset}
+              />
+              {hasMoreDatasets(state) && (
+                <Button
+                  hasIconOnly
+                  kind="tertiary"
+                  size="md"
+                  iconDescription="More data projects"
+                  tooltipPosition="bottom"
+                  tooltipAlignment="end"
+                  onClick={onShowMore}
+                >
+                  <OverflowMenuVertical24 />
+                </Button>
+              )}
             </div>
-          </div>
-          <div className={`${formStyles.item} ${styles.searchBox}`}>
-            <ComboBox
-              id="dataset-search"
-              name="dataset"
-              required={true}
-              aria-required={true}
-              items={getItems(state)}
-              itemToString={(item) => item?.label || ""}
-              placeholder={getSearchPlaceholder(state)}
-              titleText={
-                <div className={styles.searchTitle}>
-                  <div>
-                    Link to a <abbr>QDR</abbr> data project
-                  </div>
-                  <div>
-                    {state.status !== "error" && (
-                      <InlineLoading
-                        className={styles.searchLoader}
-                        status={state.status}
-                        description={getResultDesc(state)}
-                      />
-                    )}
-                  </div>
-                </div>
-              }
-              helperText={
-                <span>
-                  If your data project is already stored on <abbr>QDR</abbr>, choose a data project
-                  to link to your <abbr>ATI</abbr> project.
-                </span>
-              }
-              invalid={state.error !== ""}
-              invalidText={getErrorMsg(state)}
-              onInput={memoizedHandleSearch}
-              onChange={onSelectDataset}
-            />
-            {hasMoreDatasets(state) && (
-              <Button
-                hasIconOnly
-                kind="tertiary"
-                size="md"
-                iconDescription="More data projects"
-                tooltipPosition="bottom"
-                tooltipAlignment="end"
-                onClick={onShowMore}
-              >
-                <OverflowMenuVertical24 />
-              </Button>
-            )}
-          </div>
+            <div className={formStyles.item}>
+              <p className="bx--label">
+                Don&apos;t have a <abbr>QDR</abbr> data project?
+              </p>
+              <div>
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  as="a"
+                  href={`${serverUrl}/dataset.xhtml?ownerId=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Create new
+                </Button>
+                <Button kind="ghost" size="sm" onClick={onRefreshDataProjects}>
+                  Refresh data projects
+                </Button>
+              </div>
+            </div>
+          </fieldset>
           <div className={formStyles.item}>
             <FileUploader
               aria-required={true}
@@ -283,7 +291,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               filenameStatus="edit"
               iconDescription="Clear file"
               labelDescription="Supported file types are .docx and .pdf."
-              labelTitle="Manuscript"
+              labelTitle="2. Manuscript"
               name="manuscript"
               size="small"
               onDelete={onClearFile}
@@ -291,7 +299,9 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
             />
           </div>
           <Button className={formStyles.submitBtn} type="submit" renderIcon={Add16}>
-            Create project
+            <span>
+              Create <abbr>ATI</abbr> project
+            </span>
           </Button>
         </Form>
       </div>

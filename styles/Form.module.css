@@ -11,6 +11,11 @@
   margin-bottom: 2.5rem;
 }
 
+/** indent the list */
+.desc > ol {
+  margin-left: 2rem;
+}
+
 .item {
   margin-bottom: 2rem;
 }
