@@ -3,7 +3,7 @@ import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
 
 import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
-import { LOGIN_ID, SEPARATOR } from "../../../features/auth/constants"
+import { INVALID_HYPOTHESIS_API_TOKEN, LOGIN_ID } from "../../../features/auth/constants"
 
 interface Creds {
   dataverseApiToken: string
@@ -27,7 +27,7 @@ export default NextAuth({
           hypothesisApiToken: "",
           hypothesisUserId: null,
         }
-        /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+        let dataverseErrorMsg
         try {
           const { status, data } = await axios.get(
             `${process.env.DATAVERSE_SERVER_URL}/api/users/:me`,
@@ -40,12 +40,11 @@ export default NextAuth({
           if (status === 200 && data.status === "OK") {
             user.dataverseApiToken = creds.dataverseApiToken.trim()
           }
-        } catch (error) {}
-        /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+        } catch (e) {
+          dataverseErrorMsg = (e as any).response.data.message
+        }
         try {
-          const { data } = await axios({
-            method: "GET",
-            url: `${process.env.HYPOTHESIS_SERVER_URL}/api/profile`,
+          const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
             headers: {
               Authorization: `Bearer ${creds.hypothesisApiToken.trim()}`,
             },
@@ -54,10 +53,22 @@ export default NextAuth({
             user.hypothesisApiToken = creds.hypothesisApiToken.trim()
             user.hypothesisUserId = data.userid
           }
-        } catch (error) {}
+        } catch (e) {
+          console.warn(`Failed to login to Hypothes.is: ${e}`)
+        }
+
         if (user.dataverseApiToken === "" || user.hypothesisApiToken === "") {
           throw new Error(
-            `${user.dataverseApiToken === ""}${SEPARATOR}${user.hypothesisApiToken === ""}`
+            JSON.stringify([
+              {
+                hasError: user.dataverseApiToken === "",
+                errorMsg: dataverseErrorMsg,
+              },
+              {
+                hasError: user.hypothesisApiToken === "",
+                errorMsg: INVALID_HYPOTHESIS_API_TOKEN,
+              },
+            ])
           )
         } else {
           return user
