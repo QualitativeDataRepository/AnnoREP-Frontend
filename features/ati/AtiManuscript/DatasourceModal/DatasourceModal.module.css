@@ -26,6 +26,10 @@
   gap: 16px;
 }
 
+.inlineLoading {
+  margin-right: 0.25rem;
+}
+
 @media (min-width: 42rem) {
   .datasourceModal {
     width: 320px;

@@ -93,7 +93,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
           </Link>
           {taskState.status !== "inactive" ? (
             <InlineLoading
-              style={{ marginRight: "0.25rem" }}
+              className={styles.inlineLoading}
               status={taskState.status}
               description={taskState.desc}
             />
