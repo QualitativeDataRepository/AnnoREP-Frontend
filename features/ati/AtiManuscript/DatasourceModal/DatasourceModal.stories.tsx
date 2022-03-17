@@ -18,6 +18,11 @@ Default.args = {
       name: "Datasource",
       uri: "https://datasource-uri.com",
     },
+    {
+      id: "datasource-id-2",
+      name: "Datasourcefffffff-fffffffffff_fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff.tab",
+      uri: "https://datasource-uri.com",
+    },
   ],
   datasetDoi: "dataset-doi",
   serverUrl: "https://test.com",

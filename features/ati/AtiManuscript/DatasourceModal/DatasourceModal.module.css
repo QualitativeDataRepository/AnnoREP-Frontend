@@ -1,9 +1,6 @@
-.datasource {
+.datasources {
   padding-top: 24px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  row-gap: 24px;
 }
 
 .datasourceModal {
@@ -19,11 +16,12 @@
   max-height: 100%;
 }
 
-.datasourceActions {
+.twoColumns {
   display: grid;
   grid-template-columns: 1fr auto;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
+  column-gap: 16px;
 }
 
 .inlineLoading {
