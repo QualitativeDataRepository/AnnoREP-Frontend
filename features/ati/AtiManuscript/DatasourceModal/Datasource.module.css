@@ -1,0 +1,5 @@
+.datasource {
+  text-overflow: clip;
+  overflow: hidden;
+  white-space: nowrap;
+}
