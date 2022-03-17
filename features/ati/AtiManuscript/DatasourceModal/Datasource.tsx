@@ -18,7 +18,7 @@ const Datasource: FC<DatasourceProps> = ({ name }) => {
         setRequireTitle(true)
       }
     }
-  }, [name])
+  }, [])
 
   return (
     <p ref={ref} title={requireTitle ? name : undefined} className={styles.datasource}>
