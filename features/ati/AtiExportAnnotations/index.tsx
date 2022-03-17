@@ -1,4 +1,4 @@
-import { FC, useState, FormEventHandler, useEffect } from "react"
+import { FC, useState, FormEventHandler, useEffect, useRef } from "react"
 
 import axios from "axios"
 import { Export16, TrashCan16 } from "@carbon/icons-react"
@@ -11,7 +11,9 @@ import {
   Select,
   SelectItem,
   Toggle,
+  NotificationActionButton,
 } from "carbon-components-react"
+import CopyToClipboard from "react-copy-to-clipboard"
 
 import { AtiTab } from "../../../constants/ati"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
@@ -48,6 +50,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   manuscript,
   hypothesisGroups,
 }) => {
+  const exportHypothesisUrl = useRef("")
   const { state: exportTaskState, dispatch: exportTaskDispatch } = useTask({
     status: "inactive",
     desc: "",
@@ -129,9 +132,19 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         )
       })
       .then(({ data }) => {
+        const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
+        exportHypothesisUrl.current = hypothesisUrl
+        const payload = (
+          <span>
+            {`Exported ${data.totalExported} annotation(s) to your`}
+            <Link href={hypothesisUrl} size="lg" target="_blank" rel="noopener noreferrer">
+              destination <abbr>URL</abbr>
+            </Link>
+          </span>
+        )
         exportTaskDispatch({
           type: TaskActionType.FINISH,
-          payload: `Exported ${data.totalExported} annotation(s) from ${manuscript.name} to ${target.destinationUrl.value}.`,
+          payload,
         })
       })
       .catch((e) => {
@@ -217,8 +230,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(exportTaskState)}
-                subtitle={<span>{exportTaskState.desc}</span>}
+                subtitle={exportTaskState.desc}
                 title={getTaskStatus(exportTaskState)}
+                actions={
+                  exportTaskState.status === "finished" ? (
+                    <CopyToClipboard text={exportHypothesisUrl.current}>
+                      <NotificationActionButton>
+                        Copy <abbr>URL</abbr>
+                      </NotificationActionButton>
+                    </CopyToClipboard>
+                  ) : undefined
+                }
               />
             </div>
           )}
