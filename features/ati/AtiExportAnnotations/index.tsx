@@ -136,9 +136,11 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         exportHypothesisUrl.current = hypothesisUrl
         const payload = (
           <span>
-            {`Exported ${data.totalExported} annotation(s) to your`}
-            <Link href={hypothesisUrl} size="lg" target="_blank" rel="noopener noreferrer">
-              destination <abbr>URL</abbr>
+            {`Exported ${data.totalExported} annotation(s) to your`}{" "}
+            <Link href={hypothesisUrl} size="md" target="_blank" rel="noopener noreferrer">
+              <span>
+                destination <abbr>URL</abbr>
+              </span>
             </Link>
           </span>
         )
@@ -236,7 +238,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                   exportTaskState.status === "finished" ? (
                     <CopyToClipboard text={exportHypothesisUrl.current}>
                       <NotificationActionButton>
-                        Copy <abbr>URL</abbr>
+                        <span>
+                          Copy <abbr>URL</abbr>
+                        </span>
                       </NotificationActionButton>
                     </CopyToClipboard>
                   ) : undefined
