@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import React, { FC, useState } from "react"
 
 import axios from "axios"
 import { Renew20 } from "@carbon/icons-react"
@@ -15,6 +15,8 @@ import {
 import CopyToClipboard from "react-copy-to-clipboard"
 
 import useTask, { TaskActionType } from "../../../../hooks/useTask"
+
+import Datasource from "./Datasource"
 
 import { IDatasource } from "../../../../types/dataverse"
 import { getMessageFromError } from "../../../../utils/httpRequestUtils"
@@ -81,7 +83,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
         aria-label="Data source URLs"
         hasScrollingContent={true}
       >
-        <div className={styles.datasourceActions} aria-live="assertive">
+        <div className={styles.twoColumns} aria-live="assertive">
           <Link
             href={`${serverUrl}/dataset.xhtml?persistentId=${datasetDoi}`}
             target="_blank"
@@ -118,23 +120,24 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
             title="This project has no data sources."
           />
         )}
-        {datasourcesState.map(({ id, name, uri }) => (
-          <div
-            key={id}
-            className={styles.datasource}
-            aria-live="assertive"
-            aria-relevant="additions removals"
-          >
-            <p>{name}</p>
-            <CopyToClipboard key={id} text={uri}>
-              <CopyButton
-                feedback="Copied!"
-                feedbackTimeout={3000}
-                iconDescription="Copy URL to clipboard"
-              />
-            </CopyToClipboard>
-          </div>
-        ))}
+        <div
+          className={`${styles.datasources} ${styles.twoColumns}`}
+          aria-live="assertive"
+          aria-relevant="additions removals"
+        >
+          {datasourcesState.map(({ id, name, uri }) => (
+            <React.Fragment key={id}>
+              <Datasource name={name} />
+              <CopyToClipboard key={id} text={uri}>
+                <CopyButton
+                  feedback="Copied!"
+                  feedbackTimeout={3000}
+                  iconDescription="Copy URL to clipboard"
+                />
+              </CopyToClipboard>
+            </React.Fragment>
+          ))}
+        </div>
       </ModalBody>
     </ComposedModal>
   )
