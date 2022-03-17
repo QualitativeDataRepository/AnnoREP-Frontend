@@ -11,7 +11,7 @@ import {
   Select,
   SelectItem,
   Toggle,
-  NotificationActionButton,
+  CopyButton,
 } from "carbon-components-react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
@@ -136,11 +136,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         exportHypothesisUrl.current = hypothesisUrl
         const payload = (
           <span>
-            {`Exported ${data.totalExported} annotation(s) to your`}{" "}
+            {`Exported ${data.totalExported} annotation(s). Your manuscript with annotation(s) can
+            be accessed at your`}{" "}
             <Link href={hypothesisUrl} size="md" target="_blank" rel="noopener noreferrer">
               <span>
                 destination <abbr>URL</abbr>
               </span>
+              .
             </Link>
           </span>
         )
@@ -236,13 +238,16 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 title={getTaskStatus(exportTaskState)}
                 actions={
                   exportTaskState.status === "finished" ? (
-                    <CopyToClipboard text={exportHypothesisUrl.current}>
-                      <NotificationActionButton>
-                        <span>
-                          Copy <abbr>URL</abbr>
-                        </span>
-                      </NotificationActionButton>
-                    </CopyToClipboard>
+                    <div className={styles.copyAction}>
+                      <CopyToClipboard text={exportHypothesisUrl.current}>
+                        <CopyButton
+                          className={styles.copyButton}
+                          feedback="Copied!"
+                          feedbackTimeout={3000}
+                          iconDescription="Copy URL to clipboard"
+                        />
+                      </CopyToClipboard>
+                    </div>
                   ) : undefined
                 }
               />

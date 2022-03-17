@@ -16,3 +16,23 @@
   border: 1px solid red;
   border-radius: 10px;
 }
+
+.copyAction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.copyButton {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.copyButton > svg {
+  fill: #0f62fe;
+}
+
+.copyButton:hover {
+  background-color: white;
+}
