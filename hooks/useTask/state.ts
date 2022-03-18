@@ -1,5 +1,5 @@
-import { InlineLoadingStatus } from "carbon-components-react"
 import { ReactNode } from "react"
+import { InlineLoadingStatus } from "carbon-components-react"
 
 export interface ITaskState {
   status: InlineLoadingStatus
