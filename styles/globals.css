@@ -14,11 +14,6 @@ a {
   box-sizing: border-box;
 }
 
-.bx--inline-notification {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
 .react-pdf__Page__textContent span {
   opacity: 0.25;
 }
