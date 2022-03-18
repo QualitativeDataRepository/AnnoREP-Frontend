@@ -1,8 +1,9 @@
+import { ReactNode } from "react"
 import { InlineLoadingStatus } from "carbon-components-react"
 
 export interface ITaskState {
   status: InlineLoadingStatus
-  desc: string
+  desc: ReactNode
 }
 
 export enum TaskActionType {
@@ -15,7 +16,7 @@ export enum TaskActionType {
 
 export type ITaskAction =
   | { type: TaskActionType.START; payload: string }
-  | { type: TaskActionType.FINISH; payload: string }
+  | { type: TaskActionType.FINISH; payload: ReactNode }
   | { type: TaskActionType.FAIL; payload: string }
   | { type: TaskActionType.NEXT_STEP; payload: string }
   | { type: TaskActionType.RESET }
