@@ -8,19 +8,21 @@ import qs from "qs"
 import AtiSummary from "../../../features/ati/AtiSummary"
 import AtiTab from "../../../features/ati/AtiTab"
 
+import { AtiTab as AtiTabConstant } from "../../../constants/ati"
 import {
   DATASET_DV_TYPE,
   DATAVERSE_HEADER_NAME,
   PUBLICATION_STATUSES,
 } from "../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
-import { AtiTab as AtiTabConstant } from "../../../constants/ati"
+import { IAnnoRepUser } from "../../../types/auth"
 import { IATIProjectDetails } from "../../../types/dataverse"
+import { getAnnoRepUser } from "../../../utils/authUtils"
 import { createAtiProjectDetails } from "../../../utils/dataverseUtils"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 interface AtiPageProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
   appUrl: string
@@ -28,7 +30,7 @@ interface AtiPageProps {
 }
 
 const AtiPage: FC<AtiPageProps> = ({
-  isLoggedIn,
+  user,
   serverUrl,
   atiProjectDetails,
   appUrl,
@@ -36,7 +38,7 @@ const AtiPage: FC<AtiPageProps> = ({
 }) => {
   return (
     <AtiTab
-      isLoggedIn={isLoggedIn}
+      user={user}
       dataset={atiProjectDetails ? atiProjectDetails.dataset : null}
       selectedTab={AtiTabConstant.summary.id}
     >
@@ -55,14 +57,14 @@ const AtiPage: FC<AtiPageProps> = ({
 export default AtiPage
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
   const props: AtiPageProps = {
-    isLoggedIn: false,
+    user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjectDetails: null,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
     appUrl: process.env.NEXTAUTH_URL as string,
     hypthesisAtiStagingGroupId: process.env.HYPOTHESIS_ATI_STAGING_GROUP_ID as string,
   }
-  const session = await getSession(context)
   const datasetId = context?.params?.id
 
   const responses: AxiosResponse<any>[] = []
@@ -71,7 +73,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let publicationStatuses: string[] = []
 
   if (session) {
-    props.isLoggedIn = true
     const { dataverseApiToken } = session
     //Get the dataset json
     await axios

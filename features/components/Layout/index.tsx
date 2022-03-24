@@ -5,17 +5,19 @@ import Head from "next/head"
 
 import AppBar from "../AppBar"
 
+import { IAnnoRepUser } from "../../../types/auth"
+
 import styles from "./Layout.module.css"
 
 interface LayoutProps {
   title: string
   children: ReactNode
-  isLoggedIn?: boolean
+  user: IAnnoRepUser | null
   isFullWidth?: boolean
   hasPdf?: boolean
 }
 
-const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, hasPdf }) => {
+const Layout: FC<LayoutProps> = ({ title, children, user, isFullWidth, hasPdf }) => {
   useEffect(() => {
     if (hasPdf) {
       const hClientConfig = document.createElement("script")
@@ -46,7 +48,7 @@ const Layout: FC<LayoutProps> = ({ title, children, isLoggedIn, isFullWidth, has
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <div className={styles.container}>
-        <AppBar isLoggedIn={isLoggedIn} />
+        <AppBar user={user} />
         <main className={`${styles.main} ${isFullWidth ? styles.fullMaxWidth : styles.maxWidth}`}>
           {children}
         </main>

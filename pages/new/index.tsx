@@ -9,34 +9,30 @@ import qs from "qs"
 import NewAtiProjectForm from "../../features/ati/NewAtiProjectForm"
 import Layout from "../../features/components/Layout"
 
-import { IDatasetOption } from "../../types/dataverse"
 import {
   ANNOREP_METADATA_VALUE,
   DATASET_DV_TYPE,
   KIND_OF_DATA_NAME,
   PUBLICATION_STATUSES,
 } from "../../constants/dataverse"
-import { getResponseFromError } from "../../utils/httpRequestUtils"
 import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
+import { IAnnoRepUser } from "../../types/auth"
+import { IDatasetOption } from "../../types/dataverse"
+import { getAnnoRepUser } from "../../utils/authUtils"
+import { getResponseFromError } from "../../utils/httpRequestUtils"
 
 interface NewAtiProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   datasets: IDatasetOption[]
   serverUrl: string
   totalCount: number
   datasetsPerPage?: number
 }
 
-const NewAti: FC<NewAtiProps> = ({
-  isLoggedIn,
-  datasets,
-  serverUrl,
-  totalCount,
-  datasetsPerPage,
-}) => {
+const NewAti: FC<NewAtiProps> = ({ user, datasets, serverUrl, totalCount, datasetsPerPage }) => {
   return (
-    <Layout isLoggedIn={isLoggedIn} title="AnnoREP - New ATI Project">
-      {isLoggedIn ? (
+    <Layout user={user} title="AnnoREP - New ATI Project">
+      {user ? (
         <NewAtiProjectForm
           datasets={datasets}
           serverUrl={serverUrl}
@@ -61,13 +57,12 @@ export default NewAti
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const props: NewAtiProps = {
-    isLoggedIn: false,
+    user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     datasets: [],
     totalCount: 0,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
   }
   if (session) {
-    props.isLoggedIn = true
     try {
       const { data } = await axios.get(
         //TODO: change to X-Dataverse-key header later

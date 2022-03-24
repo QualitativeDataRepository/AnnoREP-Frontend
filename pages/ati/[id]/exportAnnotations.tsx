@@ -7,31 +7,32 @@ import { getSession } from "next-auth/client"
 import AtiExportAnnotations from "../../../features/ati/AtiExportAnnotations"
 import AtiTab from "../../../features/ati/AtiTab"
 
+import { AtiTab as AtiTabConstant } from "../../../constants/ati"
 import {
   ANNOREP_METADATA_VALUE,
   DATAVERSE_HEADER_NAME,
   SOURCE_MANUSCRIPT_TAG,
 } from "../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
-import { AtiTab as AtiTabConstant } from "../../../constants/ati"
+import { IAnnoRepUser } from "../../../types/auth"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
-
+import { getAnnoRepUser } from "../../../utils/authUtils"
 import { createAtiProjectDetails } from "../../../utils/dataverseUtils"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 interface AtiPageProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   appUrl: string
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
   hypothesisGroups: IHypothesisGroup[]
 }
 
-const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGroups, appUrl }) => {
+const AtiPage: FC<AtiPageProps> = ({ user, atiProjectDetails, hypothesisGroups, appUrl }) => {
   return (
     <AtiTab
-      isLoggedIn={isLoggedIn}
+      user={user}
       dataset={atiProjectDetails ? atiProjectDetails.dataset : null}
       selectedTab={AtiTabConstant.exportAnnotations.id}
     >
@@ -50,14 +51,14 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails, hypothesisGr
 export default AtiPage
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
   const props: AtiPageProps = {
-    isLoggedIn: false,
+    user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjectDetails: null,
     appUrl: process.env.NEXTAUTH_URL as string,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
     hypothesisGroups: [],
   }
-  const session = await getSession(context)
   const datasetId = context?.params?.id
 
   const responses: AxiosResponse<any>[] = []
@@ -65,7 +66,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let ingestPdf = ""
 
   if (session) {
-    props.isLoggedIn = true
     const { dataverseApiToken, hypothesisApiToken } = session
     //Get the dataset json
     await axios

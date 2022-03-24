@@ -6,14 +6,17 @@ import { GetServerSideProps } from "next"
 import AppGuide from "../../features/components/AppGuide"
 import Layout from "../../features/components/Layout"
 
+import { IAnnoRepUser } from "../../types/auth"
+import { getAnnoRepUser } from "../../utils/authUtils"
+
 interface GuideProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
 }
 
-const Guide: FC<GuideProps> = ({ isLoggedIn }) => {
+const Guide: FC<GuideProps> = ({ user }) => {
   return (
-    <Layout isLoggedIn={isLoggedIn} title="AnnoREP - Guide">
-      <AppGuide isLoggedIn={isLoggedIn} />
+    <Layout user={user} title="AnnoREP - Guide">
+      <AppGuide isLoggedIn={user ? true : false} />
     </Layout>
   )
 }
@@ -22,8 +25,9 @@ export default Guide
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
+  const user = getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL)
   const props: GuideProps = {
-    isLoggedIn: session ? true : false,
+    user,
   }
 
   return {

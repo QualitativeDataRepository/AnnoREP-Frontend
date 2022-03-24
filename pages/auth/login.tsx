@@ -13,12 +13,15 @@ import Layout from "../../features/components/Layout"
 import LoginForm from "../../features/auth/LoginForm"
 import { LOGIN_ID } from "../../features/auth/constants"
 
+import { IAnnoRepUser } from "../../types/auth"
+import { getAnnoRepUser } from "../../utils/authUtils"
+
 interface LoginProps {
   serverUrl: string
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
 }
 
-const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
+const Login: FC<LoginProps> = ({ user, serverUrl }) => {
   const router = useRouter()
 
   const { state: dataverseApiTokenState, dispatch: dataverseApiTokenDispatch } =
@@ -56,13 +59,13 @@ const Login: FC<LoginProps> = ({ isLoggedIn, serverUrl }) => {
   }
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (user) {
       router.push("/")
     }
-  }, [isLoggedIn, router])
+  }, [user, router])
 
   return (
-    <Layout isLoggedIn={false} title="AnnoREP - Login">
+    <Layout user={user} title="AnnoREP - Login">
       <LoginForm
         dataverseServerUrl={serverUrl}
         dataverseApiToken={dataverseApiTokenState.credential}
@@ -83,9 +86,10 @@ export default Login
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
+  const user = getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL)
   return {
     props: {
-      isLoggedIn: session ? true : false,
+      user,
       serverUrl: process.env.DATAVERSE_SERVER_URL,
     },
   }

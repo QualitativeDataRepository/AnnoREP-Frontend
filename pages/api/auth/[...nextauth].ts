@@ -25,6 +25,7 @@ export default NextAuth({
         const user = {
           dataverseApiToken: "",
           hypothesisApiToken: "",
+          dataverseUserName: "",
           hypothesisUserId: null,
         }
         let dataverseErrorMsg
@@ -39,6 +40,7 @@ export default NextAuth({
           )
           if (status === 200 && data.status === "OK") {
             user.dataverseApiToken = creds.dataverseApiToken.trim()
+            user.dataverseUserName = data.data.displayName
           }
         } catch (e) {
           dataverseErrorMsg = (e as any).response.data.message
@@ -81,18 +83,17 @@ export default NextAuth({
       const isSignIn = user ? true : false
       if (isSignIn) {
         token.dataverseApiToken = user?.dataverseApiToken
+        token.dataverseUserName = user?.dataverseUserName
         token.hypothesisApiToken = user?.hypothesisApiToken
         token.hypothesisUserId = user?.hypothesisUserId
-        //token.name = user?.name
-        //token.email = user?.email
       }
       return token
     },
     async session(session, user) {
       session.dataverseApiToken = user?.dataverseApiToken
+      session.dataverseUserName = user?.dataverseUserName
       session.hypothesisApiToken = user?.hypothesisApiToken
       session.hypothesisUserId = user?.hypothesisUserId
-      //session.user = user
       return session
     },
     async redirect(url, baseUrl) {

@@ -22,11 +22,13 @@ import {
   KIND_OF_DATA_NAME,
   PUBLICATION_STATUSES,
 } from "../constants/dataverse"
+import { IAnnoRepUser } from "../types/auth"
+import { getAnnoRepUser } from "../utils/authUtils"
 
 import styles from "../styles/Home.module.css"
 
 interface HomeProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   atiProjects: IAtiProject[]
   totalCount: number
   atisPerPage?: number
@@ -35,7 +37,7 @@ interface HomeProps {
   errorMsg?: string
 }
 const Home: FC<HomeProps> = ({
-  isLoggedIn,
+  user,
   atiProjects,
   totalCount,
   errorMsg,
@@ -45,9 +47,9 @@ const Home: FC<HomeProps> = ({
 }) => {
   const router = useRouter()
   return (
-    <Layout isLoggedIn={isLoggedIn} title="AnnoREP - Home">
+    <Layout user={user} title="AnnoREP - Home">
       <>
-        {isLoggedIn ? (
+        {user ? (
           <div className={styles.container}>
             <HomePageTitle />
             {totalCount === 0 || errorMsg ? (
@@ -73,7 +75,7 @@ const Home: FC<HomeProps> = ({
             )}
           </div>
         ) : (
-          <AppGuide isLoggedIn={isLoggedIn} />
+          <AppGuide isLoggedIn={user ? true : false} />
         )}
       </>
     </Layout>
@@ -85,12 +87,11 @@ export default Home
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
   const props: HomeProps = {
-    isLoggedIn: false,
+    user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjects: [],
     totalCount: 0,
   }
   if (session) {
-    props.isLoggedIn = true
     try {
       const { data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
         params: {
