@@ -7,24 +7,25 @@ import { getSession } from "next-auth/client"
 import AtiSettings from "../../../features/ati/AtiSettings"
 import AtiTab from "../../../features/ati/AtiTab"
 
+import { AtiTab as AtiTabConstant } from "../../../constants/ati"
 import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
-import { AtiTab as AtiTabConstant } from "../../../constants/ati"
+import { IAnnoRepUser } from "../../../types/auth"
 import { IATIProjectDetails } from "../../../types/dataverse"
-
+import { getAnnoRepUser } from "../../../utils/authUtils"
 import { createAtiProjectDetails } from "../../../utils/dataverseUtils"
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 interface AtiPageProps {
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
 }
 
-const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails }) => {
+const AtiPage: FC<AtiPageProps> = ({ user, atiProjectDetails }) => {
   return (
     <AtiTab
-      isLoggedIn={isLoggedIn}
+      user={user}
       dataset={atiProjectDetails ? atiProjectDetails.dataset : null}
       selectedTab={AtiTabConstant.settings.id}
     >
@@ -41,18 +42,17 @@ const AtiPage: FC<AtiPageProps> = ({ isLoggedIn, atiProjectDetails }) => {
 export default AtiPage
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context)
   const props: AtiPageProps = {
-    isLoggedIn: false,
+    user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjectDetails: null,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
   }
-  const session = await getSession(context)
   const datasetId = context?.params?.id
 
   const responses: AxiosResponse<any>[] = []
 
   if (session) {
-    props.isLoggedIn = true
     const { dataverseApiToken } = session
     //Get the dataset json
     await axios

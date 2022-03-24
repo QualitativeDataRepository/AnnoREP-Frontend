@@ -5,6 +5,7 @@ import { InlineNotification, Tabs, Tab } from "carbon-components-react"
 import Layout from "../../components/Layout"
 
 import { IAtiTab, tabs, AtiTab as AtiTabs } from "../../../constants/ati"
+import { IAnnoRepUser } from "../../../types/auth"
 import { IDataset } from "../../../types/dataverse"
 
 import styles from "./AtiTab.module.css"
@@ -15,7 +16,7 @@ export interface AtiTabProps {
   /** The children of the tab */
   children: ReactNode
   /** Is the user logged in? */
-  isLoggedIn: boolean
+  user: IAnnoRepUser | null
   /** The dataset for the ati project */
   dataset: IDataset | null
   /** Display Hypothes.is client? */
@@ -23,19 +24,13 @@ export interface AtiTabProps {
 }
 
 /** A container for different tabs of an ati project */
-const AtiTab: FC<AtiTabProps> = ({
-  dataset,
-  children,
-  isLoggedIn,
-  selectedTab,
-  hasPdf,
-}: AtiTabProps) => {
+const AtiTab: FC<AtiTabProps> = ({ dataset, children, user, selectedTab, hasPdf }: AtiTabProps) => {
   const onSelectionChange = (index: number) =>
     window.location.assign(`/ati/${dataset?.id}/${tabs[index]}`)
   const selectedTabIndex = tabs.findIndex((tab) => tab === selectedTab)
 
   let content
-  if (dataset === null || !isLoggedIn) {
+  if (dataset === null || !user) {
     content = (
       <InlineNotification
         hideCloseButton
@@ -75,11 +70,7 @@ const AtiTab: FC<AtiTabProps> = ({
     )
   }
   return (
-    <Layout
-      title={dataset ? `AnnoREP - ${dataset.title}` : "AnnoREP"}
-      isLoggedIn={isLoggedIn}
-      hasPdf={hasPdf}
-    >
+    <Layout title={dataset ? `AnnoREP - ${dataset.title}` : "AnnoREP"} user={user} hasPdf={hasPdf}>
       {content}
     </Layout>
   )

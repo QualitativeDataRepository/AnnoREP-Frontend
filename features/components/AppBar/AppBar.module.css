@@ -1,19 +1,47 @@
 .container {
-  border-bottom: 1px solid #dbdbdb;
-  padding: 16px;
   width: 100%;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.header {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.logoLink {
+.logo {
   font-size: 1.5rem;
-  color: black;
+  color: #161616;
 }
 
-.links {
+.logo:hover {
+  color: #161616;
+}
+
+.actions {
   display: flex;
   justify-content: flex-start;
-  column-gap: 32px;
+}
+
+.actionButton > svg {
+  color: #161616;
+}
+
+.user > svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+.menuOptions {
+  width: 15rem;
+}
+
+.menuOptions > li > a,
+.menuOptions > li > button {
+  width: 100%;
+  max-width: 15rem;
 }
