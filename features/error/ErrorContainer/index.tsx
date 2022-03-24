@@ -13,7 +13,7 @@ export interface ErrorContainerProps {
 
 const ErrorContainer: FC<ErrorContainerProps> = ({ error }) => {
   return (
-    <Layout title={error}>
+    <Layout user={null} title={error}>
       <div className={styles.container}>
         <div className={styles.title}>
           <h1>Something went wrong!</h1>

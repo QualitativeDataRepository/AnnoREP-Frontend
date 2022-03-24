@@ -11,5 +11,14 @@ const Template: Story<AppBarProps> = (args) => <AppBar {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  isLoggedIn: true,
+  user: {
+    dataverse: {
+      name: "Test @ QDR",
+      link: "test.com",
+    },
+    hypothesis: {
+      name: "Test @ Hypothes.is",
+      link: "test.com",
+    },
+  },
 }
