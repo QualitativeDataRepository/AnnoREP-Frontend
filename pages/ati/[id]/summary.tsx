@@ -1,9 +1,11 @@
 import { FC } from "react"
 
-import axios, { AxiosResponse } from "axios"
+import { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
 import qs from "qs"
+
+import { axiosClient } from "../../../features/app"
 
 import AtiSummary from "../../../features/ati/AtiSummary"
 import AtiTab from "../../../features/ati/AtiTab"
@@ -75,7 +77,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const { dataverseApiToken } = session
     //Get the dataset json
-    await axios
+    await axiosClient
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
@@ -87,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         responses.push(datasetJsonResponse)
         const dsPersistentId = datasetJsonResponse.data.data.latestVersion.datasetPersistentId
         const promises = [
-          axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+          axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
             params: {
               key: dataverseApiToken,
               dvobject_types: DATASET_DV_TYPE,
@@ -106,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (latest.files.length > 0) {
           //Get the dataset zip
           promises.push(
-            axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
+            axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
               responseType: "arraybuffer",
               headers: {
                 [DATAVERSE_HEADER_NAME]: dataverseApiToken,

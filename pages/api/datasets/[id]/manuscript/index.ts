@@ -1,9 +1,10 @@
-import axios from "axios"
 import formidable from "formidable"
 import FormData from "form-data"
 import fs from "fs"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../../features/app"
 
 import {
   ANNOREP_METADATA_VALUE,
@@ -52,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 restrict: true,
               })
             )
-            const { status, data } = await axios({
+            const { status, data } = await axiosClient({
               method: "POST",
               url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/add`,
               data: addManuscriptForm,

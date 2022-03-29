@@ -1,10 +1,11 @@
 import { FC, FormEventHandler, useReducer, ChangeEvent } from "react"
 
-import axios from "axios"
 import { Button, Form, FileUploader, InlineNotification, Toggle } from "carbon-components-react"
 import FormData from "form-data"
 import { DocumentAdd20, TrashCan20, Upload16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
+
+import { axiosClient } from "../../app"
 
 import DatasourceModal from "./DatasourceModal"
 import DeleteManuscriptModal from "./DeleteManuscriptModal"
@@ -72,7 +73,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   const handleDeleteManuscript = async () => {
     closeDeleteManuscriptModal()
     taskDispatch({ type: TaskActionType.START, payload: "Deleting manuscript..." })
-    await axios
+    await axiosClient
       .delete(`/api/delete-file/${manuscript.id}`)
       .then(() => {
         taskDispatch({ type: TaskActionType.FINISH, payload: `Deleted ${manuscript.name}.` })
@@ -142,7 +143,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         type: TaskActionType.START,
         payload: `Uploading ${uploadManuscriptTaskState.manuscript.name}...`,
       })
-      await axios({
+      await axiosClient({
         method: "POST",
         url: `/api/datasets/${datasetId}/manuscript`,
         data: formData,
@@ -153,7 +154,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         .then(async ({ data }) => {
           const newManuscriptId = data.data.files[0].dataFile.id
           const deleteAnnotationsPromise = uploadManuscriptTaskState.uploadAnnotations
-            ? axios({
+            ? axiosClient({
                 method: "GET",
                 url: `/api/hypothesis/${datasetId}/download-annotations`,
                 params: {
@@ -166,7 +167,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                     type: TaskActionType.NEXT_STEP,
                     payload: `Deleting current annotation(s) from Hypothes.is server...`,
                   })
-                  return axios({
+                  return axiosClient({
                     method: "DELETE",
                     url: `/api/hypothesis/${datasetId}/delete-annotations`,
                     data: JSON.stringify({ annotations: data.annotations }),
@@ -189,7 +190,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   : "Creating ingest PDF"
               } from ${uploadManuscriptTaskState.manuscript?.name}...`,
             })
-            return axios({
+            return axiosClient({
               method: "PUT",
               url: `/api/arcore/${newManuscriptId}`,
               params: {

@@ -1,7 +1,8 @@
 import { Dispatch, useEffect, useReducer } from "react"
 
-import axios from "axios"
 import qs from "qs"
+
+import { axiosClient } from "../../app"
 
 import { SearchActionType, ISearchAction, searchReducer, ISearchState } from "./state"
 import { getTrueFields } from "./utils"
@@ -23,7 +24,7 @@ const useSearch = (inititalState: ISearchState): [ISearchState, Dispatch<ISearch
         const publicationStatuses = state.fetchQ
           ? PUBLICATION_STATUSES
           : getTrueFields(state.selectedPublicationStatuses)
-        const { data } = await axios.get<IMyDataSearch>(`/api/mydata-search`, {
+        const { data } = await axiosClient.get<IMyDataSearch>(`/api/mydata-search`, {
           params: {
             publicationStatuses,
             q: state.q,

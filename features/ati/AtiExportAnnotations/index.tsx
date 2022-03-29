@@ -1,6 +1,5 @@
 import { FC, useState, FormEventHandler, useEffect, useRef } from "react"
 
-import axios from "axios"
 import { Export16, TrashCan16 } from "@carbon/icons-react"
 import {
   Link,
@@ -14,6 +13,8 @@ import {
   CopyButton,
 } from "carbon-components-react"
 import CopyToClipboard from "react-copy-to-clipboard"
+
+import { axiosClient } from "../../app"
 
 import { AtiTab } from "../../../constants/ati"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
@@ -69,7 +70,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   useEffect(() => {
     let didCancel = false
     const getAnnotationsJson = async () => {
-      const { data } = await axios.get(`/api/hypothesis/${datasetId}/download-annotations`, {
+      const { data } = await axiosClient.get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
           hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
           isAdminAuthor: false,
@@ -103,7 +104,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     }
 
     exportTaskDispatch({ type: TaskActionType.START, payload: "Downloading annotations..." })
-    await axios
+    await axiosClient
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
           hypothesisGroup:
@@ -115,7 +116,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       })
       .then(({ data }) => {
         exportTaskDispatch({ type: TaskActionType.NEXT_STEP, payload: "Exporting annotations..." })
-        return axios.post(
+        return axiosClient.post(
           `/api/hypothesis/${datasetId}/export-annotations`,
           JSON.stringify({
             isAdminAuthor: false,
@@ -172,7 +173,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   const handleDeleteAnnotations = async () => {
     closeDeleteAnnotationsModal()
     deleteTaskDispatch({ type: TaskActionType.START, payload: "Downloading annotations..." })
-    await axios
+    await axiosClient
       .get(`/api/hypothesis/${datasetId}/download-annotations`, {
         params: {
           hypothesisGroup: deleteAnnotationsHypothesisGroup,
@@ -184,7 +185,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
           type: TaskActionType.NEXT_STEP,
           payload: `Deleting ${data.annotations.length} annotation(s)...`,
         })
-        return axios.delete(`/api/hypothesis/${datasetId}/delete-annotations`, {
+        return axiosClient.delete(`/api/hypothesis/${datasetId}/delete-annotations`, {
           data: JSON.stringify({ annotations: data.annotations }),
           params: {
             isAdminAuthor: false,

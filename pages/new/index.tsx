@@ -1,10 +1,11 @@
 import { FC } from "react"
 
-import axios from "axios"
 import { InlineNotification } from "carbon-components-react"
 import { getSession } from "next-auth/client"
 import { GetServerSideProps } from "next"
 import qs from "qs"
+
+import { axiosClient } from "../../features/app"
 
 import NewAtiProjectForm from "../../features/ati/NewAtiProjectForm"
 import Layout from "../../features/components/Layout"
@@ -64,7 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   if (session) {
     try {
-      const { data } = await axios.get(
+      const { data } = await axiosClient.get(
         //TODO: change to X-Dataverse-key header later
         `${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`,
         {

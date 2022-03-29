@@ -1,6 +1,8 @@
-import axios, { AxiosPromise } from "axios"
+import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../features/app"
 
 import { AtiTab } from "../../../../constants/ati"
 import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
@@ -14,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session) {
       const { id } = req.query
       const { dataverseApiToken, hypothesisApiToken } = session
-      const createPdfAnn = axios({
+      const createPdfAnn = axiosClient({
         method: "PUT",
         url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}`,
         headers: {
@@ -24,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       await createPdfAnn
         .then(() => {
-          return axios({
+          return axiosClient({
             method: "GET",
             url: `${process.env.ARCORE_SERVER_URL}/api/documents/${id}/ann`,
             headers: {
@@ -41,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               annotation.target.forEach((element: any) => {
                 element.source = uri
               })
-              return axios({
+              return axiosClient({
                 method: "POST",
                 url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
                 data: JSON.stringify({

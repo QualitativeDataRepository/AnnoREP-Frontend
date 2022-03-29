@@ -1,5 +1,4 @@
 import { FC } from "react"
-import axios from "axios"
 import {
   UnorderedList,
   ListItem,
@@ -10,6 +9,8 @@ import {
 } from "carbon-components-react"
 import { Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
+
+import { axiosClient } from "../../app"
 
 import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
@@ -55,23 +56,26 @@ const AtiSummary: FC<AtiSummaryProps> = ({
     try {
       taskDispatch({ type: TaskActionType.START, payload: "Submitting project for review..." })
 
-      const submitForReviewPromise = axios.post(`/api/datasets/${id}/submit-for-review`)
+      const submitForReviewPromise = axiosClient.post(`/api/datasets/${id}/submit-for-review`)
 
-      const getAtiStagingAnnotationsPromise = axios.get(
+      const getAtiStagingAnnotationsPromise = axiosClient.get(
         `/api/hypothesis/${id}/download-annotations`,
         {
           params: { hypothesisGroup: hypothesisAtiStagingGroupId, isAdminAuthor: true },
         }
       )
-      const getUserAnnotationsPromise = axios.get(`/api/hypothesis/${id}/download-annotations`, {
-        params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
-      })
+      const getUserAnnotationsPromise = axiosClient.get(
+        `/api/hypothesis/${id}/download-annotations`,
+        {
+          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
+        }
+      )
       const [getAtiStagingAnnotationsResult, getUserAnnotationsResult] = await Promise.all([
         getAtiStagingAnnotationsPromise,
         getUserAnnotationsPromise,
       ])
 
-      const deleteAtiStagingAnnotationsPromise = axios.delete(
+      const deleteAtiStagingAnnotationsPromise = axiosClient.delete(
         `/api/hypothesis/${id}/delete-annotations`,
         {
           data: JSON.stringify({ annotations: getAtiStagingAnnotationsResult.data.annotations }),
@@ -83,7 +87,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({
           },
         }
       )
-      const exportUserAnnotationsPromise = axios.post(
+      const exportUserAnnotationsPromise = axiosClient.post(
         `/api/hypothesis/${id}/export-annotations`,
         JSON.stringify({
           isAdminAuthor: true,

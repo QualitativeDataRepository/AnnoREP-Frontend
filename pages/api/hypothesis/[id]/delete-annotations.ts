@@ -1,6 +1,8 @@
-import axios, { AxiosPromise } from "axios"
+import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../features/app"
 
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
@@ -8,7 +10,7 @@ import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "DELETE") {
     const session = await getSession({ req })
-    const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
+    const { data } = await axiosClient.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
       headers: { Authorization: `Bearer ${process.env.ADMIN_HYPOTHESIS_API_TOKEN}` },
     })
     if (session) {
@@ -28,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           annotation.permissions.delete.includes(hypothesisUserId)
         )
         const deleteAnns: AxiosPromise<any>[] = deletableAnnotations.map((annotation: any) => {
-          return axios.delete(
+          return axiosClient.delete(
             `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations/${annotation.id}`,
             {
               headers: {

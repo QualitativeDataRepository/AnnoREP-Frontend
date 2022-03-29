@@ -1,8 +1,10 @@
 import { FC } from "react"
 
-import axios, { AxiosResponse } from "axios"
+import { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../features/app"
 
 import AtiExportAnnotations from "../../../features/ati/AtiExportAnnotations"
 import AtiTab from "../../../features/ati/AtiTab"
@@ -68,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const { dataverseApiToken, hypothesisApiToken } = session
     //Get the dataset json
-    await axios
+    await axiosClient
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
           [DATAVERSE_HEADER_NAME]: dataverseApiToken,
@@ -88,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         )
         if (manuscript && manuscript.dataFile.id) {
           //Get the ingest pdf
-          return axios.get(
+          return axiosClient.get(
             `${process.env.ARCORE_SERVER_URL}/api/documents/${manuscript.dataFile.id}/pdf`,
             {
               responseType: "arraybuffer",
@@ -114,7 +116,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     try {
-      const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/groups`, {
+      const { data } = await axiosClient.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/groups`, {
         headers: {
           Authorization: `Bearer ${hypothesisApiToken}`,
           Accept: "application/json",

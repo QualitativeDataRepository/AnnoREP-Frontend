@@ -1,6 +1,8 @@
-import axios, { AxiosPromise } from "axios"
+import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../features/app"
 
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
@@ -27,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (!privateAnnotation) {
             newReadPermission = [`group:${destinationHypothesisGroup}`]
           }
-          return axios({
+          return axiosClient({
             method: "POST",
             url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
             data: JSON.stringify({
