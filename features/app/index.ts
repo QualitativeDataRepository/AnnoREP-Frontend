@@ -17,7 +17,12 @@ axiosRetry(axiosClient, {
     return axiosRetry.exponentialDelay(retryCount)
   },
   retryCondition: (e) => {
-    return axiosRetry.isNetworkOrIdempotentRequestError(e) || e.response?.status === 429
+    if (e.response) {
+      if (e.response.status === 429 && e.response.config.url?.includes("hypothes.is")) {
+        return true
+      }
+    }
+    return axiosRetry.isNetworkOrIdempotentRequestError(e)
   },
 })
 
