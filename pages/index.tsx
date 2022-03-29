@@ -1,11 +1,12 @@
 import { FC } from "react"
 
-import axios from "axios"
 import { InlineNotification, NotificationActionButton } from "carbon-components-react"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
 import { useRouter } from "next/router"
 import qs from "qs"
+
+import { axiosClient } from "../features/app"
 
 import AtiProjects from "../features/ati/AtiProjects"
 import AppGuide from "../features/components/AppGuide"
@@ -93,20 +94,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   if (session) {
     try {
-      const { data } = await axios.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
-        params: {
-          key: session.dataverseApiToken,
-          dvobject_types: DATASET_DV_TYPE,
-          published_states: PUBLICATION_STATUSES,
-          mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
-        },
-        paramsSerializer: (params) => {
-          return qs.stringify(params, { indices: false })
-        },
-        headers: {
-          [REQUEST_DESC_HEADER_NAME]: `Searching for ${ANNOREP_METADATA_VALUE} data projects`,
-        },
-      })
+      const { data } = await axiosClient.get(
+        `${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`,
+        {
+          params: {
+            key: session.dataverseApiToken,
+            dvobject_types: DATASET_DV_TYPE,
+            published_states: PUBLICATION_STATUSES,
+            mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false })
+          },
+          headers: {
+            [REQUEST_DESC_HEADER_NAME]: `Searching for ${ANNOREP_METADATA_VALUE} data projects`,
+          },
+        }
+      )
       if (data.success) {
         const items = data.data.items
         for (let i = 0; i < items.length; i++) {

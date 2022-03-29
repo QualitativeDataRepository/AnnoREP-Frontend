@@ -1,6 +1,7 @@
-import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../features/app"
 
 import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
@@ -13,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { id } = req.query
       const requestDesc = `Getting data files for data project ${id}`
       try {
-        const { status, data } = await axios({
+        const { status, data } = await axiosClient({
           method: "GET",
           url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}`,
           headers: {

@@ -1,7 +1,8 @@
 import { Dispatch, useEffect, useReducer } from "react"
 
-import axios from "axios"
 import qs from "qs"
+
+import { axiosClient } from "../../app"
 
 import {
   ISearchDatasetAction,
@@ -25,7 +26,7 @@ const useSearchDataset = (
     const search = async () => {
       try {
         dispatch({ type: SearchDatasetActionType.SEARCH_INIT })
-        const { data } = await axios.get<IMyDataSearch>(`/api/mydata-search`, {
+        const { data } = await axiosClient.get<IMyDataSearch>(`/api/mydata-search`, {
           params: {
             q: state.q,
             //dataverse mydata selected_page starts at 1

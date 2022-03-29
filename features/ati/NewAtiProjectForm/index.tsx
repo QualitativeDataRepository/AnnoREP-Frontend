@@ -9,7 +9,6 @@ import React, {
 } from "react"
 
 import FormData from "form-data"
-import axios from "axios"
 import { Add16, OverflowMenuVertical24 } from "@carbon/icons-react"
 import {
   Button,
@@ -23,6 +22,8 @@ import {
 } from "carbon-components-react"
 import { debounce } from "lodash"
 import { useRouter } from "next/router"
+
+import { axiosClient } from "../../app"
 
 import { ManuscriptFileExtension, ManuscriptMimeType } from "../../../constants/arcore"
 import { AtiTab } from "../../../constants/ati"
@@ -133,13 +134,13 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     const formData = new FormData()
     formData.append("manuscript", manuscript)
     taskDispatch({ type: TaskActionType.START, payload: "Creating ATI project..." })
-    await axios({
+    await axiosClient({
       method: "PUT",
       url: `/api/datasets/${selectedDataset?.id}/annorep`,
     })
       .then(() => {
         taskDispatch({ type: TaskActionType.NEXT_STEP, payload: `Uploading ${manuscript.name}...` })
-        return axios({
+        return axiosClient({
           method: "POST",
           url: `/api/datasets/${selectedDataset?.id}/manuscript`,
           data: formData,
@@ -154,7 +155,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           payload: `Extracting annotations from ${manuscript.name}...`,
         })
         const manuscriptId = data.data.files[0].dataFile.id
-        return axios({
+        return axiosClient({
           method: "PUT",
           url: `/api/arcore/${manuscriptId}`,
           params: {

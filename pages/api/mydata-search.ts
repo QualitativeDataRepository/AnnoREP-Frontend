@@ -1,7 +1,8 @@
-import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 import qs from "qs"
+
+import { axiosClient } from "../../features/app"
 
 import {
   ANNOREP_METADATA_VALUE,
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         searchTerm = searchTerm + ` AND ${q}`
       }
       try {
-        const { data } = await axios.get(
+        const { data } = await axiosClient.get(
           `${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`,
           {
             params: {

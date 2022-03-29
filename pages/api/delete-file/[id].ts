@@ -1,6 +1,8 @@
-import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../features/app"
+
 import { getResponseFromError } from "../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
@@ -10,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { id } = req.query
       const { dataverseApiToken } = session
       try {
-        const { status, data } = await axios({
+        const { status, data } = await axiosClient({
           method: "DELETE",
           url: `${process.env.DATAVERSE_SERVER_URL}/dvn/api/data-deposit/v1.1/swordv2/edit-media/file/${id}`,
           auth: {

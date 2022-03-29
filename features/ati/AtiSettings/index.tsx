@@ -1,9 +1,10 @@
 import { FC, FormEventHandler } from "react"
 
-import axios from "axios"
 import { TrashCan16 } from "@carbon/icons-react"
 import { Button, Form, InlineNotification } from "carbon-components-react"
 import { useRouter } from "next/router"
+
+import { axiosClient } from "../../app"
 
 import DeleteAtiModal from "./DeleteAtiModal"
 
@@ -41,7 +42,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
   const handleDeleteAti = async () => {
     closeDeleteAtiModal()
     taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
-    await axios
+    await axiosClient
       .put(`/api/datasets/${dataset.id}/annorep/delete`)
       .then(() => {
         if (manuscript.id) {
@@ -49,13 +50,13 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             type: TaskActionType.NEXT_STEP,
             payload: `Deleting manuscript ${manuscript.name}...`,
           })
-          return axios.delete(`/api/delete-file/${manuscript.id}`)
+          return axiosClient.delete(`/api/delete-file/${manuscript.id}`)
         } else {
           return Promise.resolve<any>("Skip!")
         }
       })
       .then(() => {
-        return axios.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
+        return axiosClient.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
           params: { hypothesisGroup: "", isAdminAuthor: false },
         })
       })
@@ -65,7 +66,7 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
             type: TaskActionType.NEXT_STEP,
             payload: "Deleting annotations from Hypothes.is server...",
           })
-          return axios.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
+          return axiosClient.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
             data: JSON.stringify({ annotations: data.annotations }),
             params: {
               isAdminAuthor: false,

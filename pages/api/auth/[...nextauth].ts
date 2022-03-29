@@ -1,6 +1,7 @@
-import axios from "axios"
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
+
+import { axiosClient } from "../../../features/app"
 
 import { DATAVERSE_HEADER_NAME } from "../../../constants/dataverse"
 import { INVALID_HYPOTHESIS_API_TOKEN, LOGIN_ID } from "../../../features/auth/constants"
@@ -30,7 +31,7 @@ export default NextAuth({
         }
         let dataverseErrorMsg
         try {
-          const { status, data } = await axios.get(
+          const { status, data } = await axiosClient.get(
             `${process.env.DATAVERSE_SERVER_URL}/api/users/:me`,
             {
               headers: {
@@ -46,11 +47,14 @@ export default NextAuth({
           dataverseErrorMsg = (e as any).response.data.message
         }
         try {
-          const { data } = await axios.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
-            headers: {
-              Authorization: `Bearer ${creds.hypothesisApiToken.trim()}`,
-            },
-          })
+          const { data } = await axiosClient.get(
+            `${process.env.HYPOTHESIS_SERVER_URL}/api/profile`,
+            {
+              headers: {
+                Authorization: `Bearer ${creds.hypothesisApiToken.trim()}`,
+              },
+            }
+          )
           if (data.userid !== null) {
             user.hypothesisApiToken = creds.hypothesisApiToken.trim()
             user.hypothesisUserId = data.userid

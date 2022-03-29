@@ -1,6 +1,7 @@
-import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../../features/app"
 
 import {
   ANNOREP_METADATA_FIELD,
@@ -17,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { id } = req.query
       const requestDesc = `Adding ${ANNOREP_METADATA_VALUE} metadata to data project ${id}`
       try {
-        const { status, data } = await axios({
+        const { status, data } = await axiosClient({
           method: "PUT",
           url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/metadata`,
           params: {

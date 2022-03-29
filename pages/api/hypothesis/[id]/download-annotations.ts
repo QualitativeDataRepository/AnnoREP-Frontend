@@ -1,6 +1,7 @@
-import axios from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
+
+import { axiosClient } from "../../../../features/app"
 
 import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
@@ -21,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const hypothesisApiToken =
         isAdminAuthor === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
       const requestDesc = `Getting annotations from Hypothes.is server for data project ${id}`
-      await axios
+      await axiosClient
         //Get the total annotations
         .get(searchEndpoint, {
           params: {
@@ -40,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const offsets = range(0, data.total - 1, ANNOTATIONS_MAX_LIMIT)
           return Promise.all(
             offsets.map((offset) => {
-              return axios.get(searchEndpoint, {
+              return axiosClient.get(searchEndpoint, {
                 params: {
                   limit: ANNOTATIONS_MAX_LIMIT,
                   group: hypothesisGroup,
