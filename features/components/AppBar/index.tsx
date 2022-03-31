@@ -14,7 +14,7 @@ export interface AppBarProps {
 }
 
 const AppBar: FC<AppBarProps> = ({ user }) => {
-  const handleLogout = () => signOut()
+  const handleLogout = () => signOut({ redirect: true, callbackUrl: "/" })
 
   return (
     <div className={styles.container}>
