@@ -1,4 +1,3 @@
-import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
@@ -6,7 +5,9 @@ import { axiosClient } from "../../../../features/app"
 
 import { AtiTab } from "../../../../constants/ati"
 import { DATAVERSE_HEADER_NAME } from "../../../../constants/dataverse"
+import { REQUEST_BATCH_SIZE } from "../../../../constants/hypothesis"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
+import { range } from "../../../../utils/arrayUtils"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
@@ -39,27 +40,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (uploadAnnotations === "true") {
             //Uploading new file, send annotations to hypothes.is server
             const uri = `${process.env.NEXTAUTH_URL}/ati/${datasetId}/${AtiTab.manuscript.id}`
-            const sendAnns: AxiosPromise<any>[] = data.map((annotation: any) => {
-              annotation.target.forEach((element: any) => {
-                element.source = uri
+            const batches = range(0, data.length - 1, REQUEST_BATCH_SIZE)
+            batches.reduce((promise, start) => {
+              return promise.then(() => {
+                const sendAnns = data
+                  .slice(start, start + REQUEST_BATCH_SIZE)
+                  .map((annotation: any) => {
+                    annotation.target.forEach((element: any) => {
+                      element.source = uri
+                    })
+                    return axiosClient({
+                      method: "POST",
+                      url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
+                      data: JSON.stringify({
+                        uri: uri,
+                        document: annotation.document,
+                        text: annotation.text,
+                        target: annotation.target,
+                      }),
+                      headers: {
+                        Authorization: `Bearer ${hypothesisApiToken}`,
+                        "Content-type": "application/json",
+                        [REQUEST_DESC_HEADER_NAME]: `Sending annotations from source manuscript ${id} to Hypothes.is server`,
+                      },
+                    })
+                  })
+                return Promise.all(sendAnns)
               })
-              return axiosClient({
-                method: "POST",
-                url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
-                data: JSON.stringify({
-                  uri: uri,
-                  document: annotation.document,
-                  text: annotation.text,
-                  target: annotation.target,
-                }),
-                headers: {
-                  Authorization: `Bearer ${hypothesisApiToken}`,
-                  "Content-type": "application/json",
-                  [REQUEST_DESC_HEADER_NAME]: `Sending annotations from source manuscript ${id} to Hypothes.is server`,
-                },
-              })
-            })
-            return Promise.all(sendAnns)
+            }, Promise.resolve<any[]>([]))
           }
         })
         .then(() => {

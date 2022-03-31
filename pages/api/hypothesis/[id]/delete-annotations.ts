@@ -1,10 +1,11 @@
-import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
 import { axiosClient } from "../../../../features/app"
 
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
+import { REQUEST_BATCH_SIZE } from "../../../../constants/hypothesis"
+import { range } from "../../../../utils/arrayUtils"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
@@ -29,18 +30,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const deletableAnnotations = annotations.filter((annotation: any) =>
           annotation.permissions.delete.includes(hypothesisUserId)
         )
-        const deleteAnns: AxiosPromise<any>[] = deletableAnnotations.map((annotation: any) => {
-          return axiosClient.delete(
-            `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations/${annotation.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${hypothesisApiToken}`,
-                [REQUEST_DESC_HEADER_NAME]: requestDesc,
-              },
-            }
-          )
-        })
-        await Promise.all(deleteAnns)
+
+        const batches = range(0, deletableAnnotations.length - 1, REQUEST_BATCH_SIZE)
+        for (const start of batches) {
+          const batchedDeleteAnns = deletableAnnotations
+            .slice(start, start + REQUEST_BATCH_SIZE)
+            .map((annotation: any) => {
+              return axiosClient.delete(
+                `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations/${annotation.id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${hypothesisApiToken}`,
+                    [REQUEST_DESC_HEADER_NAME]: requestDesc,
+                  },
+                }
+              )
+            })
+          await Promise.all(batchedDeleteAnns)
+        }
         res.status(200).json({
           totalDeleted:
             deletableAnnotations.length === annotations.length
