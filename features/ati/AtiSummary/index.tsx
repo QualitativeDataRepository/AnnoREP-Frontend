@@ -10,6 +10,8 @@ import {
 import { Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
+import { axiosClient } from "../../app"
+
 import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
@@ -86,7 +88,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         privateAnnotation: false,
       })
 
-      //await axiosClient.post(`/api/datasets/${id}/submit-for-review`)
+      await axiosClient.post(`/api/datasets/${id}/submit-for-review`)
       taskDispatch({ type: TaskActionType.FINISH, payload: `Submitted ${title} for review.` })
       router.reload()
     } catch (e) {

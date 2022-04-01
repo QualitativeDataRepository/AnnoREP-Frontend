@@ -178,11 +178,9 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
               : "Creating ingest PDF"
           } from ${uploadManuscriptTaskState.manuscript?.name}...`,
         })
-        await axiosClient.put(`/api/arcore/${newManuscriptId}`, undefined, {
-          params: {
-            datasetId,
-            uploadAnnotations: uploadManuscriptTaskState.uploadAnnotations,
-          },
+        await axiosClient.put(`/api/arcore/${newManuscriptId}`, {
+          datasetId,
+          uploadAnnotations: uploadManuscriptTaskState.uploadAnnotations,
         })
         taskDispatch({
           type: TaskActionType.FINISH,

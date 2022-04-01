@@ -11,11 +11,11 @@ import { range } from "../../../../utils/arrayUtils"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const { datasetId, uploadAnnotations } = req.query
   if (req.method === "PUT") {
     const session = await getSession({ req })
     if (session) {
       const { id } = req.query
+      const { datasetId, uploadAnnotations } = req.body
       const { dataverseApiToken, hypothesisApiToken } = session
       const createPdfAnn = axiosClient({
         method: "PUT",
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         })
         .then(({ data }) => {
-          if (uploadAnnotations === "true") {
+          if (uploadAnnotations) {
             //Uploading new file, send annotations to hypothes.is server
             const uri = `${process.env.NEXTAUTH_URL}/ati/${datasetId}/${AtiTab.manuscript.id}`
             const batches = range(0, data.length - 1, REQUEST_BATCH_SIZE)
