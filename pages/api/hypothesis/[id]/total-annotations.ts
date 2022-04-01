@@ -13,21 +13,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
-      const { id, hypothesisGroup, isAdminDownloader, offset, limit } = req.query
+      const { id, hypothesisGroup, isAdminDownloader } = req.query
       const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken: userHypothesisApiToken } = session
       const hypothesisApiToken =
         isAdminDownloader === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
-      const requestDesc = `Getting annotations at ${offset} from Hypothes.is server for data project ${id}`
+      const requestDesc = `Getting the total number of annotations for data project ${id}`
       try {
-        //TODO: add annotation type to get<>
-        //limit must less than 200
         const { data } = await axiosClient.get(searchEndpoint, {
           params: {
-            limit,
             uri,
-            offset,
+            limit: 1,
             group: hypothesisGroup,
           },
           headers: {
@@ -36,11 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })
-        const exactMatches = data.rows.filter((annotation: any) => annotation.uri === uri)
-        res.status(200).json({
-          rows: exactMatches,
-          total: exactMatches.length,
-        })
+        res.status(200).json({ total: data.total })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
         console.error(status, message)

@@ -10,8 +10,6 @@ import {
 import { Launch16 } from "@carbon/icons-react"
 import { useRouter } from "next/router"
 
-import { axiosClient } from "../../app"
-
 import { AtiTab } from "../../../constants/ati"
 import { PUBLICATION_STATUSES_COLOR } from "../../../constants/dataverse"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
@@ -22,6 +20,11 @@ import useTask, {
 } from "../../../hooks/useTask"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import {
+  deleteAnnotations,
+  exportAnnotations,
+  getAnnotations,
+} from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiSummary.module.css"
 import layoutStyles from "../../components/Layout/Layout.module.css"
@@ -55,58 +58,35 @@ const AtiSummary: FC<AtiSummaryProps> = ({
   const submitForReview = async () => {
     try {
       taskDispatch({ type: TaskActionType.START, payload: "Submitting project for review..." })
-
-      const submitForReviewPromise = axiosClient.post(`/api/datasets/${id}/submit-for-review`)
-
-      const getAtiStagingAnnotationsPromise = axiosClient.get(
-        `/api/hypothesis/${id}/download-annotations`,
-        {
-          params: { hypothesisGroup: hypothesisAtiStagingGroupId, isAdminAuthor: true },
-        }
-      )
-      const getUserAnnotationsPromise = axiosClient.get(
-        `/api/hypothesis/${id}/download-annotations`,
-        {
-          params: { hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID, isAdminAuthor: false },
-        }
-      )
-      const [getAtiStagingAnnotationsResult, getUserAnnotationsResult] = await Promise.all([
-        getAtiStagingAnnotationsPromise,
-        getUserAnnotationsPromise,
-      ])
-
-      const deleteAtiStagingAnnotationsPromise = axiosClient.delete(
-        `/api/hypothesis/${id}/delete-annotations`,
-        {
-          data: JSON.stringify({ annotations: getAtiStagingAnnotationsResult.data.annotations }),
-          params: {
-            isAdminAuthor: true,
-          },
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      const exportUserAnnotationsPromise = axiosClient.post(
-        `/api/hypothesis/${id}/export-annotations`,
-        JSON.stringify({
+      const deleteAnns = await getAnnotations({
+        datasetId: id,
+        hypothesisGroup: hypothesisAtiStagingGroupId,
+        isAdminDownloader: true,
+      })
+      if (deleteAnns.length > 0) {
+        await deleteAnnotations({
+          datasetId: id,
+          annotations: deleteAnns,
           isAdminAuthor: true,
-          destinationUrl: `${appUrl}/ati/${id}/${AtiTab.manuscript.id}`,
-          annotations: getUserAnnotationsResult.data.annotations,
-          destinationHypothesisGroup: hypothesisAtiStagingGroupId,
-          privateAnnotation: false,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      await Promise.all([
-        submitForReviewPromise,
-        deleteAtiStagingAnnotationsPromise,
-        exportUserAnnotationsPromise,
-      ])
+        })
+      }
+
+      taskDispatch({
+        type: TaskActionType.NEXT_STEP,
+        payload: "Exporting annotations for review...",
+      })
+      await exportAnnotations({
+        taskDispatch,
+        datasetId: id,
+        sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+        isAdminDownloader: false,
+        destinationUrl: `${appUrl}/ati/${id}/${AtiTab.manuscript.id}`,
+        destinationHypothesisGroup: hypothesisAtiStagingGroupId,
+        isAdminAuthor: true,
+        privateAnnotation: false,
+      })
+
+      //await axiosClient.post(`/api/datasets/${id}/submit-for-review`)
       taskDispatch({ type: TaskActionType.FINISH, payload: `Submitted ${title} for review.` })
       router.reload()
     } catch (e) {
