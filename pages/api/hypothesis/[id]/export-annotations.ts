@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         privateAnnotation,
         isAdminAuthor,
       } = req.body
-      const requestDesc = `Exporting annotations to ${destinationUrl}...`
+      const requestDesc = `Exporting annotations to ${destinationUrl}`
       const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken } = session
@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               isAdminDownloader ? process.env.ADMIN_HYPOTHESIS_API_TOKEN : hypothesisApiToken
             }`,
             Accept: "application/json",
-            [REQUEST_DESC_HEADER_NAME]: `Downloading annotations at offset ${offset}...`,
+            [REQUEST_DESC_HEADER_NAME]: `Downloading annotations at offset ${offset}`,
           },
         })
         const exactMatches = data.rows.filter((annotation: any) => annotation.uri === uri)
