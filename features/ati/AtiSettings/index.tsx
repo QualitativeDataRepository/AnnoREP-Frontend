@@ -16,6 +16,7 @@ import useTask, {
 } from "../../../hooks/useTask"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { deleteAnnotations, getAnnotations } from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -41,52 +42,41 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
 
   const handleDeleteAti = async () => {
     closeDeleteAtiModal()
-    taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
-    await axiosClient
-      .put(`/api/datasets/${dataset.id}/annorep/delete`)
-      .then(() => {
-        if (manuscript.id) {
-          taskDispatch({
-            type: TaskActionType.NEXT_STEP,
-            payload: `Deleting manuscript ${manuscript.name}...`,
-          })
-          return axiosClient.delete(`/api/delete-file/${manuscript.id}`)
-        } else {
-          return Promise.resolve<any>("Skip!")
-        }
+    try {
+      taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
+      const deleteAnns = await getAnnotations({
+        datasetId: dataset.id,
+        hypothesisGroup: "",
+        isAdminDownloader: false,
       })
-      .then(() => {
-        return axiosClient.get(`/api/hypothesis/${dataset.id}/download-annotations`, {
-          params: { hypothesisGroup: "", isAdminAuthor: false },
-        })
-      })
-      .then(({ data }) => {
-        if (data.total > 0) {
-          taskDispatch({
-            type: TaskActionType.NEXT_STEP,
-            payload: "Deleting annotations from Hypothes.is server...",
-          })
-          return axiosClient.delete(`/api/hypothesis/${dataset.id}/delete-annotations`, {
-            data: JSON.stringify({ annotations: data.annotations }),
-            params: {
-              isAdminAuthor: false,
-            },
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-        }
-      })
-      .then(() => {
+      if (deleteAnns.length > 0) {
         taskDispatch({
-          type: TaskActionType.FINISH,
-          payload: `Deleted ATI project from data project ${dataset.title}.`,
+          type: TaskActionType.NEXT_STEP,
+          payload: "Deleting annotations from Hypothes.is server...",
         })
-        router.push("/")
+        await deleteAnnotations({
+          taskDispatch,
+          datasetId: dataset.id,
+          annotations: deleteAnns,
+          isAdminAuthor: false,
+        })
+      }
+      if (manuscript.id) {
+        taskDispatch({
+          type: TaskActionType.NEXT_STEP,
+          payload: `Deleting manuscript ${manuscript.name}...`,
+        })
+        await axiosClient.delete(`/api/delete-file/${manuscript.id}`)
+      }
+      await axiosClient.put(`/api/datasets/${dataset.id}/annorep/delete`)
+      taskDispatch({
+        type: TaskActionType.FINISH,
+        payload: `Deleted ATI project from data project ${dataset.title}.`,
       })
-      .catch((error) => {
-        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
-      })
+      router.push("/")
+    } catch (e) {
+      taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
+    }
   }
 
   return (

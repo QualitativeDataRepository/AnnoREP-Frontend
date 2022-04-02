@@ -1,9 +1,9 @@
-import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
 import { axiosClient } from "../../../../features/app"
 
+import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
@@ -11,19 +11,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
+      const { id } = req.query
       const {
-        destinationUrl: url,
-        isAdminAuthor,
-        annotations,
+        sourceHypothesisGroup,
+        isAdminDownloader,
+        offset,
+        limit,
+        destinationUrl,
         destinationHypothesisGroup,
         privateAnnotation,
+        isAdminAuthor,
       } = req.body
-      const requestDesc = `Exporting annotations to ${url}`
+      const requestDesc = `Exporting annotations to ${destinationUrl}`
+      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
+      const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
       const { hypothesisApiToken } = session
       try {
-        const copyAnns: AxiosPromise<any>[] = annotations.map((annotation: any) => {
+        const { data } = await axiosClient.get(searchEndpoint, {
+          params: {
+            limit,
+            uri,
+            offset,
+            group: sourceHypothesisGroup,
+          },
+          headers: {
+            Authorization: `Bearer ${
+              isAdminDownloader ? process.env.ADMIN_HYPOTHESIS_API_TOKEN : hypothesisApiToken
+            }`,
+            Accept: "application/json",
+            [REQUEST_DESC_HEADER_NAME]: `Downloading annotations at offset ${offset}`,
+          },
+        })
+        const exactMatches = data.rows.filter((annotation: any) => annotation.uri === uri)
+        const copyAnns = exactMatches.map((annotation: any) => {
           annotation.target.forEach((element: any) => {
-            element.source = url
+            element.source = destinationUrl
           })
           let newReadPermission = annotation.permissions.read
           if (!privateAnnotation) {
@@ -33,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             method: "POST",
             url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
             data: JSON.stringify({
-              uri: url,
+              uri: destinationUrl,
               //document
               text: annotation.text,
               tags: annotation.tags,
@@ -53,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         await Promise.all(copyAnns)
         res.status(200).json({
-          totalExported: annotations.length,
+          total: exactMatches.length,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)

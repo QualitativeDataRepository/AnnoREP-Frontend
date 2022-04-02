@@ -13,7 +13,7 @@ axiosRetry(axiosClient, {
         return retryAfter
       }
       if (error.response.status === 429 && error.config.url?.includes(HYPOTHESIS_API_BASE_URL)) {
-        return retryCount * 1000 /** ms */
+        return retryCount * 2000 /** ms */
       }
     }
     return axiosRetry.exponentialDelay(retryCount)

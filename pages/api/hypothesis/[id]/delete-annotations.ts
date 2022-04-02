@@ -1,4 +1,3 @@
-import { AxiosPromise } from "axios"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getSession } from "next-auth/client"
 
@@ -14,14 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       headers: { Authorization: `Bearer ${process.env.ADMIN_HYPOTHESIS_API_TOKEN}` },
     })
     if (session) {
-      const { id, isAdminAuthor } = req.query
-      const { annotations } = req.body
+      const { id } = req.query
+      const { annotations, isAdminAuthor } = req.body
       const requestDesc = `Deleting annotations from data project ${id}`
       const { hypothesisApiToken: userHypothesisApiToken, hypothesisUserId: userHypothesisUserId } =
         session
       let hypothesisApiToken = userHypothesisApiToken
       let hypothesisUserId = userHypothesisUserId
-      if (isAdminAuthor === "true") {
+      if (isAdminAuthor) {
         hypothesisApiToken = process.env.ADMIN_HYPOTHESIS_API_TOKEN
         hypothesisUserId = data.userid
       }
@@ -29,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const deletableAnnotations = annotations.filter((annotation: any) =>
           annotation.permissions.delete.includes(hypothesisUserId)
         )
-        const deleteAnns: AxiosPromise<any>[] = deletableAnnotations.map((annotation: any) => {
+        const deleteAnns = deletableAnnotations.map((annotation: any) => {
           return axiosClient.delete(
             `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations/${annotation.id}`,
             {
@@ -42,10 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         await Promise.all(deleteAnns)
         res.status(200).json({
-          totalDeleted:
-            deletableAnnotations.length === annotations.length
-              ? annotations.length
-              : `${deletableAnnotations.length}/${annotations.length}`,
+          total: deletableAnnotations.length,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)

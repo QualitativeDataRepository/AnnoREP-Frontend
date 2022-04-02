@@ -24,6 +24,7 @@ import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/
 import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
+import { deleteAnnotations, getAnnotations } from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiManuscript.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -137,79 +138,59 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     // closes the modal if click `continue`
     uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.TOGGLE_MODAL_VISIBILITY })
     if (uploadManuscriptTaskState.manuscript) {
-      const formData = new FormData()
-      formData.append("manuscript", uploadManuscriptTaskState.manuscript)
-      taskDispatch({
-        type: TaskActionType.START,
-        payload: `Uploading ${uploadManuscriptTaskState.manuscript.name}...`,
-      })
-      await axiosClient({
-        method: "POST",
-        url: `/api/datasets/${datasetId}/manuscript`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-        .then(async ({ data }) => {
-          const newManuscriptId = data.data.files[0].dataFile.id
-          const deleteAnnotationsPromise = uploadManuscriptTaskState.uploadAnnotations
-            ? axiosClient({
-                method: "GET",
-                url: `/api/hypothesis/${datasetId}/download-annotations`,
-                params: {
-                  hypothesisGroup: "",
-                  isAdminAuthor: false,
-                },
-              }).then(({ data }) => {
-                if (data.total > 0) {
-                  taskDispatch({
-                    type: TaskActionType.NEXT_STEP,
-                    payload: `Deleting current annotation(s) from Hypothes.is server...`,
-                  })
-                  return axiosClient({
-                    method: "DELETE",
-                    url: `/api/hypothesis/${datasetId}/delete-annotations`,
-                    data: JSON.stringify({ annotations: data.annotations }),
-                    params: {
-                      isAdminAuthor: false,
-                    },
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  })
-                }
-              })
-            : Promise.resolve("Skip!")
-          return await deleteAnnotationsPromise.then(() => {
-            taskDispatch({
-              type: TaskActionType.NEXT_STEP,
-              payload: `${
-                uploadManuscriptTaskState.uploadAnnotations
-                  ? "Extracting annotations"
-                  : "Creating ingest PDF"
-              } from ${uploadManuscriptTaskState.manuscript?.name}...`,
-            })
-            return axiosClient({
-              method: "PUT",
-              url: `/api/arcore/${newManuscriptId}`,
-              params: {
-                datasetId: datasetId,
-                uploadAnnotations: uploadManuscriptTaskState.uploadAnnotations,
-              },
-            })
+      try {
+        const formData = new FormData()
+        formData.append("manuscript", uploadManuscriptTaskState.manuscript)
+        taskDispatch({
+          type: TaskActionType.START,
+          payload: `Uploading ${uploadManuscriptTaskState.manuscript.name}...`,
+        })
+        const uploadManuscriptResponse = await axiosClient.post(
+          `/api/datasets/${datasetId}/manuscript`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        //TODO BETTER RESPONSE
+        const newManuscriptId = uploadManuscriptResponse.data.data.files[0].dataFile.id
+        if (uploadManuscriptTaskState.uploadAnnotations) {
+          const deleteAnns = await getAnnotations({
+            datasetId,
+            // TODO: maybe don't delete everything written by the user -- just in public group?
+            hypothesisGroup: "",
+            isAdminDownloader: false,
           })
+          if (deleteAnns.length > 0) {
+            await deleteAnnotations({
+              datasetId,
+              annotations: deleteAnns,
+              isAdminAuthor: false,
+            })
+          }
+        }
+        taskDispatch({
+          type: TaskActionType.NEXT_STEP,
+          payload: `${
+            uploadManuscriptTaskState.uploadAnnotations
+              ? "Extracting annotations"
+              : "Creating ingest PDF"
+          } from ${uploadManuscriptTaskState.manuscript?.name}...`,
         })
-        .then(() => {
-          taskDispatch({
-            type: TaskActionType.FINISH,
-            payload: `Uploaded ${uploadManuscriptTaskState.manuscript?.name}.`,
-          })
-          router.reload()
+        await axiosClient.put(`/api/arcore/${newManuscriptId}`, {
+          datasetId,
+          uploadAnnotations: uploadManuscriptTaskState.uploadAnnotations,
         })
-        .catch((error) => {
-          taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
+        taskDispatch({
+          type: TaskActionType.FINISH,
+          payload: `Uploaded ${uploadManuscriptTaskState.manuscript?.name}.`,
         })
+        router.reload()
+      } catch (e) {
+        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
+      }
     } else {
       taskDispatch({ type: TaskActionType.FAIL, payload: "Please upload a manuscript file." })
     }

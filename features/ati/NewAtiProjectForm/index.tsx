@@ -158,7 +158,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
         return axiosClient({
           method: "PUT",
           url: `/api/arcore/${manuscriptId}`,
-          params: {
+          data: {
             datasetId: selectedDataset?.id,
             uploadAnnotations: true,
           },
