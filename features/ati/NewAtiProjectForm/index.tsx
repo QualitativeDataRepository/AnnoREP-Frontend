@@ -172,7 +172,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
 
       router.push(`/ati/${selectedDataset?.id}/${AtiTab.manuscript.id}`)
     } catch (e) {
-      await Promise.all(undos)
+      await Promise.all(undos.map((undo) => undo()))
       taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
     }
   }
