@@ -10,7 +10,16 @@ export default {
 const Template: Story<AtiTabProps> = (args) => <AtiTab {...args} />
 
 const args = {
-  isLoggedIn: true,
+  user: {
+    dataverse: {
+      name: "User name @ QDR",
+      link: "test.com",
+    },
+    hypothesis: {
+      name: "User name @ Hypothes.is",
+      link: "test.com",
+    },
+  },
   dataset: {
     id: "dataset-id",
     doi: "doi",
