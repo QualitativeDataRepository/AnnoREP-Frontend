@@ -109,6 +109,7 @@ interface ExportAnnotationsArgs {
   destinationHypothesisGroup: string
   privateAnnotation: boolean
   isAdminAuthor: boolean
+  addQdrInfo: boolean
   taskDispatch: Dispatch<ITaskAction>
 }
 export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<number> {
@@ -120,6 +121,7 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     destinationHypothesisGroup,
     privateAnnotation,
     isAdminAuthor,
+    addQdrInfo,
     taskDispatch,
   } = args
   const total = await getTotalAnnotations({
@@ -127,7 +129,7 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     isAdminDownloader,
     hypothesisGroup: sourceHypothesisGroup,
   })
-  let totalDeleted = 0
+  let totalExported = 0
   const offsets = range(0, total - 1, REQUEST_BATCH_SIZE)
   for (const offset of offsets) {
     taskDispatch({
@@ -147,6 +149,7 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
         destinationHypothesisGroup,
         isAdminAuthor,
         privateAnnotation,
+        addQdrInfo,
         limit: REQUEST_BATCH_SIZE,
       }),
       {
@@ -155,7 +158,8 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
         },
       }
     )
-    totalDeleted += response.data.total
+    totalExported += response.data.total
   }
-  return totalDeleted
+  //TODO: write one intial annotation on the title
+  return totalExported
 }

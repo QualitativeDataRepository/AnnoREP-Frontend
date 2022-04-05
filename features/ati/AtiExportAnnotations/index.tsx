@@ -46,6 +46,8 @@ export interface AtiExportAnnotationstProps {
   manuscript: IManuscript
   /** The list of hypothes.is groups */
   hypothesisGroups: IHypothesisGroup[]
+  /** Can the exported annotations be prefixed with QDR info */
+  canAddQdrInfo: boolean
 }
 
 const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
@@ -53,6 +55,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   datasetId,
   manuscript,
   hypothesisGroups,
+  canAddQdrInfo,
 }) => {
   const exportHypothesisUrl = useRef("")
   const { state: exportTaskState, dispatch: exportTaskDispatch } = useTask({
@@ -101,6 +104,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       destinationHypothesisGroup: { value: string }
       sourceHypothesisGroup: { value: string }
       privateAnnotation: { checked: boolean }
+      addQdrInfo: { checked: boolean }
     }
     try {
       if (
@@ -121,6 +125,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         destinationHypothesisGroup: target.destinationHypothesisGroup.value,
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
+        addQdrInfo: target.addQdrInfo.checked,
         taskDispatch: exportTaskDispatch,
       })
 
@@ -303,6 +308,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               name="privateAnnotation"
             />
           </div>
+          {canAddQdrInfo && (
+            <div className={formStyles.item}>
+              <Toggle
+                id="toggle-add-qdr-info"
+                labelA="No"
+                labelB="Yes"
+                labelText="Add QDR information to annotations"
+                name="addQdrInfo"
+              />
+            </div>
+          )}
           <Button
             className={formStyles.submitBtn}
             type="submit"
