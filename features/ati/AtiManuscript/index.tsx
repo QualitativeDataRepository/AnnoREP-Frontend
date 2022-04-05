@@ -22,6 +22,7 @@ import useTask, {
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
+import { deleteFile, GetApiResponse } from "../../../utils/apiUtils"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import { deleteAnnotations, getAnnotations } from "../../../utils/hypothesisUtils"
@@ -138,6 +139,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
     // closes the modal if click `continue`
     uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.TOGGLE_MODAL_VISIBILITY })
     if (uploadManuscriptTaskState.manuscript) {
+      const undos: GetApiResponse[] = []
       try {
         const formData = new FormData()
         formData.append("manuscript", uploadManuscriptTaskState.manuscript)
@@ -156,6 +158,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         )
         //TODO BETTER RESPONSE
         const newManuscriptId = uploadManuscriptResponse.data.data.files[0].dataFile.id
+        undos.push(deleteFile(newManuscriptId))
         if (uploadManuscriptTaskState.uploadAnnotations) {
           const deleteAnns = await getAnnotations({
             datasetId,
@@ -189,6 +192,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         })
         router.reload()
       } catch (e) {
+        await Promise.all(undos.map((undo) => undo()))
         taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
       }
     } else {

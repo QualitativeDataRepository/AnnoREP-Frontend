@@ -36,6 +36,7 @@ import useTask, {
   getTaskStatus,
 } from "../../../hooks/useTask"
 import { IDatasetOption } from "../../../types/dataverse"
+import { GetApiResponse, deleteFile } from "../../../utils/apiUtils"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 
@@ -133,47 +134,47 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     }
     const formData = new FormData()
     formData.append("manuscript", manuscript)
-    taskDispatch({ type: TaskActionType.START, payload: "Creating ATI project..." })
-    await axiosClient({
-      method: "PUT",
-      url: `/api/datasets/${selectedDataset?.id}/annorep`,
-    })
-      .then(() => {
-        taskDispatch({ type: TaskActionType.NEXT_STEP, payload: `Uploading ${manuscript.name}...` })
-        return axiosClient({
-          method: "POST",
-          url: `/api/datasets/${selectedDataset?.id}/manuscript`,
-          data: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
+    const undos: GetApiResponse[] = []
+    try {
+      taskDispatch({ type: TaskActionType.START, payload: `Uploading ${manuscript.name}...` })
+      const uploadManuscriptResponse = await axiosClient({
+        method: "POST",
+        url: `/api/datasets/${selectedDataset?.id}/manuscript`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       })
-      .then(({ data }) => {
-        taskDispatch({
-          type: TaskActionType.NEXT_STEP,
-          payload: `Extracting annotations from ${manuscript.name}...`,
-        })
-        const manuscriptId = data.data.files[0].dataFile.id
-        return axiosClient({
-          method: "PUT",
-          url: `/api/arcore/${manuscriptId}`,
-          data: {
-            datasetId: selectedDataset?.id,
-            uploadAnnotations: true,
-          },
-        })
+      const manuscriptId = uploadManuscriptResponse.data.data.files[0].dataFile.id
+      undos.push(deleteFile(manuscriptId))
+
+      taskDispatch({
+        type: TaskActionType.NEXT_STEP,
+        payload: `Extracting annotations from ${manuscript.name}...`,
       })
-      .then(() => {
-        taskDispatch({
-          type: TaskActionType.FINISH,
-          payload: `Created ATI project for data project ${selectedDataset?.label}.`,
-        })
-        router.push(`/ati/${selectedDataset?.id}/${AtiTab.manuscript.id}`)
+      await axiosClient({
+        method: "PUT",
+        url: `/api/arcore/${manuscriptId}`,
+        data: {
+          datasetId: selectedDataset?.id,
+          uploadAnnotations: true,
+        },
       })
-      .catch((error) => {
-        taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(error) })
+
+      await axiosClient({
+        method: "PUT",
+        url: `/api/datasets/${selectedDataset?.id}/annorep`,
       })
+      taskDispatch({
+        type: TaskActionType.FINISH,
+        payload: `Created ATI project for data project ${selectedDataset?.label}.`,
+      })
+
+      router.push(`/ati/${selectedDataset?.id}/${AtiTab.manuscript.id}`)
+    } catch (e) {
+      await Promise.all(undos.map((undo) => undo()))
+      taskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
+    }
   }
   //TODO: is ownerId=1 justified?
   return (
