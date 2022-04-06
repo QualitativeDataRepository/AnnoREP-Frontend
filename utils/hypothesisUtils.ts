@@ -161,5 +161,13 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     totalExported += response.data.total
   }
   //TODO: write one intial annotation on the title
+  if (addQdrInfo /**manuscriptId */) {
+    await axiosClient.post(`/api/hypothesis/${datasetId}/title-annotation`, {
+      destinationUrl,
+      destinationHypothesisGroup,
+      privateAnnotation,
+      //manuscriptId
+    })
+  }
   return totalExported
 }
