@@ -86,7 +86,6 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         destinationHypothesisGroup: hypothesisAtiStagingGroupId,
         isAdminAuthor: true,
         privateAnnotation: false,
-        addQdrInfo: false,
       })
 
       await axiosClient.post(`/api/datasets/${id}/submit-for-review`)

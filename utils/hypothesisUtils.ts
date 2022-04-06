@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios"
 import { axiosClient } from "../features/app"
 import { ITaskAction, TaskActionType } from "../hooks/useTask/state"
 
+import { ATI_HEADER_HTML } from "../constants/ati"
 import { ANNOTATIONS_MAX_LIMIT, REQUEST_BATCH_SIZE } from "../constants/hypothesis"
 import { range } from "./arrayUtils"
 
@@ -109,8 +110,11 @@ interface ExportAnnotationsArgs {
   destinationHypothesisGroup: string
   privateAnnotation: boolean
   isAdminAuthor: boolean
-  addQdrInfo: boolean
   taskDispatch: Dispatch<ITaskAction>
+  addQdrInfo?: {
+    manuscriptId: string
+    datasetDoi: string
+  }
 }
 export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<number> {
   const {
@@ -121,8 +125,8 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     destinationHypothesisGroup,
     privateAnnotation,
     isAdminAuthor,
-    addQdrInfo,
     taskDispatch,
+    addQdrInfo,
   } = args
   const total = await getTotalAnnotations({
     datasetId,
@@ -149,7 +153,7 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
         destinationHypothesisGroup,
         isAdminAuthor,
         privateAnnotation,
-        addQdrInfo,
+        addQdrInfo: addQdrInfo ? true : false,
         limit: REQUEST_BATCH_SIZE,
       }),
       {
@@ -160,14 +164,28 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     )
     totalExported += response.data.total
   }
-  //TODO: write one intial annotation on the title
-  if (addQdrInfo /**manuscriptId */) {
+  if (addQdrInfo) {
     await axiosClient.post(`/api/hypothesis/${datasetId}/title-annotation`, {
       destinationUrl,
       destinationHypothesisGroup,
       privateAnnotation,
-      //manuscriptId
+      manuscriptId: addQdrInfo.manuscriptId,
+      datasetDoi: addQdrInfo.datasetDoi,
     })
   }
   return totalExported
+}
+
+export function createInitialAnnotationText(citation: string, doi: string): string {
+  //const nonVersionedCitation = citation.split(". ")
+  //nonVersionedCitation.pop()
+  return `${ATI_HEADER_HTML}This is an Annotation for Transparent Inquiry project, published by the <a href="https://qdr.syr.edu">Qualitative Data Repository</a>.
+
+  <b>The <a href="${doi}">Data Overview</a> discusses project context, data generation and analysis, and logic of annotation.</b>
+  
+  Please cite as:
+
+  ${citation}
+
+  <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }

@@ -11,7 +11,11 @@ const Template: Story<AtiExportAnnotationstProps> = (args) => <AtiExportAnnotati
 
 export const Default = Template.bind({})
 Default.args = {
-  datasetId: "dataset-id",
+  dataset: {
+    id: "dataset-id",
+    doi: "dataset-doi",
+    title: "Dataset title",
+  },
   manuscript: {
     id: "manuscript-id",
     name: "manuscript",

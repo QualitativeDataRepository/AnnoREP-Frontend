@@ -44,7 +44,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         })
         const exactMatches = data.rows.filter((annotation: any) => annotation.uri === uri)
-        //TODO: prefix each annotation with qdr info
         const copyAnns = exactMatches.map((annotation: any) => {
           annotation.target.forEach((element: any) => {
             element.source = destinationUrl

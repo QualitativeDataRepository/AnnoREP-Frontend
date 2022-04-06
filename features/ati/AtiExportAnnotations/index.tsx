@@ -24,7 +24,7 @@ import useTask, {
   getTaskStatus,
   TaskActionType,
 } from "../../../hooks/useTask"
-import { IManuscript } from "../../../types/dataverse"
+import { IDataset, IManuscript } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import {
@@ -41,7 +41,7 @@ export interface AtiExportAnnotationstProps {
   /** The canonical url of the app */
   appUrl: string
   /** The dataset id of the ati project */
-  datasetId: string
+  dataset: IDataset
   /** The manuscript for the ati project */
   manuscript: IManuscript
   /** The list of hypothes.is groups */
@@ -52,7 +52,7 @@ export interface AtiExportAnnotationstProps {
 
 const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   appUrl,
-  datasetId,
+  dataset,
   manuscript,
   hypothesisGroups,
   canAddQdrInfo,
@@ -77,7 +77,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     let didCancel = false
     const getAnnotationsJson = async () => {
       const annotations = await getAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
         isAdminDownloader: false,
       })
@@ -94,7 +94,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     return () => {
       didCancel = true
     }
-  }, [manuscript.id, datasetId])
+  }, [manuscript.id, dataset.id])
 
   const onExportAnnotations: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -118,15 +118,21 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
       exportTaskDispatch({ type: TaskActionType.START, payload: "Exporting annotations..." })
       const totalExported = await exportAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         sourceHypothesisGroup: target.sourceHypothesisGroup.value,
         isAdminDownloader: false,
         destinationUrl: target.destinationUrl.value,
         destinationHypothesisGroup: target.destinationHypothesisGroup.value,
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
-        addQdrInfo: target.addQdrInfo.checked,
         taskDispatch: exportTaskDispatch,
+        addQdrInfo:
+          target.addQdrInfo && target.addQdrInfo.checked
+            ? {
+                manuscriptId: manuscript.id,
+                datasetDoi: dataset.doi,
+              }
+            : undefined,
       })
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
@@ -170,14 +176,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     try {
       deleteTaskDispatch({ type: TaskActionType.START, payload: "Deleting annotations..." })
       const annotations = await getAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         hypothesisGroup: deleteAnnotationsHypothesisGroup,
         isAdminDownloader: false,
       })
 
       const totalDeleted = await deleteAnnotations({
-        datasetId,
         annotations,
+        datasetId: dataset.id,
         isAdminAuthor: false,
         taskDispatch: deleteTaskDispatch,
       })
@@ -244,7 +250,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               aria-readonly
               id="export-annotations-source-url"
               name="sourceUrl"
-              value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
+              value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
               size="xl"
@@ -350,7 +356,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               aria-readonly
               id="delete-annotations-source-url"
               name="sourceUrl"
-              value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
+              value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
               size="xl"

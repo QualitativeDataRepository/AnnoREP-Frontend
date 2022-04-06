@@ -48,7 +48,7 @@ const AtiPage: FC<AtiPageProps> = ({
       {atiProjectDetails && (
         <AtiExportAnnotations
           appUrl={appUrl}
-          datasetId={atiProjectDetails.dataset.id}
+          dataset={atiProjectDetails.dataset}
           manuscript={atiProjectDetails.manuscript}
           hypothesisGroups={hypothesisGroups}
           canAddQdrInfo={isAdminUser}
