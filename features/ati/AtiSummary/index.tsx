@@ -49,7 +49,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({
   appUrl,
   hypothesisAtiStagingGroupId,
 }) => {
-  const { id, doi, title, description, zip, subjects, publicationStatuses, citationHtml } =
+  const { id, doi, title, description, subjects, publicationStatuses, citationHtml } =
     atiProjectDetails.dataset
   const { manuscript, datasources } = atiProjectDetails
 
@@ -129,16 +129,6 @@ const AtiSummary: FC<AtiSummaryProps> = ({
       </div>
       <div className={styles.aboutContainer}>
         <div className={styles.buttonSet}>
-          {zip && (
-            <Button
-              kind="primary"
-              href={`data:application/zip;base64,${zip}`}
-              download={`dataverse_files.zip`}
-              size="sm"
-            >
-              Download project
-            </Button>
-          )}
           <Button
             kind="primary"
             size="sm"
