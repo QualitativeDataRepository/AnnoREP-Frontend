@@ -3,7 +3,7 @@ import { getSession } from "next-auth/client"
 
 import { axiosClient } from "../../../../features/app"
 
-import { AtiTab } from "../../../../constants/ati"
+import { AtiTab, ATI_HEADER_HTML } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         destinationUrl,
         destinationHypothesisGroup,
         privateAnnotation,
+        addQdrInfo,
         isAdminAuthor,
       } = req.body
       const requestDesc = `Exporting annotations to ${destinationUrl}`
@@ -51,13 +52,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (!privateAnnotation) {
             newReadPermission = [`group:${destinationHypothesisGroup}`]
           }
+          let newText = annotation.text
+          if (addQdrInfo) {
+            newText = `${ATI_HEADER_HTML}${annotation.text}`
+          }
           return axiosClient({
             method: "POST",
             url: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
             data: JSON.stringify({
               uri: destinationUrl,
               //document
-              text: annotation.text,
+              text: newText,
               tags: annotation.tags,
               group: destinationHypothesisGroup,
               permissions: { read: newReadPermission },

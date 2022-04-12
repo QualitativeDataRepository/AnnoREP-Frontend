@@ -24,7 +24,7 @@ import useTask, {
   getTaskStatus,
   TaskActionType,
 } from "../../../hooks/useTask"
-import { IManuscript } from "../../../types/dataverse"
+import { IDataset, IManuscript } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import {
@@ -40,19 +40,22 @@ import layoutStyles from "../../components/Layout/Layout.module.css"
 export interface AtiExportAnnotationstProps {
   /** The canonical url of the app */
   appUrl: string
-  /** The dataset id of the ati project */
-  datasetId: string
+  /** The dataset of the ati project */
+  dataset: IDataset
   /** The manuscript for the ati project */
   manuscript: IManuscript
   /** The list of hypothes.is groups */
   hypothesisGroups: IHypothesisGroup[]
+  /** Can the exported annotations be prefixed with QDR info? */
+  canAddQdrInfo: boolean
 }
 
 const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
   appUrl,
-  datasetId,
+  dataset,
   manuscript,
   hypothesisGroups,
+  canAddQdrInfo,
 }) => {
   const exportHypothesisUrl = useRef("")
   const { state: exportTaskState, dispatch: exportTaskDispatch } = useTask({
@@ -74,7 +77,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     let didCancel = false
     const getAnnotationsJson = async () => {
       const annotations = await getAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
         isAdminDownloader: false,
       })
@@ -91,7 +94,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     return () => {
       didCancel = true
     }
-  }, [manuscript.id, datasetId])
+  }, [manuscript.id, dataset.id])
 
   const onExportAnnotations: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -101,6 +104,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       destinationHypothesisGroup: { value: string }
       sourceHypothesisGroup: { value: string }
       privateAnnotation: { checked: boolean }
+      addQdrInfo: { checked: boolean }
     }
     try {
       if (
@@ -114,7 +118,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
       exportTaskDispatch({ type: TaskActionType.START, payload: "Exporting annotations..." })
       const totalExported = await exportAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         sourceHypothesisGroup: target.sourceHypothesisGroup.value,
         isAdminDownloader: false,
         destinationUrl: target.destinationUrl.value,
@@ -122,6 +126,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
         taskDispatch: exportTaskDispatch,
+        addQdrInfo:
+          target.addQdrInfo && target.addQdrInfo.checked
+            ? {
+                manuscriptId: manuscript.id,
+                datasetDoi: dataset.doi,
+              }
+            : undefined,
       })
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
@@ -165,14 +176,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     try {
       deleteTaskDispatch({ type: TaskActionType.START, payload: "Deleting annotations..." })
       const annotations = await getAnnotations({
-        datasetId,
+        datasetId: dataset.id,
         hypothesisGroup: deleteAnnotationsHypothesisGroup,
         isAdminDownloader: false,
       })
 
       const totalDeleted = await deleteAnnotations({
-        datasetId,
         annotations,
+        datasetId: dataset.id,
         isAdminAuthor: false,
         taskDispatch: deleteTaskDispatch,
       })
@@ -239,7 +250,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               aria-readonly
               id="export-annotations-source-url"
               name="sourceUrl"
-              value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
+              value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
               size="xl"
@@ -303,6 +314,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               name="privateAnnotation"
             />
           </div>
+          {canAddQdrInfo && (
+            <div className={formStyles.item}>
+              <Toggle
+                id="toggle-add-qdr-info"
+                labelA="No"
+                labelB="Yes"
+                labelText="Add QDR information to annotations"
+                name="addQdrInfo"
+              />
+            </div>
+          )}
           <Button
             className={formStyles.submitBtn}
             type="submit"
@@ -334,7 +356,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               aria-readonly
               id="delete-annotations-source-url"
               name="sourceUrl"
-              value={`${appUrl}/ati/${datasetId}/${AtiTab.manuscript.id}`}
+              value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
               size="xl"

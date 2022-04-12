@@ -29,9 +29,16 @@ interface AtiPageProps {
   serverUrl: string
   atiProjectDetails: IATIProjectDetails | null
   hypothesisGroups: IHypothesisGroup[]
+  isAdminUser: boolean
 }
 
-const AtiPage: FC<AtiPageProps> = ({ user, atiProjectDetails, hypothesisGroups, appUrl }) => {
+const AtiPage: FC<AtiPageProps> = ({
+  user,
+  atiProjectDetails,
+  hypothesisGroups,
+  appUrl,
+  isAdminUser,
+}) => {
   return (
     <AtiTab
       user={user}
@@ -41,9 +48,10 @@ const AtiPage: FC<AtiPageProps> = ({ user, atiProjectDetails, hypothesisGroups, 
       {atiProjectDetails && (
         <AtiExportAnnotations
           appUrl={appUrl}
-          datasetId={atiProjectDetails.dataset.id}
+          dataset={atiProjectDetails.dataset}
           manuscript={atiProjectDetails.manuscript}
           hypothesisGroups={hypothesisGroups}
+          canAddQdrInfo={isAdminUser}
         />
       )}
     </AtiTab>
@@ -60,6 +68,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     appUrl: process.env.NEXTAUTH_URL as string,
     serverUrl: process.env.DATAVERSE_SERVER_URL as string,
     hypothesisGroups: [],
+    isAdminUser: false,
   }
   const datasetId = context?.params?.id
 
@@ -69,6 +78,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (session) {
     const { dataverseApiToken, hypothesisApiToken } = session
+    if (hypothesisApiToken === process.env.ADMIN_HYPOTHESIS_API_TOKEN) {
+      props.isAdminUser = true
+    }
     //Get the dataset json
     await axiosClient
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
