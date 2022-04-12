@@ -176,16 +176,22 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
   return totalExported
 }
 
-export function createInitialAnnotationText(citation: string, doi: string): string {
-  //const nonVersionedCitation = citation.split(". ")
-  //nonVersionedCitation.pop()
+export function createInitialAnnotationText(
+  citation: string,
+  doi: string,
+  isDraftState: boolean
+): string {
+  const citationArr = citation.split(". ")
+  if (isDraftState) {
+    citationArr.pop()
+  }
   return `${ATI_HEADER_HTML}This is an Annotation for Transparent Inquiry project, published by the <a href="https://qdr.syr.edu">Qualitative Data Repository</a>.
 
   <b>The <a href="${doi}">Data Overview</a> discusses project context, data generation and analysis, and logic of annotation.</b>
   
   Please cite as:
 
-  ${citation}
+  ${citationArr.join(". ")}${isDraftState ? "." : ""}
 
   <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }

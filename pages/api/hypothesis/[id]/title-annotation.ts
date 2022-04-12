@@ -60,6 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const dataset = myDataResponse.data.data.items[0]
         const citationHtml = dataset.citationHtml
         const doiUrl = dataset.url
+        const isDraftState = dataset.is_draft_state
 
         const annotation = titleAnnResponse.data
         annotation.target.forEach((element: any) => {
@@ -74,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           JSON.stringify({
             uri: destinationUrl,
             document: annotation.document,
-            text: createInitialAnnotationText(citationHtml, doiUrl),
+            text: createInitialAnnotationText(citationHtml, doiUrl, isDraftState),
             target: annotation.target,
             group: destinationHypothesisGroup,
             permissions: { read: newReadPermission },
