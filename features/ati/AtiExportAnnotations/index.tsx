@@ -40,13 +40,13 @@ import layoutStyles from "../../components/Layout/Layout.module.css"
 export interface AtiExportAnnotationstProps {
   /** The canonical url of the app */
   appUrl: string
-  /** The dataset id of the ati project */
+  /** The dataset of the ati project */
   dataset: IDataset
   /** The manuscript for the ati project */
   manuscript: IManuscript
   /** The list of hypothes.is groups */
   hypothesisGroups: IHypothesisGroup[]
-  /** Can the exported annotations be prefixed with QDR info */
+  /** Can the exported annotations be prefixed with QDR info? */
   canAddQdrInfo: boolean
 }
 
