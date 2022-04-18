@@ -22,6 +22,7 @@ import {
   DATASET_DV_TYPE,
   KIND_OF_DATA_NAME,
   PUBLICATION_STATUSES,
+  ROLE_IDS,
 } from "../constants/dataverse"
 import { IAnnoRepUser } from "../types/auth"
 import { getAnnoRepUser } from "../utils/authUtils"
@@ -102,6 +103,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             dvobject_types: DATASET_DV_TYPE,
             published_states: PUBLICATION_STATUSES,
             mydata_search_term: `${KIND_OF_DATA_NAME}:${ANNOREP_METADATA_VALUE}`,
+            role_ids: ROLE_IDS,
           },
           paramsSerializer: (params) => {
             return qs.stringify(params, { indices: false })

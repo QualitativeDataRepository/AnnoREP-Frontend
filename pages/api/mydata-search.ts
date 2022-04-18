@@ -8,6 +8,7 @@ import {
   ANNOREP_METADATA_VALUE,
   DATASET_DV_TYPE,
   KIND_OF_DATA_NAME,
+  ROLE_IDS,
 } from "../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../constants/http"
 import { IAtiProject } from "../../types/ati"
@@ -37,6 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               published_states: publicationStatuses,
               mydata_search_term: searchTerm,
               selected_page: selectedPage || 1,
+              role_ids: ROLE_IDS,
             },
             paramsSerializer: (params) => {
               return qs.stringify(params, { indices: false })
