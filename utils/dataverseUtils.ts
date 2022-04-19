@@ -5,7 +5,6 @@ import { IATIProjectDetails } from "../types/dataverse"
 
 export function createAtiProjectDetails(
   response: AxiosResponse<any>,
-  datasetZip: string,
   ingestPdf: string
 ): IATIProjectDetails {
   const latest = response.data.data.latestVersion
@@ -24,7 +23,6 @@ export function createAtiProjectDetails(
       title: metadataFields.find((field: any) => field.typeName === "title").value,
       description: metadataFields.find((field: any) => field.typeName === "dsDescription").value[0]
         .dsDescriptionValue.value,
-      zip: datasetZip,
       subjects: metadataFields.find((field: any) => field.typeName === "subject").value,
     },
     manuscript: {

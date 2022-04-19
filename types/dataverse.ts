@@ -3,7 +3,6 @@ export interface IDataset {
   doi: string
   title: string
   description?: string
-  zip?: string
   citationHtml?: string
   publicationStatuses?: string[]
   subjects?: string[]

@@ -25,7 +25,6 @@ const args = {
     doi: "doi",
     title: "Dataset",
     description: "Description",
-    zip: "base 64 zip of the project bundle",
     subjects: ["Subject"],
     publicationStatuses: ["Draft"],
     citationHtml: "Citation HTML",

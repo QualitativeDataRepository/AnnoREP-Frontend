@@ -124,7 +124,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.error(status, message)
       })
     if (responses.length === 1) {
-      props.atiProjectDetails = createAtiProjectDetails(responses[0], "", ingestPdf)
+      props.atiProjectDetails = createAtiProjectDetails(responses[0], ingestPdf)
     }
 
     try {

@@ -70,7 +70,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const datasetId = context?.params?.id
 
   const responses: AxiosResponse<any>[] = []
-  let datasetZip = ""
   let citationHtml = ""
   let publicationStatuses: string[] = []
 
@@ -88,46 +87,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       .then((datasetJsonResponse) => {
         responses.push(datasetJsonResponse)
         const dsPersistentId = datasetJsonResponse.data.data.latestVersion.datasetPersistentId
-        const promises = [
-          axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
-            params: {
-              key: dataverseApiToken,
-              dvobject_types: DATASET_DV_TYPE,
-              published_states: PUBLICATION_STATUSES,
-              mydata_search_term: `"${dsPersistentId}"`,
-            },
-            paramsSerializer: (params) => {
-              return qs.stringify(params, { indices: false })
-            },
-            headers: {
-              [REQUEST_DESC_HEADER_NAME]: `Searching for data project ${dsPersistentId}`,
-            },
-          }),
-        ]
-        const latest = datasetJsonResponse.data.data.latestVersion
-        if (latest.files.length > 0) {
-          //Get the dataset zip
-          promises.push(
-            axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/access/dataset/${datasetId}`, {
-              responseType: "arraybuffer",
-              headers: {
-                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
-                [REQUEST_DESC_HEADER_NAME]: `Getting the zip for data project ${datasetId}`,
-                Accept: "application/zip",
-              },
-            })
-          )
-        }
-        return Promise.all(promises)
+        return axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+          params: {
+            key: dataverseApiToken,
+            dvobject_types: DATASET_DV_TYPE,
+            published_states: PUBLICATION_STATUSES,
+            mydata_search_term: `"${dsPersistentId}"`,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false })
+          },
+          headers: {
+            [REQUEST_DESC_HEADER_NAME]: `Searching for data project ${dsPersistentId}`,
+          },
+        })
       })
-      .then((extraResponses) => {
-        if (extraResponses[0].data.success && extraResponses[0].data.data.items.length > 0) {
-          const dataset = extraResponses[0].data.data.items[0]
+      .then((myDataResponse) => {
+        if (myDataResponse.data.success && myDataResponse.data.data.items.length > 0) {
+          const dataset = myDataResponse.data.data.items[0]
           citationHtml = dataset.citationHtml
           publicationStatuses = dataset.publication_statuses
-        }
-        if (extraResponses.length == 2) {
-          datasetZip = Buffer.from(extraResponses[1].data, "binary").toString("base64")
         }
       })
       .catch((e) => {
@@ -135,7 +114,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.error(status, message)
       })
     if (responses.length === 1) {
-      props.atiProjectDetails = createAtiProjectDetails(responses[0], datasetZip, "")
+      props.atiProjectDetails = createAtiProjectDetails(responses[0], "")
       if (citationHtml) {
         props.atiProjectDetails.dataset.citationHtml = citationHtml
       }
