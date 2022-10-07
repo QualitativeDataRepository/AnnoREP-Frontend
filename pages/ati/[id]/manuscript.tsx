@@ -34,7 +34,6 @@ const AtiPage: FC<AtiPageProps> = ({ user, serverUrl, atiProjectDetails }) => {
       user={user}
       dataset={atiProjectDetails ? atiProjectDetails.dataset : null}
       selectedTab={AtiTabConstant.manuscript.id}
-      hasPdf={atiProjectDetails?.manuscript.id ? true : false}
     >
       {atiProjectDetails && (
         <AtiManuscript

@@ -19,12 +19,10 @@ export interface AtiTabProps {
   user: IAnnoRepUser | null
   /** The dataset for the ati project */
   dataset: IDataset | null
-  /** Display Hypothes.is client? */
-  hasPdf?: boolean
 }
 
 /** A container for different tabs of an ati project */
-const AtiTab: FC<AtiTabProps> = ({ dataset, children, user, selectedTab, hasPdf }: AtiTabProps) => {
+const AtiTab: FC<AtiTabProps> = ({ dataset, children, user, selectedTab }: AtiTabProps) => {
   const onSelectionChange = (index: number) =>
     window.location.assign(`/ati/${dataset?.id}/${tabs[index]}`)
   const selectedTabIndex = tabs.findIndex((tab) => tab === selectedTab)
@@ -70,7 +68,7 @@ const AtiTab: FC<AtiTabProps> = ({ dataset, children, user, selectedTab, hasPdf 
     )
   }
   return (
-    <Layout title={dataset ? `AnnoREP - ${dataset.title}` : "AnnoREP"} user={user} hasPdf={hasPdf}>
+    <Layout title={dataset ? `AnnoREP - ${dataset.title}` : "AnnoREP"} user={user}>
       {content}
     </Layout>
   )

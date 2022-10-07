@@ -29,7 +29,6 @@ const args = {
     publicationStatuses: ["Draft"],
     citationHtml: "Citation HTML",
   },
-  hasPdf: false,
 }
 
 export const AtiSummary = Template.bind({})
