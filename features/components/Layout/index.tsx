@@ -1,6 +1,5 @@
-import { ReactNode, FC, useEffect } from "react"
+import { ReactNode, FC } from "react"
 
-import DOMPurify from "isomorphic-dompurify"
 import Head from "next/head"
 
 import AppBar from "../AppBar"
@@ -14,24 +13,9 @@ interface LayoutProps {
   children: ReactNode
   user: IAnnoRepUser | null
   isFullWidth?: boolean
-  hasPdf?: boolean
 }
 
-const Layout: FC<LayoutProps> = ({ title, children, user, isFullWidth, hasPdf }) => {
-  useEffect(() => {
-    if (hasPdf) {
-      const hClientConfig = document.createElement("script")
-      hClientConfig.type = "application/json"
-      hClientConfig.className = "js-hypothesis-config"
-      hClientConfig.innerHTML = DOMPurify.sanitize(JSON.stringify({ openSidebar: true }))
-      const hClient = document.createElement("script")
-      hClient.src = "https://hypothes.is/embed.js"
-      hClient.async = true
-      document.head.appendChild(hClientConfig)
-      document.head.appendChild(hClient)
-    }
-  }, [hasPdf])
-
+const Layout: FC<LayoutProps> = ({ title, children, user, isFullWidth }) => {
   return (
     <>
       <Head>
