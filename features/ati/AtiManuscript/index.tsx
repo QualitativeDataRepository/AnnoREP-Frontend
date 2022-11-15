@@ -162,8 +162,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         if (uploadManuscriptTaskState.uploadAnnotations) {
           const deleteAnns = await getAnnotations({
             datasetId,
-            // TODO: maybe don't delete everything written by the user -- just in public group?
-            hypothesisGroup: "",
             isAdminDownloader: false,
           })
           if (deleteAnns.length > 0) {

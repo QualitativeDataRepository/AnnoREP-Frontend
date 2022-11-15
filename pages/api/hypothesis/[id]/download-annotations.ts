@@ -23,13 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         //TODO: add annotation type to get<>
         //limit must less than 200
+        const params: Record<string, any> = { limit, uri, offset }
+        if (hypothesisGroup !== undefined && hypothesisGroup.length > 0) {
+          params["group"] = hypothesisGroup
+        }
         const { data } = await axiosClient.get(searchEndpoint, {
-          params: {
-            limit,
-            uri,
-            offset,
-            group: hypothesisGroup,
-          },
+          params,
           headers: {
             Authorization: `Bearer ${hypothesisApiToken}`,
             Accept: "application/json",
