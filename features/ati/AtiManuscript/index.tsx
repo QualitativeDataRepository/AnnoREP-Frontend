@@ -21,7 +21,6 @@ import useTask, {
 } from "../../../hooks/useTask"
 
 import { ManuscriptMimeType, ManuscriptFileExtension } from "../../../constants/arcore"
-import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { deleteFile, GetApiResponse } from "../../../utils/apiUtils"
 import { getMimeType } from "../../../utils/fileUtils"
@@ -163,7 +162,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         if (uploadManuscriptTaskState.uploadAnnotations) {
           const deleteAnns = await getAnnotations({
             datasetId,
-            hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
             isAdminDownloader: false,
           })
           if (deleteAnns.length > 0) {

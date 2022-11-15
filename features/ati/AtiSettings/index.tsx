@@ -46,7 +46,6 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
       taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
       const deleteAnns = await getAnnotations({
         datasetId: dataset.id,
-        hypothesisGroup: "",
         isAdminDownloader: false,
       })
       if (deleteAnns.length > 0) {

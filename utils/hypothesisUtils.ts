@@ -10,7 +10,7 @@ import { range } from "./arrayUtils"
 
 interface GetAnnotationsArgs {
   datasetId: string
-  hypothesisGroup: string
+  hypothesisGroup?: string
   isAdminDownloader: boolean
 }
 export async function getTotalAnnotations(args: GetAnnotationsArgs): Promise<number> {
