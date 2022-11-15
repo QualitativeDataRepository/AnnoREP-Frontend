@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const requestDesc = `Getting the total number of annotations for data project ${id}`
       try {
         const params: Record<string, any> = { uri, limit: 1 }
-        if (hypothesisGroup.length > 0) {
+        if (hypothesisGroup !== undefined && hypothesisGroup.length > 0) {
           params["group"] = hypothesisGroup
         }
         const { data } = await axiosClient.get(searchEndpoint, {
