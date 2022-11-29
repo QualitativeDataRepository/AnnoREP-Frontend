@@ -5,7 +5,11 @@ import { axiosClient } from "../features/app"
 import { ITaskAction, TaskActionType } from "../hooks/useTask/state"
 
 import { ATI_HEADER_HTML } from "../constants/ati"
-import { ANNOTATIONS_MAX_LIMIT, REQUEST_BATCH_SIZE } from "../constants/hypothesis"
+import {
+  ANNOTATIONS_MAX_LIMIT,
+  REQUEST_BATCH_SIZE,
+  TOTAL_EXPORTED_ANNOTATIONS_LIMIT,
+} from "../constants/hypothesis"
 import { range } from "./arrayUtils"
 
 interface GetAnnotationsArgs {
@@ -115,6 +119,7 @@ interface ExportAnnotationsArgs {
     manuscriptId: string
     datasetDoi: string
   }
+  numberAnnotations: boolean
 }
 export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<number> {
   const {
@@ -127,12 +132,22 @@ export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<nu
     isAdminAuthor,
     taskDispatch,
     addQdrInfo,
+    numberAnnotations,
   } = args
   const total = await getTotalAnnotations({
     datasetId,
     isAdminDownloader,
     hypothesisGroup: sourceHypothesisGroup,
   })
+  if (numberAnnotations && total > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
+    throw new Error(
+      `Found ${total.toLocaleString(
+        "en-US"
+      )} annotations. AnnoREP can't number annotations for projects with more than ${TOTAL_EXPORTED_ANNOTATIONS_LIMIT.toLocaleString(
+        "en-US"
+      )} annotations.`
+    )
+  }
   let totalExported = 0
   const offsets = range(0, total - 1, REQUEST_BATCH_SIZE)
   for (const offset of offsets) {
