@@ -16,6 +16,7 @@ import {
   SOURCE_MANUSCRIPT_TAG,
 } from "../../../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../../../constants/http"
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { IAnnoRepUser } from "../../../types/auth"
 import { IATIProjectDetails } from "../../../types/dataverse"
 import { IHypothesisGroup } from "../../../types/hypothesis"
@@ -128,14 +129,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     try {
-      const { data } = await axiosClient.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/groups`, {
-        headers: {
-          Authorization: `Bearer ${hypothesisApiToken}`,
-          Accept: "application/json",
-          [REQUEST_DESC_HEADER_NAME]: "Getting Hypothes.is groups",
-        },
+      const [publicGroupResponse, memberGroupResponse] = await Promise.all([
+        axiosClient.get(
+          `${process.env.HYPOTHESIS_SERVER_URL}/api/groups/${HYPOTHESIS_PUBLIC_GROUP_ID}`,
+          {
+            headers: {
+              Authorization: `Bearer ${hypothesisApiToken}`,
+              Accept: "application/json",
+              [REQUEST_DESC_HEADER_NAME]: "Getting Public Hypothes.is group",
+            },
+          }
+        ),
+        axiosClient.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile/groups`, {
+          headers: {
+            Authorization: `Bearer ${hypothesisApiToken}`,
+            Accept: "application/json",
+            [REQUEST_DESC_HEADER_NAME]: "Getting user's Hypothes.is groups",
+          },
+        }),
+      ])
+      props.hypothesisGroups.push({
+        id: publicGroupResponse.data.id,
+        name: publicGroupResponse.data.name,
+        type: publicGroupResponse.data.type,
       })
-      data.forEach((group: any) => {
+      memberGroupResponse.data.forEach((group: any) => {
         props.hypothesisGroups.push({
           id: group.id,
           name: group.name,
