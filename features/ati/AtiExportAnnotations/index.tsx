@@ -126,7 +126,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         destinationHypothesisGroup: target.destinationHypothesisGroup.value,
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
-        taskDispatch: exportTaskDispatch,
         addQdrInfo:
           target.addQdrInfo && target.addQdrInfo.checked
             ? {

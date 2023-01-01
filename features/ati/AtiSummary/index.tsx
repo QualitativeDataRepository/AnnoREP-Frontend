@@ -78,7 +78,6 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         payload: "Exporting annotations for review...",
       })
       await exportAnnotations({
-        taskDispatch,
         datasetId: id,
         sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
         isAdminDownloader: false,
