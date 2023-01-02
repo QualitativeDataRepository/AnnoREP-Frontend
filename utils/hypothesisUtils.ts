@@ -248,7 +248,7 @@ export async function serverExportAnnotations({
   if (numberAnnotations) {
     //TODO sort the annotations
     //export annotations
-    totalAnnotationsCount = await copyAnnotations({
+    totalExportedCount = await copyAnnotations({
       sourceAnnotations,
       exportApiUrl,
       exportApiToken,
