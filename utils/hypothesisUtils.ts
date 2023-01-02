@@ -437,7 +437,7 @@ async function copyAnnotations({
           Authorization: `Bearer ${exportApiToken}`,
           "Content-type": "application/json",
           [REQUEST_DESC_HEADER_NAME]: `Copying annotation ${
-            sourceAnnotations[exportOffset + i /**check */].id
+            sourceAnnotations[exportOffset + i].id
           } to ${destinationUrl}`,
         },
       })
@@ -473,12 +473,11 @@ function createNewAnnotation({
   if (!privateAnnotation) {
     newReadPermission = [`group:${destinationHypothesisGroup}`]
   }
-  let newText = sourceAnnotation.text
 
+  let newText = sourceAnnotation.text
   if (newAnnotationPrefixIndex && newAnnotationPrefixIndex > 0) {
     newText = `<b>AN${newAnnotationPrefixIndex}</b><br>${newText}`
   }
-
   if (addQdrInfo) {
     newText = `${ATI_HEADER_HTML}${newText}`
   }
