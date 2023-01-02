@@ -246,7 +246,15 @@ export async function serverExportAnnotations({
     }
   }
   if (numberAnnotations) {
-    //TODO sort the annotations
+    sourceAnnotations.sort((a, b) => {
+      const t1: TextPositionSelector = a.target[0].selector.find(
+        (s: any) => s.type === TEXT_POSITION_SELECTOR
+      )
+      const t2: TextPositionSelector = b.target[0].selector.find(
+        (s: any) => s.type === TEXT_POSITION_SELECTOR
+      )
+      return textPositionSelectorCompare(t1, t2)
+    })
     //export annotations
     totalExportedCount = await copyAnnotations({
       sourceAnnotations,
@@ -493,4 +501,25 @@ function createNewAnnotation({
     target: sourceAnnotation.target,
     //references
   })
+}
+
+const TEXT_POSITION_SELECTOR = "TextPositionSelector"
+interface TextPositionSelector {
+  type: typeof TEXT_POSITION_SELECTOR
+  start: number
+  end: number
+}
+function textPositionSelectorCompare(
+  selector: TextPositionSelector,
+  otherselector: TextPositionSelector
+): number {
+  //diff < 0 -> selector.start < otherSelector.start and selector is sorted before otherSelector
+  const diff = selector.start - otherselector.start
+  if (diff === 0) {
+    //selectors have the same start position
+    //according to hypothesis, the longer selector(i.e. larger end) is sorted before the other
+    //this diff < 0 -> otherSelector.end < selector.end and otherSelector is sorted before selector
+    return otherselector.end - selector.end
+  }
+  return diff
 }
