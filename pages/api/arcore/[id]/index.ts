@@ -50,6 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                       uri: uri,
                       document: annotation.document,
                       text: annotation.text,
+                      //group defaults to public
+                      //permissions default to user only
                       target: annotation.target,
                     }),
                     {

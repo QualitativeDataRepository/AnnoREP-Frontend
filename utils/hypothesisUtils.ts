@@ -488,6 +488,7 @@ function createNewAnnotation({
     text: newText,
     tags: sourceAnnotation.tags,
     group: destinationHypothesisGroup,
+    //other permission types default to the user only
     permissions: { read: newReadPermission },
     target: sourceAnnotation.target,
     //references
