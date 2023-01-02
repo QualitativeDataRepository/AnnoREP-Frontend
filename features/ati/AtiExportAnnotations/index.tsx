@@ -132,7 +132,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 manuscriptId: manuscript.id,
                 datasetDoi: dataset.doi,
               }
-            : undefined,
+            : false,
         numberAnnotations: target.numberAnnotations.checked,
       })
 

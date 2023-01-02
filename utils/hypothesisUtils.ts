@@ -1,10 +1,16 @@
 import { Dispatch } from "react"
 import { AxiosResponse } from "axios"
+import qs from "qs"
 
 import { axiosClient } from "../features/app"
 import { ITaskAction, TaskActionType } from "../hooks/useTask/state"
 
 import { ATI_HEADER_HTML } from "../constants/ati"
+import {
+  DATASET_DV_TYPE,
+  DATAVERSE_HEADER_NAME,
+  PUBLICATION_STATUSES,
+} from "../constants/dataverse"
 import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
 import {
   ANNOTATIONS_MAX_LIMIT,
@@ -115,10 +121,12 @@ interface ExportAnnotationsArgs {
   destinationHypothesisGroup: string
   privateAnnotation: boolean
   isAdminAuthor: boolean
-  addQdrInfo?: {
-    manuscriptId: string
-    datasetDoi: string
-  }
+  addQdrInfo:
+    | {
+        manuscriptId: string
+        datasetDoi: string
+      }
+    | false
   numberAnnotations: boolean
 }
 export async function exportAnnotations({
@@ -150,37 +158,7 @@ export async function exportAnnotations({
       },
     }
   )
-  if (addQdrInfo) {
-    //TODO: copy the content the endpoint into a func
-    await axiosClient.post(`/api/hypothesis/${datasetId}/title-annotation`, {
-      destinationUrl,
-      destinationHypothesisGroup,
-      privateAnnotation,
-      manuscriptId: addQdrInfo.manuscriptId,
-      datasetDoi: addQdrInfo.datasetDoi,
-    })
-  }
   return data.total
-}
-
-export function createInitialAnnotationText(
-  citation: string,
-  doi: string,
-  isDraftState: boolean
-): string {
-  const citationArr = citation.split(". ")
-  if (isDraftState) {
-    citationArr.pop()
-  }
-  return `${ATI_HEADER_HTML}This is an Annotation for Transparent Inquiry project, published by the <a href="https://qdr.syr.edu">Qualitative Data Repository</a>.
-
-  <b>The <a href="${doi}">Data Overview</a> discusses project context, data generation and analysis, and logic of annotation.</b>
-  
-  Please cite as:
-
-  ${citationArr.join(". ")}${isDraftState ? "." : ""}
-
-  <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }
 
 interface ServerExportAnnotationsServerSideArgs {
@@ -194,7 +172,12 @@ interface ServerExportAnnotationsServerSideArgs {
   downloadApiToken: string
   exportApiToken: string
   privateAnnotation: boolean
-  addQdrInfo: boolean
+  addQdrInfo:
+    | {
+        manuscriptId: string
+        datasetDoi: string
+      }
+    | false
   numberAnnotations: boolean
 }
 export async function serverExportAnnotations({
@@ -210,9 +193,8 @@ export async function serverExportAnnotations({
   privateAnnotation,
   addQdrInfo,
   numberAnnotations,
-}: ServerExportAnnotationsServerSideArgs) {
+}: ServerExportAnnotationsServerSideArgs): Promise<number> {
   if (numberAnnotations && totalAnnotationsCount > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
-    //TODO does the error correctly show in UI?
     throw new Error(
       `Found ${totalAnnotationsCount.toLocaleString(
         "en-US"
@@ -221,11 +203,14 @@ export async function serverExportAnnotations({
       )} annotations.`
     )
   }
+  //[0, 200, 400, so on]
   const downloadOffsets = range(0, totalAnnotationsCount - 1, ANNOTATIONS_MAX_LIMIT)
+  //[0, 30, 60, so on]
   const downloadBatches = range(0, downloadOffsets.length - 1, REQUEST_BATCH_SIZE)
   let totalExportedCount = 0
   let sourceAnnotations: any[] = []
   for (const downloadBatch of downloadBatches) {
+    //send at most 30 requests to hypothesis' api search endpoint, with each request returning at most 200 annotations
     const annotationsDataRows = await Promise.all(
       downloadOffsets.slice(downloadBatch, downloadBatch + REQUEST_BATCH_SIZE).map((offset) => {
         return downloadAnnotations({
@@ -241,9 +226,12 @@ export async function serverExportAnnotations({
 
     const annotations = annotationsDataRows.flat()
     annotations.filter((annotation) => annotation.uri === sourceUrl)
+
     if (numberAnnotations) {
+      //accumulate all the source annotations
       sourceAnnotations = sourceAnnotations.concat(annotations)
     } else {
+      //export the anotations
       const exportedCount = await copyAnnotations({
         sourceAnnotations: annotations,
         exportApiUrl,
@@ -259,6 +247,7 @@ export async function serverExportAnnotations({
   }
   if (numberAnnotations) {
     //TODO sort the annotations
+    //export annotations
     totalAnnotationsCount = await copyAnnotations({
       sourceAnnotations,
       exportApiUrl,
@@ -272,6 +261,100 @@ export async function serverExportAnnotations({
   }
 
   return totalExportedCount
+}
+
+interface PostTitleAnnotationArgs {
+  dataverseApiToken: string
+  hypothesisApiToken: string
+  hypothesisUserId: string
+  destinationUrl: string
+  destinationHypothesisGroup: string
+  manuscriptId: string
+  datasetDoi: string
+  privateAnnotation: boolean
+}
+export async function postTitleAnnotation({
+  dataverseApiToken,
+  hypothesisApiToken,
+  hypothesisUserId,
+  destinationUrl,
+  destinationHypothesisGroup,
+  manuscriptId,
+  datasetDoi,
+  privateAnnotation,
+}: PostTitleAnnotationArgs): Promise<void> {
+  const [titleAnnResponse, myDataResponse] = await Promise.all([
+    axiosClient.get(`${process.env.ARCORE_SERVER_URL}/api/documents/${manuscriptId}/titleann`, {
+      headers: {
+        [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+        [REQUEST_DESC_HEADER_NAME]: `Getting title annotation from source manuscript ${manuscriptId}`,
+      },
+    }),
+    axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+      params: {
+        key: dataverseApiToken,
+        dvobject_types: DATASET_DV_TYPE,
+        published_states: PUBLICATION_STATUSES,
+        mydata_search_term: `"${datasetDoi}"`,
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { indices: false })
+      },
+      headers: {
+        [REQUEST_DESC_HEADER_NAME]: `Searching for data project ${datasetDoi}`,
+      },
+    }),
+  ])
+
+  if (!myDataResponse.data.success || myDataResponse.data.data.items.length === 0) {
+    throw new Error(`Unable to find data project ${datasetDoi} to get its citation.`)
+  }
+  const dataset = myDataResponse.data.data.items[0]
+  const citationHtml = dataset.citationHtml
+  const doiUrl = dataset.url
+  const isDraftState = dataset.is_draft_state
+
+  const annotation = titleAnnResponse.data
+  annotation.target.forEach((element: any) => {
+    element.source = destinationUrl
+  })
+  let newReadPermission = [hypothesisUserId]
+  if (!privateAnnotation) {
+    newReadPermission = [`group:${destinationHypothesisGroup}`]
+  }
+  await axiosClient.post(
+    `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
+    JSON.stringify({
+      uri: destinationUrl,
+      document: annotation.document,
+      text: createInitialAnnotationText(citationHtml, doiUrl, isDraftState),
+      target: annotation.target,
+      group: destinationHypothesisGroup,
+      permissions: { read: newReadPermission },
+    }),
+    {
+      headers: {
+        Authorization: `Bearer ${hypothesisApiToken}`,
+        "Content-type": "application/json",
+        [REQUEST_DESC_HEADER_NAME]: `Sending title annotation from source manuscript ${manuscriptId} to Hypothes.is server`,
+      },
+    }
+  )
+}
+function createInitialAnnotationText(citation: string, doi: string, isDraftState: boolean): string {
+  const citationArr = citation.split(". ")
+  if (isDraftState) {
+    citationArr.pop()
+  }
+  return `${ATI_HEADER_HTML}This is an Annotation for Transparent Inquiry project, published by the <a href="https://qdr.syr.edu">Qualitative Data Repository</a>.
+
+  <b>The <a href="${doi}">Data Overview</a> discusses project context, data generation and analysis, and logic of annotation.</b>
+  
+  Please cite as:
+
+  ${citationArr.join(". ")}${isDraftState ? "." : ""}
+
+  <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }
 
 type DownloadAnnotationsKeys =
@@ -291,8 +374,7 @@ async function downloadAnnotations({
   downloadApiToken,
   offset,
   limit,
-}: DownloadAnnotationsArgs) {
-  //TODO: check limit > 200
+}: DownloadAnnotationsArgs): Promise<any[]> {
   const { data } = await axiosClient.get<{ rows: any[]; total: number }>(downloadApiUrl, {
     params: {
       limit,
@@ -392,13 +474,13 @@ function createNewAnnotation({
     newReadPermission = [`group:${destinationHypothesisGroup}`]
   }
   let newText = sourceAnnotation.text
-  if (addQdrInfo) {
-    newText = `${ATI_HEADER_HTML}${sourceAnnotation.text}`
-  }
 
   if (newAnnotationPrefixIndex && newAnnotationPrefixIndex > 0) {
-    //add number
-    //what's the correct order here with regards to ATI_HEADER_HTML
+    newText = `<b>AN${newAnnotationPrefixIndex}</b><br>${newText}`
+  }
+
+  if (addQdrInfo) {
+    newText = `${ATI_HEADER_HTML}${newText}`
   }
 
   return JSON.stringify({

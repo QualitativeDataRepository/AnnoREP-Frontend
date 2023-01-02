@@ -6,7 +6,7 @@ import { axiosClient } from "../../../../features/app"
 import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
-import { serverExportAnnotations } from "../../../../utils/hypothesisUtils"
+import { postTitleAnnotation, serverExportAnnotations } from "../../../../utils/hypothesisUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "POST") {
@@ -26,7 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const requestDesc = `Exporting annotations to ${destinationUrl}`
       const sourceUrl = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
       const downloadApiUrl = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
-      const { hypothesisApiToken } = session
+      const exportApiUrl = `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`
+      const { dataverseApiToken, hypothesisApiToken, hypothesisUserId } = session
 
       const downloadApiToken = isAdminDownloader
         ? process.env.ADMIN_HYPOTHESIS_API_TOKEN
@@ -45,22 +46,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             [REQUEST_DESC_HEADER_NAME]: `Getting total annotations count for ${sourceUrl}`,
           },
         })
-        const totalExported = serverExportAnnotations({
-          totalAnnotationsCount: data.total,
-          downloadApiUrl,
-          exportApiUrl: `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
-          sourceUrl,
-          destinationUrl,
-          sourceHypothesisGroup,
-          destinationHypothesisGroup,
-          downloadApiToken: downloadApiToken as string,
-          exportApiToken: exportApiToken as string,
-          privateAnnotation,
-          addQdrInfo,
-          numberAnnotations,
-        })
+        const [totalAnnotationsExported] = await Promise.all([
+          serverExportAnnotations({
+            totalAnnotationsCount: data.total,
+            downloadApiUrl,
+            exportApiUrl,
+            sourceUrl,
+            destinationUrl,
+            sourceHypothesisGroup,
+            destinationHypothesisGroup,
+            downloadApiToken: downloadApiToken as string,
+            exportApiToken: exportApiToken as string,
+            privateAnnotation,
+            addQdrInfo,
+            numberAnnotations,
+          }),
+          addQdrInfo
+            ? postTitleAnnotation({
+                dataverseApiToken: dataverseApiToken as string,
+                hypothesisApiToken: exportApiToken as string,
+                //** postTitleAnnotation is only use in export-annotations page. using the logged-in user's api token is ok.  */
+                hypothesisUserId: hypothesisUserId as string,
+                destinationUrl,
+                destinationHypothesisGroup,
+                manuscriptId: addQdrInfo.manuscriptId,
+                datasetDoi: addQdrInfo.datasetDoi,
+                privateAnnotation,
+              })
+            : Promise.resolve(),
+        ])
         res.status(200).json({
-          total: totalExported,
+          total: totalAnnotationsExported,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)

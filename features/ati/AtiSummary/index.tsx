@@ -86,6 +86,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         isAdminAuthor: true,
         privateAnnotation: false,
         numberAnnotations: false,
+        addQdrInfo: false,
       })
 
       await axiosClient.post(`/api/datasets/${id}/submit-for-review`)
