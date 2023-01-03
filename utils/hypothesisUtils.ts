@@ -246,15 +246,8 @@ export async function serverExportAnnotations({
     }
   }
   if (numberAnnotations) {
-    sourceAnnotations.sort((a, b) => {
-      const t1: TextPositionSelector = a.target[0].selector.find(
-        (s: any) => s.type === TEXT_POSITION_SELECTOR
-      )
-      const t2: TextPositionSelector = b.target[0].selector.find(
-        (s: any) => s.type === TEXT_POSITION_SELECTOR
-      )
-      return textPositionSelectorCompare(t1, t2)
-    })
+    //sort annotations by location
+    sourceAnnotations.sort(annotationLocationCompareFn)
     //export annotations
     totalExportedCount = await copyAnnotations({
       sourceAnnotations,
@@ -389,6 +382,10 @@ async function downloadAnnotations({
       offset,
       uri: sourceUrl,
       group: sourceHypothesisGroup,
+      //oldest annotations are retrieved first to be copied first
+      //to preserve the relative time-order between annotations
+      sort: "created",
+      order: "asc",
     },
     headers: {
       Authorization: `Bearer ${downloadApiToken}`,
@@ -503,23 +500,20 @@ function createNewAnnotation({
   })
 }
 
-const TEXT_POSITION_SELECTOR = "TextPositionSelector"
-interface TextPositionSelector {
-  type: typeof TEXT_POSITION_SELECTOR
-  start: number
-  end: number
+//https://github.com/hypothesis/client/blob/main/src/sidebar/helpers/thread-sorters.js#L87
+function annotationLocationCompareFn(a: any, b: any): number {
+  const aLocation = getLocationOfAnnotation(a)
+  const bLocation = getLocationOfAnnotation(b)
+  return Math.sign(aLocation - bLocation)
 }
-function textPositionSelectorCompare(
-  selector: TextPositionSelector,
-  otherselector: TextPositionSelector
-): number {
-  //diff < 0 -> selector.start < otherSelector.start and selector is sorted before otherSelector
-  const diff = selector.start - otherselector.start
-  if (diff === 0) {
-    //selectors have the same start position
-    //according to hypothesis, the longer selector(i.e. larger end) is sorted before the other
-    //this diff < 0 -> otherSelector.end < selector.end and otherSelector is sorted before selector
-    return otherselector.end - selector.end
+
+//https://github.com/hypothesis/client/blob/main/src/sidebar/helpers/annotation-metadata.js#L319
+function getLocationOfAnnotation(annotation: any): number {
+  const targets = annotation.target
+  for (const selector of targets[0]?.selector ?? []) {
+    if (selector.type === "TextPositionSelector") {
+      return selector.start
+    }
   }
-  return diff
+  return Number.MAX_SAFE_INTEGER
 }
