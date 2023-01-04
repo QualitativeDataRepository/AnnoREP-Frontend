@@ -224,8 +224,8 @@ export async function serverExportAnnotations({
       })
     )
 
-    const annotations = annotationsDataRows.flat()
-    annotations.filter((annotation) => annotation.uri === sourceUrl)
+    let annotations = annotationsDataRows.flat()
+    annotations = annotations.filter((annotation) => annotation.uri === sourceUrl)
 
     if (numberAnnotations) {
       //accumulate all the source annotations
