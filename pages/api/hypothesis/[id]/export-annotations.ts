@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? serverPostTitleAnnotation({
                 dataverseApiToken: dataverseApiToken as string,
                 hypothesisApiToken: exportApiToken as string,
-                //** postTitleAnnotation is only use in export-annotations page. using the logged-in user's api token is ok.  */
+                //** postTitleAnnotation is only use in export-annotations page. using the logged-in user's user id is ok.  */
                 hypothesisUserId: hypothesisUserId as string,
                 destinationUrl,
                 destinationHypothesisGroup,
