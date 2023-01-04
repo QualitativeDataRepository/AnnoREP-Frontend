@@ -264,7 +264,7 @@ export async function serverExportAnnotations({
   return totalExportedCount
 }
 
-interface PostTitleAnnotationArgs {
+interface ServerPostTitleAnnotationArgs {
   dataverseApiToken: string
   hypothesisApiToken: string
   hypothesisUserId: string
@@ -274,7 +274,7 @@ interface PostTitleAnnotationArgs {
   datasetDoi: string
   privateAnnotation: boolean
 }
-export async function postTitleAnnotation({
+export async function serverPostTitleAnnotation({
   dataverseApiToken,
   hypothesisApiToken,
   hypothesisUserId,
@@ -283,7 +283,7 @@ export async function postTitleAnnotation({
   manuscriptId,
   datasetDoi,
   privateAnnotation,
-}: PostTitleAnnotationArgs): Promise<void> {
+}: ServerPostTitleAnnotationArgs): Promise<void> {
   const [titleAnnResponse, myDataResponse] = await Promise.all([
     axiosClient.get(`${process.env.ARCORE_SERVER_URL}/api/documents/${manuscriptId}/titleann`, {
       headers: {

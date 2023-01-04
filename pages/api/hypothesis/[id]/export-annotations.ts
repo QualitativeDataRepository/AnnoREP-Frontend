@@ -6,7 +6,10 @@ import { axiosClient } from "../../../../features/app"
 import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
-import { postTitleAnnotation, serverExportAnnotations } from "../../../../utils/hypothesisUtils"
+import {
+  serverPostTitleAnnotation,
+  serverExportAnnotations,
+} from "../../../../utils/hypothesisUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "POST") {
@@ -62,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             numberAnnotations,
           }),
           addQdrInfo
-            ? postTitleAnnotation({
+            ? serverPostTitleAnnotation({
                 dataverseApiToken: dataverseApiToken as string,
                 hypothesisApiToken: exportApiToken as string,
                 //** postTitleAnnotation is only use in export-annotations page. using the logged-in user's api token is ok.  */
