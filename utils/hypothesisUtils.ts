@@ -1,11 +1,22 @@
 import { Dispatch } from "react"
 import { AxiosResponse } from "axios"
+import qs from "qs"
 
 import { axiosClient } from "../features/app"
 import { ITaskAction, TaskActionType } from "../hooks/useTask/state"
 
 import { ATI_HEADER_HTML } from "../constants/ati"
-import { ANNOTATIONS_MAX_LIMIT, REQUEST_BATCH_SIZE } from "../constants/hypothesis"
+import {
+  DATASET_DV_TYPE,
+  DATAVERSE_HEADER_NAME,
+  PUBLICATION_STATUSES,
+} from "../constants/dataverse"
+import { REQUEST_DESC_HEADER_NAME } from "../constants/http"
+import {
+  ANNOTATIONS_MAX_LIMIT,
+  REQUEST_BATCH_SIZE,
+  TOTAL_EXPORTED_ANNOTATIONS_LIMIT,
+} from "../constants/hypothesis"
 import { range } from "./arrayUtils"
 
 interface GetAnnotationsArgs {
@@ -110,77 +121,228 @@ interface ExportAnnotationsArgs {
   destinationHypothesisGroup: string
   privateAnnotation: boolean
   isAdminAuthor: boolean
-  taskDispatch: Dispatch<ITaskAction>
-  addQdrInfo?: {
-    manuscriptId: string
-    datasetDoi: string
-  }
-}
-export async function exportAnnotations(args: ExportAnnotationsArgs): Promise<number> {
-  const {
-    datasetId,
-    sourceHypothesisGroup,
-    isAdminDownloader,
-    destinationUrl,
-    destinationHypothesisGroup,
-    privateAnnotation,
-    isAdminAuthor,
-    taskDispatch,
-    addQdrInfo,
-  } = args
-  const total = await getTotalAnnotations({
-    datasetId,
-    isAdminDownloader,
-    hypothesisGroup: sourceHypothesisGroup,
-  })
-  let totalExported = 0
-  const offsets = range(0, total - 1, REQUEST_BATCH_SIZE)
-  for (const offset of offsets) {
-    taskDispatch({
-      type: TaskActionType.NEXT_STEP,
-      payload: `Processing ${offset + 1} to ${Math.min(
-        offset + REQUEST_BATCH_SIZE,
-        total
-      )} of ${total} annotations...`,
-    })
-    const response = await axiosClient.post<{ total: number }>(
-      `/api/hypothesis/${datasetId}/export-annotations`,
-      JSON.stringify({
-        sourceHypothesisGroup,
-        isAdminDownloader,
-        offset,
-        destinationUrl,
-        destinationHypothesisGroup,
-        isAdminAuthor,
-        privateAnnotation,
-        addQdrInfo: addQdrInfo ? true : false,
-        limit: REQUEST_BATCH_SIZE,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+  addQdrInfo:
+    | {
+        manuscriptId: string
+        datasetDoi: string
       }
-    )
-    totalExported += response.data.total
-  }
-  if (addQdrInfo) {
-    await axiosClient.post(`/api/hypothesis/${datasetId}/title-annotation`, {
+    | false
+  numberAnnotations: boolean
+}
+export async function exportAnnotations({
+  datasetId,
+  sourceHypothesisGroup,
+  isAdminDownloader,
+  destinationUrl,
+  destinationHypothesisGroup,
+  privateAnnotation,
+  isAdminAuthor,
+  addQdrInfo,
+  numberAnnotations,
+}: ExportAnnotationsArgs): Promise<number> {
+  const { data } = await axiosClient.post<{ total: number }>(
+    `/api/hypothesis/${datasetId}/export-annotations`,
+    JSON.stringify({
+      sourceHypothesisGroup,
+      isAdminDownloader,
       destinationUrl,
       destinationHypothesisGroup,
       privateAnnotation,
-      manuscriptId: addQdrInfo.manuscriptId,
-      datasetDoi: addQdrInfo.datasetDoi,
-    })
-  }
-  return totalExported
+      numberAnnotations,
+      addQdrInfo,
+      isAdminAuthor,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  return data.total
 }
 
-export function createInitialAnnotationText(
-  citation: string,
-  doi: string,
-  isDraftState: boolean
-): string {
+interface ServerExportAnnotationsServerSideArgs {
+  totalAnnotationsCount: number
+  downloadApiUrl: string
+  exportApiUrl: string
+  sourceUrl: string
+  destinationUrl: string
+  sourceHypothesisGroup: string
+  destinationHypothesisGroup: string
+  downloadApiToken: string
+  exportApiToken: string
+  privateAnnotation: boolean
+  addQdrInfo:
+    | {
+        manuscriptId: string
+        datasetDoi: string
+      }
+    | false
+  numberAnnotations: boolean
+}
+export async function serverExportAnnotations({
+  totalAnnotationsCount,
+  downloadApiUrl,
+  exportApiUrl,
+  sourceUrl,
+  destinationUrl,
+  sourceHypothesisGroup,
+  destinationHypothesisGroup,
+  downloadApiToken,
+  exportApiToken,
+  privateAnnotation,
+  addQdrInfo,
+  numberAnnotations,
+}: ServerExportAnnotationsServerSideArgs): Promise<number> {
+  if (numberAnnotations && totalAnnotationsCount > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
+    throw new Error(
+      `Found ${totalAnnotationsCount.toLocaleString(
+        "en-US"
+      )} annotations. AnnoREP can't number annotations for projects with more than ${TOTAL_EXPORTED_ANNOTATIONS_LIMIT.toLocaleString(
+        "en-US"
+      )} annotations.`
+    )
+  }
+  //[0, 200, 400, so on]
+  const downloadOffsets = range(0, totalAnnotationsCount - 1, ANNOTATIONS_MAX_LIMIT)
+  //[0, 30, 60, so on]
+  const downloadBatches = range(0, downloadOffsets.length - 1, REQUEST_BATCH_SIZE)
+  let totalExportedCount = 0
+  let sourceAnnotations: any[] = []
+  for (const downloadBatch of downloadBatches) {
+    //send at most 30 requests to hypothesis' api search endpoint, with each request returning at most 200 annotations
+    const annotationsDataRows = await Promise.all(
+      downloadOffsets.slice(downloadBatch, downloadBatch + REQUEST_BATCH_SIZE).map((offset) => {
+        return downloadAnnotations({
+          downloadApiUrl,
+          sourceUrl,
+          sourceHypothesisGroup,
+          downloadApiToken,
+          offset,
+          limit: ANNOTATIONS_MAX_LIMIT,
+        })
+      })
+    )
+
+    let annotations = annotationsDataRows.flat()
+    annotations = annotations.filter((annotation) => annotation.uri === sourceUrl)
+
+    if (numberAnnotations) {
+      //accumulate all the source annotations
+      sourceAnnotations = sourceAnnotations.concat(annotations)
+    } else {
+      //export the anotations
+      const exportedCount = await copyAnnotations({
+        sourceAnnotations: annotations,
+        exportApiUrl,
+        exportApiToken,
+        destinationUrl,
+        destinationHypothesisGroup,
+        privateAnnotation,
+        addQdrInfo,
+        numberAnnotations,
+      })
+      totalExportedCount += exportedCount
+    }
+  }
+  if (numberAnnotations) {
+    //sort annotations by location
+    sourceAnnotations.sort(annotationLocationCompareFn)
+    //export annotations
+    totalExportedCount = await copyAnnotations({
+      sourceAnnotations,
+      exportApiUrl,
+      exportApiToken,
+      destinationUrl,
+      destinationHypothesisGroup,
+      privateAnnotation,
+      addQdrInfo,
+      numberAnnotations,
+    })
+  }
+
+  return totalExportedCount
+}
+
+interface ServerPostTitleAnnotationArgs {
+  dataverseApiToken: string
+  hypothesisApiToken: string
+  hypothesisUserId: string
+  destinationUrl: string
+  destinationHypothesisGroup: string
+  manuscriptId: string
+  datasetDoi: string
+  privateAnnotation: boolean
+}
+export async function serverPostTitleAnnotation({
+  dataverseApiToken,
+  hypothesisApiToken,
+  hypothesisUserId,
+  destinationUrl,
+  destinationHypothesisGroup,
+  manuscriptId,
+  datasetDoi,
+  privateAnnotation,
+}: ServerPostTitleAnnotationArgs): Promise<void> {
+  const [titleAnnResponse, myDataResponse] = await Promise.all([
+    axiosClient.get(`${process.env.ARCORE_SERVER_URL}/api/documents/${manuscriptId}/titleann`, {
+      headers: {
+        [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+        [REQUEST_DESC_HEADER_NAME]: `Getting title annotation from source manuscript ${manuscriptId}`,
+      },
+    }),
+    axiosClient.get(`${process.env.DATAVERSE_SERVER_URL}/api/mydata/retrieve`, {
+      params: {
+        key: dataverseApiToken,
+        dvobject_types: DATASET_DV_TYPE,
+        published_states: PUBLICATION_STATUSES,
+        mydata_search_term: `"${datasetDoi}"`,
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { indices: false })
+      },
+      headers: {
+        [REQUEST_DESC_HEADER_NAME]: `Searching for data project ${datasetDoi}`,
+      },
+    }),
+  ])
+
+  if (!myDataResponse.data.success || myDataResponse.data.data.items.length === 0) {
+    throw new Error(`Unable to find data project ${datasetDoi} to get its citation.`)
+  }
+  const dataset = myDataResponse.data.data.items[0]
+  const citationHtml = dataset.citationHtml
+  const doiUrl = dataset.url
+  const isDraftState = dataset.is_draft_state
+
+  const annotation = titleAnnResponse.data
+  annotation.target.forEach((element: any) => {
+    element.source = destinationUrl
+  })
+  let newReadPermission = [hypothesisUserId]
+  if (!privateAnnotation) {
+    newReadPermission = [`group:${destinationHypothesisGroup}`]
+  }
+  await axiosClient.post(
+    `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`,
+    JSON.stringify({
+      uri: destinationUrl,
+      document: annotation.document,
+      text: createInitialAnnotationText(citationHtml, doiUrl, isDraftState),
+      target: annotation.target,
+      group: destinationHypothesisGroup,
+      permissions: { read: newReadPermission },
+    }),
+    {
+      headers: {
+        Authorization: `Bearer ${hypothesisApiToken}`,
+        "Content-type": "application/json",
+        [REQUEST_DESC_HEADER_NAME]: `Sending title annotation from source manuscript ${manuscriptId} to Hypothes.is server`,
+      },
+    }
+  )
+}
+function createInitialAnnotationText(citation: string, doi: string, isDraftState: boolean): string {
   const citationArr = citation.split(". ")
   if (isDraftState) {
     citationArr.pop()
@@ -194,4 +356,164 @@ export function createInitialAnnotationText(
   ${citationArr.join(". ")}${isDraftState ? "." : ""}
 
   <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
+}
+
+type DownloadAnnotationsKeys =
+  | "downloadApiUrl"
+  | "sourceUrl"
+  | "sourceHypothesisGroup"
+  | "downloadApiToken"
+interface DownloadAnnotationsArgs
+  extends Pick<ServerExportAnnotationsServerSideArgs, DownloadAnnotationsKeys> {
+  offset: number
+  limit: number
+}
+async function downloadAnnotations({
+  downloadApiUrl,
+  sourceUrl,
+  sourceHypothesisGroup,
+  downloadApiToken,
+  offset,
+  limit,
+}: DownloadAnnotationsArgs): Promise<any[]> {
+  const { data } = await axiosClient.get<{ rows: any[]; total: number }>(downloadApiUrl, {
+    params: {
+      limit,
+      offset,
+      uri: sourceUrl,
+      group: sourceHypothesisGroup,
+      //oldest annotations are retrieved first to be copied first
+      //to preserve the relative time-order between annotations
+      sort: "created",
+      order: "asc",
+    },
+    headers: {
+      Authorization: `Bearer ${downloadApiToken}`,
+      Accept: "application/json",
+      [REQUEST_DESC_HEADER_NAME]: `Downloading ${sourceHypothesisGroup} annotations from ${sourceUrl} at offset ${offset}`,
+    },
+  })
+  return data.rows
+}
+
+type CopyAnnotationsKeys =
+  | "exportApiUrl"
+  | "destinationUrl"
+  | "destinationHypothesisGroup"
+  | "exportApiToken"
+  | "privateAnnotation"
+  | "addQdrInfo"
+  | "numberAnnotations"
+interface CopyAnnotationsArgs
+  extends Pick<ServerExportAnnotationsServerSideArgs, CopyAnnotationsKeys> {
+  sourceAnnotations: any[]
+}
+async function copyAnnotations({
+  sourceAnnotations,
+  exportApiUrl,
+  destinationUrl,
+  destinationHypothesisGroup,
+  exportApiToken,
+  privateAnnotation,
+  addQdrInfo,
+  numberAnnotations,
+}: CopyAnnotationsArgs): Promise<number> {
+  const newAnnotations = sourceAnnotations.map((annotation, i) =>
+    createNewAnnotation({
+      sourceAnnotation: annotation,
+      destinationUrl,
+      destinationHypothesisGroup,
+      privateAnnotation,
+      addQdrInfo,
+      newAnnotationPrefixIndex: numberAnnotations ? i + 1 /**1-index */ : null,
+    })
+  )
+
+  let exportedCount = 0
+  const exportOffsets = range(0, newAnnotations.length - 1, REQUEST_BATCH_SIZE)
+  for (const exportOffset of exportOffsets) {
+    const batchOfAnnotations = newAnnotations.slice(exportOffset, exportOffset + REQUEST_BATCH_SIZE)
+    const copyAnns = batchOfAnnotations.map((annotation, i) => {
+      return axiosClient({
+        method: "POST",
+        url: exportApiUrl,
+        data: annotation,
+        headers: {
+          Authorization: `Bearer ${exportApiToken}`,
+          "Content-type": "application/json",
+          [REQUEST_DESC_HEADER_NAME]: `Copying annotation ${
+            sourceAnnotations[exportOffset + i].id
+          } to ${destinationUrl}`,
+        },
+      })
+    })
+    await Promise.all(copyAnns)
+    exportedCount += batchOfAnnotations.length
+  }
+  return exportedCount
+}
+
+type CreateNewAnnotationKeys =
+  | "destinationUrl"
+  | "destinationHypothesisGroup"
+  | "privateAnnotation"
+  | "addQdrInfo"
+interface CreateNewAnnotationArgs
+  extends Pick<ServerExportAnnotationsServerSideArgs, CreateNewAnnotationKeys> {
+  sourceAnnotation: any
+  newAnnotationPrefixIndex: number | null
+}
+function createNewAnnotation({
+  sourceAnnotation,
+  destinationUrl,
+  destinationHypothesisGroup,
+  privateAnnotation,
+  addQdrInfo,
+  newAnnotationPrefixIndex,
+}: CreateNewAnnotationArgs): string {
+  sourceAnnotation.target.forEach((element: any) => {
+    element.source = destinationUrl
+  })
+  let newReadPermission = sourceAnnotation.permissions.read
+  if (!privateAnnotation) {
+    newReadPermission = [`group:${destinationHypothesisGroup}`]
+  }
+
+  let newText = sourceAnnotation.text
+  if (newAnnotationPrefixIndex && newAnnotationPrefixIndex > 0) {
+    newText = `<b>AN${newAnnotationPrefixIndex}</b><br>${newText}`
+  }
+  if (addQdrInfo) {
+    newText = `${ATI_HEADER_HTML}${newText}`
+  }
+
+  return JSON.stringify({
+    uri: destinationUrl,
+    //document
+    text: newText,
+    tags: sourceAnnotation.tags,
+    group: destinationHypothesisGroup,
+    //other permission types default to the user only
+    permissions: { read: newReadPermission },
+    target: sourceAnnotation.target,
+    //references
+  })
+}
+
+//https://github.com/hypothesis/client/blob/main/src/sidebar/helpers/thread-sorters.js#L87
+function annotationLocationCompareFn(a: any, b: any): number {
+  const aLocation = getLocationOfAnnotation(a)
+  const bLocation = getLocationOfAnnotation(b)
+  return Math.sign(aLocation - bLocation)
+}
+
+//https://github.com/hypothesis/client/blob/main/src/sidebar/helpers/annotation-metadata.js#L319
+function getLocationOfAnnotation(annotation: any): number {
+  const targets = annotation.target
+  for (const selector of targets[0]?.selector ?? []) {
+    if (selector.type === "TextPositionSelector") {
+      return selector.start
+    }
+  }
+  return Number.MAX_SAFE_INTEGER
 }

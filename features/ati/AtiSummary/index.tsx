@@ -78,7 +78,6 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         payload: "Exporting annotations for review...",
       })
       await exportAnnotations({
-        taskDispatch,
         datasetId: id,
         sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
         isAdminDownloader: false,
@@ -86,6 +85,8 @@ const AtiSummary: FC<AtiSummaryProps> = ({
         destinationHypothesisGroup: hypothesisAtiStagingGroupId,
         isAdminAuthor: true,
         privateAnnotation: false,
+        numberAnnotations: false,
+        addQdrInfo: false,
       })
 
       await axiosClient.post(`/api/datasets/${id}/submit-for-review`)

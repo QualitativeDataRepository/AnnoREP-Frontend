@@ -105,6 +105,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       sourceHypothesisGroup: { value: string }
       privateAnnotation: { checked: boolean }
       addQdrInfo: { checked: boolean }
+      numberAnnotations: { checked: boolean }
     }
     try {
       if (
@@ -125,14 +126,14 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         destinationHypothesisGroup: target.destinationHypothesisGroup.value,
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
-        taskDispatch: exportTaskDispatch,
         addQdrInfo:
           target.addQdrInfo && target.addQdrInfo.checked
             ? {
                 manuscriptId: manuscript.id,
                 datasetDoi: dataset.doi,
               }
-            : undefined,
+            : false,
+        numberAnnotations: target.numberAnnotations.checked,
       })
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
@@ -325,6 +326,15 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               />
             </div>
           )}
+          <div className={formStyles.item}>
+            <Toggle
+              id="toggle-number-annotations"
+              labelA="No"
+              labelB="Yes"
+              labelText="Number annotations"
+              name="numberAnnotations"
+            />
+          </div>
           <Button
             className={formStyles.submitBtn}
             type="submit"
