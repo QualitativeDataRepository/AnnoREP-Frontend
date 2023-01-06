@@ -13,22 +13,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
-      const { id, hypothesisGroup, isAdminDownloader } = req.query
-      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
-      const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
-      const { hypothesisApiToken: userHypothesisApiToken } = session
-      const hypothesisApiToken =
-        isAdminDownloader === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
+      const { id, isAdminDownloader, sourceHypothesisGroup } = req.query
+      const sourceUrl = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
+      const downloadApiUrl = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
+      const { hypothesisApiToken } = session
+      const downloadApiToken =
+        isAdminDownloader === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : hypothesisApiToken
       const requestDesc = `Getting the total number of annotations for data project ${id}`
       try {
-        const params: Record<string, any> = { uri, limit: 1 }
-        if (hypothesisGroup !== undefined && hypothesisGroup.length > 0) {
-          params["group"] = hypothesisGroup
+        const params = {
+          uri: sourceUrl,
+          limit: 1,
+          group: sourceHypothesisGroup,
         }
-        const { data } = await axiosClient.get(searchEndpoint, {
+        const { data } = await axiosClient.get<{ total: number }>(downloadApiUrl, {
           params,
           headers: {
-            Authorization: `Bearer ${hypothesisApiToken}`,
+            Authorization: `Bearer ${downloadApiToken}`,
             Accept: "application/json",
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },

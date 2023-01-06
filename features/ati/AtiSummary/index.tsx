@@ -25,7 +25,8 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import {
   deleteAnnotations,
   exportAnnotations,
-  getAnnotations,
+  getTotalAnnotations,
+  getTotalAnnotationsCount,
 } from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiSummary.module.css"
@@ -60,10 +61,16 @@ const AtiSummary: FC<AtiSummaryProps> = ({
   const submitForReview = async () => {
     try {
       taskDispatch({ type: TaskActionType.START, payload: "Submitting project for review..." })
-      const deleteAnns = await getAnnotations({
+      const totalAnnotationsCount = await getTotalAnnotationsCount({
         datasetId: id,
-        hypothesisGroup: hypothesisAtiStagingGroupId,
         isAdminDownloader: true,
+        sourceHypothesisGroup: hypothesisAtiStagingGroupId,
+      })
+      const deleteAnns = await getTotalAnnotations({
+        totalAnnotationsCount,
+        datasetId: id,
+        isAdminDownloader: true,
+        sourceHypothesisGroup: hypothesisAtiStagingGroupId,
       })
       if (deleteAnns.length > 0) {
         await deleteAnnotations({

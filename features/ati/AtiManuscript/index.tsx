@@ -25,10 +25,15 @@ import { IDatasource, IManuscript } from "../../../types/dataverse"
 import { deleteFile, GetApiResponse } from "../../../utils/apiUtils"
 import { getMimeType } from "../../../utils/fileUtils"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { deleteAnnotations, getAnnotations } from "../../../utils/hypothesisUtils"
+import {
+  deleteAnnotations,
+  getTotalAnnotations,
+  getTotalAnnotationsCount,
+} from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiManuscript.module.css"
 import formStyles from "../../../styles/Form.module.css"
+import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 
 export interface AtiManuscriptProps {
   /** The dataset id for the ati project */
@@ -160,9 +165,16 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
         const newManuscriptId = uploadManuscriptResponse.data.data.files[0].dataFile.id
         undos.push(deleteFile(newManuscriptId))
         if (uploadManuscriptTaskState.uploadAnnotations) {
-          const deleteAnns = await getAnnotations({
+          const totalAnnotationsCount = await getTotalAnnotationsCount({
             datasetId,
             isAdminDownloader: false,
+            sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+          })
+          const deleteAnns = await getTotalAnnotations({
+            totalAnnotationsCount,
+            datasetId,
+            isAdminDownloader: false,
+            sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
           })
           if (deleteAnns.length > 0) {
             await deleteAnnotations({

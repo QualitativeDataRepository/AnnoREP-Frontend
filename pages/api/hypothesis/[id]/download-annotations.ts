@@ -13,29 +13,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const session = await getSession({ req })
     if (session) {
-      const { id, hypothesisGroup, isAdminDownloader, offset, limit } = req.query
-      const uri = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
-      const searchEndpoint = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
-      const { hypothesisApiToken: userHypothesisApiToken } = session
-      const hypothesisApiToken =
-        isAdminDownloader === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : userHypothesisApiToken
-      const requestDesc = `Getting annotations at ${offset} from Hypothes.is server for data project ${id}`
+      const { id, isAdminDownloader, sourceHypothesisGroup, sort, order, searchAfter, limit } =
+        req.query
+      const sourceUrl = `${process.env.NEXTAUTH_URL}/ati/${id}/${AtiTab.manuscript.id}`
+      const exportApiUrl = `${process.env.HYPOTHESIS_SERVER_URL}/api/search`
+      const { hypothesisApiToken } = session
+      const exportApiToken =
+        isAdminDownloader === "true" ? ADMIN_HYPOTHESIS_API_TOKEN : hypothesisApiToken
+      const requestDesc = `Downloading annotations from Hypothes.is server for data project ${id}`
       try {
-        //TODO: add annotation type to get<>
-        //limit must less than 200
-        const params: Record<string, any> = { limit, uri, offset }
-        if (hypothesisGroup !== undefined && hypothesisGroup.length > 0) {
-          params["group"] = hypothesisGroup
+        //limit must be less than 200
+        const params = {
+          uri: sourceUrl,
+          sort,
+          order,
+          search_after: searchAfter,
+          limit,
+          group: sourceHypothesisGroup,
         }
-        const { data } = await axiosClient.get(searchEndpoint, {
+        const { data } = await axiosClient.get<{ rows: any[] }>(exportApiUrl, {
           params,
           headers: {
-            Authorization: `Bearer ${hypothesisApiToken}`,
+            Authorization: `Bearer ${exportApiToken}`,
             Accept: "application/json",
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })
-        const exactMatches = data.rows.filter((annotation: any) => annotation.uri === uri)
+        const exactMatches = data.rows.filter((annotation) => annotation.uri === sourceUrl)
         res.status(200).json({
           rows: exactMatches,
           total: exactMatches.length,

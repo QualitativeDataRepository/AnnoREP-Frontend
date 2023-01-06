@@ -1,5 +1,4 @@
 import { Dispatch } from "react"
-import { AxiosResponse } from "axios"
 import qs from "qs"
 
 import { axiosClient } from "../features/app"
@@ -19,57 +18,66 @@ import {
 } from "../constants/hypothesis"
 import { range } from "./arrayUtils"
 
-interface GetAnnotationsArgs {
+interface SearchForAnnotationsArgs {
   datasetId: string
-  hypothesisGroup?: string
   isAdminDownloader: boolean
+  sourceHypothesisGroup?: string
 }
-export async function getTotalAnnotations(args: GetAnnotationsArgs): Promise<number> {
-  const { datasetId, hypothesisGroup, isAdminDownloader } = args
-  const { data: totalAnns } = await axiosClient.get<{ total: number }>(
+
+export async function getTotalAnnotationsCount({
+  datasetId,
+  isAdminDownloader,
+  sourceHypothesisGroup,
+}: SearchForAnnotationsArgs): Promise<number> {
+  const params = {
+    isAdminDownloader,
+    sourceHypothesisGroup,
+  }
+  const { data } = await axiosClient.get<{ total: number }>(
     `/api/hypothesis/${datasetId}/total-annotations`,
     {
-      params: {
-        hypothesisGroup,
-        isAdminDownloader,
-      },
+      params,
       headers: {
         Accept: "application/json",
       },
     }
   )
-  return totalAnns.total
+  return data.total
 }
 
-export async function getAnnotations(args: GetAnnotationsArgs): Promise<any[]> {
-  const { datasetId, hypothesisGroup, isAdminDownloader } = args
-  const total = await getTotalAnnotations(args)
+interface GetTotalAnnotationsArgs extends SearchForAnnotationsArgs {
+  totalAnnotationsCount: number
+}
+export async function getTotalAnnotations({
+  totalAnnotationsCount,
+  datasetId,
+  isAdminDownloader,
+  sourceHypothesisGroup,
+}: GetTotalAnnotationsArgs): Promise<any[]> {
+  const sort = "created"
+  const order = "desc"
+  let searchAfter: string | undefined
 
-  const offsets = range(0, total - 1, ANNOTATIONS_MAX_LIMIT)
-  const batches = range(0, offsets.length - 1, REQUEST_BATCH_SIZE)
-  const responses = await batches.reduce((promise, start) => {
-    return promise.then((acc) => {
-      const downloadAnns = offsets.slice(start, start + REQUEST_BATCH_SIZE).map((offset) => {
-        return axiosClient.get(`/api/hypothesis/${datasetId}/download-annotations`, {
-          params: {
-            offset,
-            hypothesisGroup,
-            isAdminDownloader,
-            limit: ANNOTATIONS_MAX_LIMIT,
-          },
-          headers: {
-            Accept: "application/json",
-          },
-        })
-      })
-      return Promise.all(downloadAnns).then((resp) => acc.concat(resp))
+  const totalBatchesCount = Math.ceil(totalAnnotationsCount / ANNOTATIONS_MAX_LIMIT)
+  let batchCount = 0
+
+  let sourceAnnotations: any[] = []
+  while (batchCount < totalBatchesCount) {
+    batchCount++
+    const annotations = await downloadAnnotations({
+      datasetId,
+      isAdminDownloader,
+      sourceHypothesisGroup,
+      sort,
+      order,
+      searchAfter,
+      limit: ANNOTATIONS_MAX_LIMIT,
     })
-  }, Promise.resolve<AxiosResponse<any>[]>([]))
+    sourceAnnotations = sourceAnnotations.concat(annotations)
+    searchAfter = annotations[annotations.length - 1][sort]
+  }
 
-  // 2d array
-  const allRows = responses.map(({ data }) => data.rows)
-  const annotations = [].concat(...allRows) as any[]
-  return annotations
+  return sourceAnnotations
 }
 
 interface DeleteAnnotationsArgs {
@@ -113,119 +121,61 @@ export async function deleteAnnotations(args: DeleteAnnotationsArgs): Promise<nu
   return totalDeleted
 }
 
-interface ExportAnnotationsArgs {
+interface PostAnnotationArgs {
   datasetId: string
-  sourceHypothesisGroup: string
-  isAdminDownloader: boolean
+  isAdminAuthor: boolean
   destinationUrl: string
   destinationHypothesisGroup: string
   privateAnnotation: boolean
-  isAdminAuthor: boolean
-  addQdrInfo:
-    | {
-        manuscriptId: string
-        datasetDoi: string
-      }
-    | false
+  addQdrInfo: { datasetDoi: string; manuscriptId: string } | false
   numberAnnotations: boolean
+}
+interface ExportAnnotationsArgs extends Required<SearchForAnnotationsArgs>, PostAnnotationArgs {
+  //taskDispatch
 }
 export async function exportAnnotations({
   datasetId,
-  sourceHypothesisGroup,
   isAdminDownloader,
-  destinationUrl,
-  destinationHypothesisGroup,
-  privateAnnotation,
   isAdminAuthor,
-  addQdrInfo,
-  numberAnnotations,
-}: ExportAnnotationsArgs): Promise<number> {
-  const { data } = await axiosClient.post<{ total: number }>(
-    `/api/hypothesis/${datasetId}/export-annotations`,
-    JSON.stringify({
-      sourceHypothesisGroup,
-      isAdminDownloader,
-      destinationUrl,
-      destinationHypothesisGroup,
-      privateAnnotation,
-      numberAnnotations,
-      addQdrInfo,
-      isAdminAuthor,
-    }),
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-  return data.total
-}
-
-interface ServerExportAnnotationsServerSideArgs {
-  totalAnnotationsCount: number
-  downloadApiUrl: string
-  exportApiUrl: string
-  sourceUrl: string
-  destinationUrl: string
-  sourceHypothesisGroup: string
-  destinationHypothesisGroup: string
-  downloadApiToken: string
-  exportApiToken: string
-  privateAnnotation: boolean
-  addQdrInfo:
-    | {
-        manuscriptId: string
-        datasetDoi: string
-      }
-    | false
-  numberAnnotations: boolean
-}
-export async function serverExportAnnotations({
-  totalAnnotationsCount,
-  downloadApiUrl,
-  exportApiUrl,
-  sourceUrl,
   destinationUrl,
   sourceHypothesisGroup,
   destinationHypothesisGroup,
-  downloadApiToken,
-  exportApiToken,
   privateAnnotation,
   addQdrInfo,
   numberAnnotations,
-}: ServerExportAnnotationsServerSideArgs): Promise<number> {
+}: //add back task dispatch
+ExportAnnotationsArgs): Promise<number> {
+  const totalAnnotationsCount = await getTotalAnnotationsCount({
+    datasetId,
+    isAdminDownloader,
+    sourceHypothesisGroup,
+  })
   if (numberAnnotations && totalAnnotationsCount > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
-    throw new Error(
-      `Found ${totalAnnotationsCount.toLocaleString(
-        "en-US"
-      )} annotations. AnnoREP can't number annotations for projects with more than ${TOTAL_EXPORTED_ANNOTATIONS_LIMIT.toLocaleString(
-        "en-US"
-      )} annotations.`
-    )
+    //task dipatch error
   }
-  //[0, 200, 400, so on]
-  const downloadOffsets = range(0, totalAnnotationsCount - 1, ANNOTATIONS_MAX_LIMIT)
-  //[0, 30, 60, so on]
-  const downloadBatches = range(0, downloadOffsets.length - 1, REQUEST_BATCH_SIZE)
+
+  const sort = "created"
+  const order = "asc"
+  let searchAfter: string | undefined //need to init?
+
+  const totalBatchesCount = Math.ceil(totalAnnotationsCount / ANNOTATIONS_MAX_LIMIT)
+  let batchCount = 0
+
   let totalExportedCount = 0
   let sourceAnnotations: any[] = []
-  for (const downloadBatch of downloadBatches) {
-    //send at most 30 requests to hypothesis' api search endpoint, with each request returning at most 200 annotations
-    const annotationsDataRows = await Promise.all(
-      downloadOffsets.slice(downloadBatch, downloadBatch + REQUEST_BATCH_SIZE).map((offset) => {
-        return downloadAnnotations({
-          downloadApiUrl,
-          sourceUrl,
-          sourceHypothesisGroup,
-          downloadApiToken,
-          offset,
-          limit: ANNOTATIONS_MAX_LIMIT,
-        })
-      })
-    )
 
-    let annotations = annotationsDataRows.flat()
-    annotations = annotations.filter((annotation) => annotation.uri === sourceUrl)
+  while (batchCount < totalBatchesCount) {
+    batchCount++
+    const annotations = await downloadAnnotations({
+      datasetId,
+      isAdminDownloader,
+      sourceHypothesisGroup,
+      sort,
+      order,
+      searchAfter,
+      limit: ANNOTATIONS_MAX_LIMIT,
+    })
+    searchAfter = annotations[annotations.length - 1][sort]
 
     if (numberAnnotations) {
       //accumulate all the source annotations
@@ -234,8 +184,8 @@ export async function serverExportAnnotations({
       //export the anotations
       const exportedCount = await copyAnnotations({
         sourceAnnotations: annotations,
-        exportApiUrl,
-        exportApiToken,
+        datasetId,
+        isAdminAuthor,
         destinationUrl,
         destinationHypothesisGroup,
         privateAnnotation,
@@ -250,15 +200,18 @@ export async function serverExportAnnotations({
     sourceAnnotations.sort(annotationLocationCompareFn)
     //export annotations
     totalExportedCount = await copyAnnotations({
+      datasetId,
       sourceAnnotations,
-      exportApiUrl,
-      exportApiToken,
+      isAdminAuthor,
       destinationUrl,
       destinationHypothesisGroup,
       privateAnnotation,
       addQdrInfo,
       numberAnnotations,
     })
+  }
+  if (addQdrInfo) {
+    //post title ann
   }
 
   return totalExportedCount
@@ -358,62 +311,50 @@ function createInitialAnnotationText(citation: string, doi: string, isDraftState
   <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }
 
-type DownloadAnnotationsKeys =
-  | "downloadApiUrl"
-  | "sourceUrl"
-  | "sourceHypothesisGroup"
-  | "downloadApiToken"
-interface DownloadAnnotationsArgs
-  extends Pick<ServerExportAnnotationsServerSideArgs, DownloadAnnotationsKeys> {
-  offset: number
+interface DownloadAnnotationsArgs extends SearchForAnnotationsArgs {
+  sort: string
+  order: string
+  searchAfter?: string
   limit: number
 }
 async function downloadAnnotations({
-  downloadApiUrl,
-  sourceUrl,
+  datasetId,
+  isAdminDownloader,
   sourceHypothesisGroup,
-  downloadApiToken,
-  offset,
+  sort,
+  order,
+  searchAfter,
   limit,
 }: DownloadAnnotationsArgs): Promise<any[]> {
-  const { data } = await axiosClient.get<{ rows: any[]; total: number }>(downloadApiUrl, {
-    params: {
-      limit,
-      offset,
-      uri: sourceUrl,
-      group: sourceHypothesisGroup,
-      //oldest annotations are retrieved first to be copied first
-      //to preserve the relative time-order between annotations
-      sort: "created",
-      order: "asc",
-    },
-    headers: {
-      Authorization: `Bearer ${downloadApiToken}`,
-      Accept: "application/json",
-      [REQUEST_DESC_HEADER_NAME]: `Downloading ${sourceHypothesisGroup} annotations from ${sourceUrl} at offset ${offset}`,
-    },
-  })
+  const params = {
+    isAdminDownloader,
+    sourceHypothesisGroup,
+    sort,
+    order,
+    searchAfter,
+    limit,
+  }
+  const { data } = await axiosClient.get<{ rows: any[] }>(
+    `/api/hypothesis/${datasetId}/download-annotations`,
+    {
+      params,
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  )
   return data.rows
 }
 
-type CopyAnnotationsKeys =
-  | "exportApiUrl"
-  | "destinationUrl"
-  | "destinationHypothesisGroup"
-  | "exportApiToken"
-  | "privateAnnotation"
-  | "addQdrInfo"
-  | "numberAnnotations"
-interface CopyAnnotationsArgs
-  extends Pick<ServerExportAnnotationsServerSideArgs, CopyAnnotationsKeys> {
+interface CopyAnnotationsArgs extends PostAnnotationArgs {
   sourceAnnotations: any[]
 }
 async function copyAnnotations({
   sourceAnnotations,
-  exportApiUrl,
+  datasetId,
+  isAdminAuthor,
   destinationUrl,
   destinationHypothesisGroup,
-  exportApiToken,
   privateAnnotation,
   addQdrInfo,
   numberAnnotations,
@@ -432,23 +373,26 @@ async function copyAnnotations({
   let exportedCount = 0
   const exportOffsets = range(0, newAnnotations.length - 1, REQUEST_BATCH_SIZE)
   for (const exportOffset of exportOffsets) {
-    const batchOfAnnotations = newAnnotations.slice(exportOffset, exportOffset + REQUEST_BATCH_SIZE)
-    const copyAnns = batchOfAnnotations.map((annotation, i) => {
-      return axiosClient({
-        method: "POST",
-        url: exportApiUrl,
-        data: annotation,
+    const batchOfNewAnnotations = newAnnotations.slice(
+      exportOffset,
+      exportOffset + REQUEST_BATCH_SIZE
+    )
+    const postData = {
+      oldAnnotationIds: sourceAnnotations.map((ann) => ann.id),
+      newAnnotations: batchOfNewAnnotations,
+      isAdminAuthor,
+      destinationUrl,
+    }
+    const { data } = await axiosClient.post<{ total: number }>(
+      `/api/hypothesis/${datasetId}/export-annotations`,
+      JSON.stringify(postData),
+      {
         headers: {
-          Authorization: `Bearer ${exportApiToken}`,
           "Content-type": "application/json",
-          [REQUEST_DESC_HEADER_NAME]: `Copying annotation ${
-            sourceAnnotations[exportOffset + i].id
-          } to ${destinationUrl}`,
         },
-      })
-    })
-    await Promise.all(copyAnns)
-    exportedCount += batchOfAnnotations.length
+      }
+    )
+    exportedCount += data.total
   }
   return exportedCount
 }
@@ -458,8 +402,8 @@ type CreateNewAnnotationKeys =
   | "destinationHypothesisGroup"
   | "privateAnnotation"
   | "addQdrInfo"
-interface CreateNewAnnotationArgs
-  extends Pick<ServerExportAnnotationsServerSideArgs, CreateNewAnnotationKeys> {
+
+interface CreateNewAnnotationArgs extends Pick<PostAnnotationArgs, CreateNewAnnotationKeys> {
   sourceAnnotation: any
   newAnnotationPrefixIndex: number | null
 }
@@ -470,7 +414,7 @@ function createNewAnnotation({
   privateAnnotation,
   addQdrInfo,
   newAnnotationPrefixIndex,
-}: CreateNewAnnotationArgs): string {
+}: CreateNewAnnotationArgs): any {
   sourceAnnotation.target.forEach((element: any) => {
     element.source = destinationUrl
   })
@@ -487,7 +431,8 @@ function createNewAnnotation({
     newText = `${ATI_HEADER_HTML}${newText}`
   }
 
-  return JSON.stringify({
+  //consider typing this
+  return {
     uri: destinationUrl,
     //document
     text: newText,
@@ -497,7 +442,7 @@ function createNewAnnotation({
     permissions: { read: newReadPermission },
     target: sourceAnnotation.target,
     //references
-  })
+  }
 }
 
 //https://github.com/hypothesis/client/blob/main/src/sidebar/helpers/thread-sorters.js#L87
