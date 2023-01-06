@@ -5,6 +5,7 @@ import { axiosClient } from "../../../../features/app"
 
 import { AtiTab } from "../../../../constants/ati"
 import { REQUEST_DESC_HEADER_NAME } from "../../../../constants/http"
+import { IHypothesisAnnotation } from "../../../../types/hypothesis"
 import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 const ADMIN_HYPOTHESIS_API_TOKEN = process.env.ADMIN_HYPOTHESIS_API_TOKEN
@@ -31,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           limit,
           group: sourceHypothesisGroup,
         }
-        const { data } = await axiosClient.get<{ rows: any[] }>(exportApiUrl, {
+        const { data } = await axiosClient.get<{ rows: IHypothesisAnnotation[] }>(exportApiUrl, {
           params,
           headers: {
             Authorization: `Bearer ${exportApiToken}`,

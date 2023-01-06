@@ -16,6 +16,7 @@ import {
   REQUEST_BATCH_SIZE,
   TOTAL_EXPORTED_ANNOTATIONS_LIMIT,
 } from "../constants/hypothesis"
+import { IHypothesisAnnotation, IHypothesisPostAnnotationBodySchema } from "../types/hypothesis"
 import { range } from "./arrayUtils"
 
 interface SearchForAnnotationsArgs {
@@ -53,7 +54,7 @@ export async function getTotalAnnotations({
   datasetId,
   isAdminDownloader,
   sourceHypothesisGroup,
-}: GetTotalAnnotationsArgs): Promise<any[]> {
+}: GetTotalAnnotationsArgs): Promise<IHypothesisAnnotation[]> {
   const sort = "created"
   const order = "desc"
   let searchAfter: string | undefined
@@ -61,7 +62,7 @@ export async function getTotalAnnotations({
   const totalBatchesCount = Math.ceil(totalAnnotationsCount / ANNOTATIONS_MAX_LIMIT)
   let batchCount = 0
 
-  let sourceAnnotations: any[] = []
+  let sourceAnnotations: IHypothesisAnnotation[] = []
   while (batchCount < totalBatchesCount) {
     batchCount++
     const annotations = await downloadAnnotations({
@@ -82,14 +83,14 @@ export async function getTotalAnnotations({
 
 interface DeleteAnnotationsArgs {
   datasetId: string
-  annotations: any[]
+  annotations: IHypothesisAnnotation[]
   isAdminAuthor: boolean
   taskDispatch?: Dispatch<ITaskAction>
 }
 export async function deleteAnnotations(args: DeleteAnnotationsArgs): Promise<number> {
   const { datasetId, annotations, isAdminAuthor, taskDispatch } = args
   let totalDeleted = 0
-  const anns = annotations.map((ann: any) => {
+  const anns = annotations.map((ann) => {
     return {
       id: ann.id,
       permissions: { delete: ann.permissions.delete },
@@ -211,7 +212,21 @@ ExportAnnotationsArgs): Promise<number> {
     })
   }
   if (addQdrInfo) {
-    //post title ann
+    await axiosClient.post(
+      `/api/hypothesis/${datasetId}/title-annotation`,
+      JSON.stringify({
+        destinationUrl,
+        destinationHypothesisGroup,
+        privateAnnotation,
+        manuscriptId: addQdrInfo.manuscriptId,
+        datasetDoi: addQdrInfo.datasetDoi,
+      }),
+      {
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    )
   }
 
   return totalExportedCount
@@ -295,7 +310,11 @@ export async function serverPostTitleAnnotation({
     }
   )
 }
-function createInitialAnnotationText(citation: string, doi: string, isDraftState: boolean): string {
+export function createInitialAnnotationText(
+  citation: string,
+  doi: string,
+  isDraftState: boolean
+): string {
   const citationArr = citation.split(". ")
   if (isDraftState) {
     citationArr.pop()
@@ -325,7 +344,7 @@ async function downloadAnnotations({
   order,
   searchAfter,
   limit,
-}: DownloadAnnotationsArgs): Promise<any[]> {
+}: DownloadAnnotationsArgs): Promise<IHypothesisAnnotation[]> {
   const params = {
     isAdminDownloader,
     sourceHypothesisGroup,
@@ -334,7 +353,7 @@ async function downloadAnnotations({
     searchAfter,
     limit,
   }
-  const { data } = await axiosClient.get<{ rows: any[] }>(
+  const { data } = await axiosClient.get<{ rows: IHypothesisAnnotation[] }>(
     `/api/hypothesis/${datasetId}/download-annotations`,
     {
       params,
@@ -347,7 +366,7 @@ async function downloadAnnotations({
 }
 
 interface CopyAnnotationsArgs extends PostAnnotationArgs {
-  sourceAnnotations: any[]
+  sourceAnnotations: IHypothesisAnnotation[]
 }
 async function copyAnnotations({
   sourceAnnotations,
@@ -404,7 +423,7 @@ type CreateNewAnnotationKeys =
   | "addQdrInfo"
 
 interface CreateNewAnnotationArgs extends Pick<PostAnnotationArgs, CreateNewAnnotationKeys> {
-  sourceAnnotation: any
+  sourceAnnotation: IHypothesisAnnotation
   newAnnotationPrefixIndex: number | null
 }
 function createNewAnnotation({
@@ -414,8 +433,8 @@ function createNewAnnotation({
   privateAnnotation,
   addQdrInfo,
   newAnnotationPrefixIndex,
-}: CreateNewAnnotationArgs): any {
-  sourceAnnotation.target.forEach((element: any) => {
+}: CreateNewAnnotationArgs): IHypothesisPostAnnotationBodySchema {
+  sourceAnnotation.target.forEach((element) => {
     element.source = destinationUrl
   })
   let newReadPermission = sourceAnnotation.permissions.read
@@ -431,7 +450,6 @@ function createNewAnnotation({
     newText = `${ATI_HEADER_HTML}${newText}`
   }
 
-  //consider typing this
   return {
     uri: destinationUrl,
     //document

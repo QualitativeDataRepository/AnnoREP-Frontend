@@ -89,7 +89,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         isAdminDownloader: false,
         sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
       })
-      const jsonStrs = annotations.map((annotation: any) => JSON.stringify(annotation))
+      const jsonStrs = annotations.map((annotation) => JSON.stringify(annotation))
       const arrayStr = encodeURIComponent(`[${jsonStrs.join(",")}]`)
       if (!didCancel) {
         setAnnotationsJsonStr(arrayStr)
