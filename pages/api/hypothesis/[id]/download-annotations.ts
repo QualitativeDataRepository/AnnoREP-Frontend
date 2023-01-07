@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         )
         res.status(200).json({
           rows: data.rows,
-          tota: data.total,
+          total: data.total,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
