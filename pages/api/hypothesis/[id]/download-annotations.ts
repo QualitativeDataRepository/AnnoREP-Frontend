@@ -40,10 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })
-        const exactMatches = data.rows.filter((annotation) => annotation.uri === sourceUrl)
         res.status(200).json({
-          rows: exactMatches,
-          total: exactMatches.length,
+          rows: data.rows,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
