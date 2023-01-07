@@ -20,9 +20,10 @@ export async function getTotalAnnotationsCount({
   const params = {
     isAdminDownloader,
     sourceHypothesisGroup,
+    limit: 1,
   }
   const { data } = await axiosClient.get<{ total: number }>(
-    `/api/hypothesis/${datasetId}/total-annotations`,
+    `/api/hypothesis/${datasetId}/download-annotations`,
     {
       params,
       headers: {

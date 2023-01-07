@@ -32,16 +32,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           limit,
           group: sourceHypothesisGroup,
         }
-        const { data } = await axiosClient.get<{ rows: IHypothesisAnnotation[] }>(exportApiUrl, {
-          params,
-          headers: {
-            Authorization: `Bearer ${exportApiToken}`,
-            Accept: "application/json",
-            [REQUEST_DESC_HEADER_NAME]: requestDesc,
-          },
-        })
+        const { data } = await axiosClient.get<{ rows: IHypothesisAnnotation[]; total: number }>(
+          exportApiUrl,
+          {
+            params,
+            headers: {
+              Authorization: `Bearer ${exportApiToken}`,
+              Accept: "application/json",
+              [REQUEST_DESC_HEADER_NAME]: requestDesc,
+            },
+          }
+        )
         res.status(200).json({
           rows: data.rows,
+          tota: data.total,
         })
       } catch (e) {
         const { status, message } = getResponseFromError(e, requestDesc)
