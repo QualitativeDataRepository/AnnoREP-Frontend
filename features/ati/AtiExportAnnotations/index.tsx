@@ -142,6 +142,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               }
             : false,
         numberAnnotations: target.numberAnnotations.checked,
+        taskDispatch: exportTaskDispatch,
       })
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`

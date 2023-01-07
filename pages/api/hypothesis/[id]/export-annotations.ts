@@ -10,7 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     const session = await getSession({ req })
     if (session) {
-      const { oldAnnotationIds, newAnnotations, isAdminAuthor, destinationUrl } = req.body
+      const { newAnnotations, isAdminAuthor } = req.body
+      const destinationUrl = newAnnotations[0].data.uri
       const requestDesc = `Exporting annotations to ${destinationUrl}`
       const exportApiUrl = `${process.env.HYPOTHESIS_SERVER_URL}/api/annotations`
       const { hypothesisApiToken } = session
@@ -22,12 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         //only ever send 30 annotations
         await Promise.all(
-          newAnnotations.map((annotation: any, i: number) => {
-            return axiosClient.post(exportApiUrl, JSON.stringify(annotation), {
+          newAnnotations.map((annotation: any) => {
+            return axiosClient.post(exportApiUrl, JSON.stringify(annotation.data), {
               headers: {
                 Authorization: `Bearer ${exportApiToken}`,
                 "Content-type": "application/json",
-                [REQUEST_DESC_HEADER_NAME]: `Exporting annotation ${oldAnnotationIds[i]} to ${destinationUrl}`,
+                [REQUEST_DESC_HEADER_NAME]: `Exporting annotation ${annotation.sourceId} to ${destinationUrl}`,
               },
             })
           })
