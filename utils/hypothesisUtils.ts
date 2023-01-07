@@ -75,7 +75,7 @@ export async function deleteAnnotations(args: DeleteAnnotationsArgs): Promise<nu
       permissions: { delete: ann.permissions.delete },
     }
   })
-  const offsets = range(0, annotations.length - 1, REQUEST_BATCH_SIZE)
+  const offsets = range(0, anns.length - 1, REQUEST_BATCH_SIZE)
   for (const offset of offsets) {
     const toDeleteAnns = anns.slice(offset, offset + REQUEST_BATCH_SIZE)
     if (taskDispatch) {
@@ -83,8 +83,8 @@ export async function deleteAnnotations(args: DeleteAnnotationsArgs): Promise<nu
         type: TaskActionType.NEXT_STEP,
         payload: generateProcessingBatchMesssage(
           offset + 1,
-          Math.min(offset + REQUEST_BATCH_SIZE, annotations.length),
-          annotations.length
+          Math.min(offset + REQUEST_BATCH_SIZE, anns.length),
+          anns.length
         ),
       })
     }
