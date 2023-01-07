@@ -81,10 +81,11 @@ export async function deleteAnnotations(args: DeleteAnnotationsArgs): Promise<nu
     if (taskDispatch) {
       taskDispatch({
         type: TaskActionType.NEXT_STEP,
-        payload: `Processing ${offset + 1} to ${Math.min(
-          offset + REQUEST_BATCH_SIZE,
+        payload: generateProcessingBatchMesssage(
+          offset + 1,
+          Math.min(offset + REQUEST_BATCH_SIZE, annotations.length),
           annotations.length
-        )} of ${annotations.length} annotations...`,
+        ),
       })
     }
     const response = await axiosClient.delete<{ total: number }>(
@@ -142,7 +143,6 @@ export async function exportAnnotations({
   let sourceAnnotations: IHypothesisAnnotation[] = []
 
   while (batchCount < totalBatchesCount) {
-    //can refactor?
     const annotations = await batchSearchForAnnotations({
       datasetId,
       isAdminDownloader,
@@ -162,9 +162,14 @@ export async function exportAnnotations({
       if (taskDispatch) {
         taskDispatch({
           type: TaskActionType.NEXT_STEP,
-          payload: `Processing batch ${(batchCount + 1).toLocaleString(
-            "en-US"
-          )} of total ${totalBatchesCount.toLocaleString("en-US")} batches of annotations...`, //copy paste
+          payload: generateProcessingBatchMesssage(
+            batchCount * ANNOTATIONS_MAX_LIMIT + 1,
+            Math.min(
+              batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT,
+              totalAnnotationsCount
+            ),
+            totalAnnotationsCount
+          ),
         })
       }
       const newAnnotations = annotations.map((sourceAnnotation) => {
@@ -205,9 +210,14 @@ export async function exportAnnotations({
       if (taskDispatch) {
         taskDispatch({
           type: TaskActionType.NEXT_STEP,
-          payload: `Processing batch ${(batchCount + 1).toLocaleString(
-            "en-US"
-          )} of total ${totalBatchesCount.toLocaleString("en-US")} batches of annotations...`,
+          payload: generateProcessingBatchMesssage(
+            batchCount * ANNOTATIONS_MAX_LIMIT + 1,
+            Math.min(
+              batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT,
+              newAnnotations.length
+            ),
+            newAnnotations.length
+          ),
         })
       }
       const batchOfNewAnnotations = newAnnotations.slice(
@@ -379,6 +389,12 @@ function getLocationOfAnnotation(annotation: any): number {
     }
   }
   return Number.MAX_SAFE_INTEGER
+}
+
+function generateProcessingBatchMesssage(start: number, end: number, total: number) {
+  return `Processing ${start.toLocaleString("en-US")} to ${end.toLocaleString(
+    "en-US"
+  )} of ${total.toLocaleString("en-US")} annotations...`
 }
 
 interface SearchForAnnotationsArgs {
