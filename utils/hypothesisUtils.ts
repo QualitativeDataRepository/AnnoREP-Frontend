@@ -341,7 +341,7 @@ function createNewAnnotation({
 
   let newText = sourceAnnotation.text
   if (newAnnotationPrefixIndex && newAnnotationPrefixIndex > 0) {
-    newText = `<b>AN${newAnnotationPrefixIndex}</b><br>${newText}`
+    newText = `<b>AN${newAnnotationPrefixIndex}</b><br><br>${newText}`
   }
   if (addQdrInfo) {
     newText = `${ATI_HEADER_HTML}${newText}`
