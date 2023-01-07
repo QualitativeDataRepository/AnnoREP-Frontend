@@ -141,7 +141,6 @@ export async function exportAnnotations({
   let sourceAnnotations: IHypothesisAnnotation[] = []
 
   while (batchCount < totalBatchesCount) {
-    batchCount++
     //can refactor?
     const annotations = await batchSearchForAnnotations({
       datasetId,
@@ -184,6 +183,7 @@ export async function exportAnnotations({
       })
       totalExportedCount += exportedCount
     }
+    batchCount++
   }
   if (numberAnnotations) {
     //sort annotations by location
@@ -200,7 +200,7 @@ export async function exportAnnotations({
     })
     //export annotations
     batchCount = 0
-    while (batchCount < totalAnnotationsCount) {
+    while (batchCount < totalBatchesCount) {
       if (taskDispatch) {
         taskDispatch({
           type: TaskActionType.NEXT_STEP,
@@ -209,7 +209,6 @@ export async function exportAnnotations({
           )} of total ${totalBatchesCount.toLocaleString("en-US")} batches of annotations...`,
         })
       }
-      batchCount++
       const batchOfNewAnnotations = newAnnotations.slice(
         batchCount * ANNOTATIONS_MAX_LIMIT,
         batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT
@@ -220,6 +219,7 @@ export async function exportAnnotations({
         isAdminAuthor,
       })
       totalExportedCount += exportedCount
+      batchCount++
     }
   }
   if (addQdrInfo) {
