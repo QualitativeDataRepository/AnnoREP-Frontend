@@ -114,24 +114,6 @@ export async function exportAnnotations({
   numberAnnotations,
   taskDispatch,
 }: ExportAnnotationsArgs): Promise<number> {
-  const totalAnnotationsCount = await getTotalAnnotationsCount({
-    datasetId,
-    isAdminDownloader,
-    sourceHypothesisGroup,
-  })
-  if (numberAnnotations && totalAnnotationsCount > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
-    if (taskDispatch) {
-      taskDispatch({
-        type: TaskActionType.FAIL,
-        payload: `Found ${totalAnnotationsCount.toLocaleString(
-          "en-US"
-        )} annotations. AnnoREP can't number annotations for projects with more than ${TOTAL_EXPORTED_ANNOTATIONS_LIMIT.toLocaleString(
-          "en-US"
-        )} annotations.`,
-      })
-    }
-  }
-
   const totalExportedCount = numberAnnotations
     ? await exportAnnotationsWithNumberAnnotations({
         datasetId,
@@ -213,6 +195,15 @@ async function exportAnnotationsWithNumberAnnotations({
     isAdminDownloader,
     sourceHypothesisGroup,
   })
+  if (totalAnnotationsCount > TOTAL_EXPORTED_ANNOTATIONS_LIMIT) {
+    throw new Error(
+      `Found ${totalAnnotationsCount.toLocaleString(
+        "en-US"
+      )} annotations. AnnoREP can't number annotations for projects with more than ${TOTAL_EXPORTED_ANNOTATIONS_LIMIT.toLocaleString(
+        "en-US"
+      )} annotations.`
+    )
+  }
   const sourceAnnotations = await getTotalAnnotations({
     totalAnnotationsCount,
     datasetId,
