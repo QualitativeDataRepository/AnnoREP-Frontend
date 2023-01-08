@@ -41,7 +41,7 @@ export async function getTotalAnnotations({
   sourceHypothesisGroup,
 }: GetTotalAnnotationsArgs): Promise<IHypothesisAnnotation[]> {
   const sort = "created"
-  const order = "desc"
+  const order = "asc"
   let searchAfter: string | undefined
 
   const totalBatchesCount = Math.ceil(totalAnnotationsCount / ANNOTATIONS_MAX_LIMIT)
@@ -132,107 +132,30 @@ export async function exportAnnotations({
     }
   }
 
-  const sort = "created"
-  const order = "asc"
-  let searchAfter: string | undefined
-
-  const totalBatchesCount = Math.ceil(totalAnnotationsCount / ANNOTATIONS_MAX_LIMIT)
-  let batchCount = 0
-
-  let totalExportedCount = 0
-  let sourceAnnotations: IHypothesisAnnotation[] = []
-
-  while (batchCount < totalBatchesCount) {
-    const annotations = await batchSearchForAnnotations({
-      datasetId,
-      isAdminDownloader,
-      sourceHypothesisGroup,
-      sort,
-      order,
-      searchAfter,
-      limit: ANNOTATIONS_MAX_LIMIT,
-    })
-    searchAfter = annotations[annotations.length - 1][sort]
-
-    if (numberAnnotations) {
-      //accumulate all the source annotations
-      sourceAnnotations = sourceAnnotations.concat(annotations)
-    } else {
-      //export the anotations
-      if (taskDispatch) {
-        taskDispatch({
-          type: TaskActionType.NEXT_STEP,
-          payload: generateProcessingBatchMesssage(
-            batchCount * ANNOTATIONS_MAX_LIMIT + 1,
-            Math.min(
-              batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT,
-              totalAnnotationsCount
-            ),
-            totalAnnotationsCount
-          ),
-        })
-      }
-      const newAnnotations = annotations.map((sourceAnnotation) => {
-        return createNewAnnotation({
-          sourceAnnotation,
-          destinationUrl,
-          destinationHypothesisGroup,
-          privateAnnotation,
-          addQdrInfo,
-          newAnnotationPrefixIndex: null,
-        })
-      })
-      const exportedCount = await batchPostAnnotations({
-        newAnnotations,
+  const totalExportedCount = numberAnnotations
+    ? await exportAnnotationsWithNumberAnnotations({
         datasetId,
+        isAdminDownloader,
         isAdminAuthor,
-      })
-      totalExportedCount += exportedCount
-    }
-    batchCount++
-  }
-  if (numberAnnotations) {
-    //sort annotations by location
-    sourceAnnotations.sort(annotationLocationCompareFn)
-    const newAnnotations = sourceAnnotations.map((sourceAnnotation, i) => {
-      return createNewAnnotation({
-        sourceAnnotation,
         destinationUrl,
+        sourceHypothesisGroup,
         destinationHypothesisGroup,
         privateAnnotation,
         addQdrInfo,
-        newAnnotationPrefixIndex: i + 1,
+        taskDispatch,
       })
-    })
-    //export annotations
-    batchCount = 0
-    while (batchCount < totalBatchesCount) {
-      if (taskDispatch) {
-        taskDispatch({
-          type: TaskActionType.NEXT_STEP,
-          payload: generateProcessingBatchMesssage(
-            batchCount * ANNOTATIONS_MAX_LIMIT + 1,
-            Math.min(
-              batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT,
-              newAnnotations.length
-            ),
-            newAnnotations.length
-          ),
-        })
-      }
-      const batchOfNewAnnotations = newAnnotations.slice(
-        batchCount * ANNOTATIONS_MAX_LIMIT,
-        batchCount * ANNOTATIONS_MAX_LIMIT + ANNOTATIONS_MAX_LIMIT
-      )
-      const exportedCount = await batchPostAnnotations({
+    : await exportAnnotationsWithoutNumberAnnotations({
         datasetId,
-        newAnnotations: batchOfNewAnnotations,
+        isAdminDownloader,
         isAdminAuthor,
+        destinationUrl,
+        sourceHypothesisGroup,
+        destinationHypothesisGroup,
+        privateAnnotation,
+        addQdrInfo,
+        taskDispatch,
       })
-      totalExportedCount += exportedCount
-      batchCount++
-    }
-  }
+
   if (addQdrInfo) {
     await axiosClient.post(
       `/api/hypothesis/${datasetId}/title-annotation`,
@@ -274,6 +197,137 @@ export function createInitialAnnotationText(
   <a href="https://qdr.syr.edu/ati">Learn more about ATI here</a>.`
 }
 
+async function exportAnnotationsWithNumberAnnotations({
+  datasetId,
+  isAdminDownloader,
+  isAdminAuthor,
+  destinationUrl,
+  sourceHypothesisGroup,
+  destinationHypothesisGroup,
+  privateAnnotation,
+  addQdrInfo,
+  taskDispatch,
+}: Omit<ExportAnnotationsArgs, "numberAnnotations">): Promise<number> {
+  const totalAnnotationsCount = await getTotalAnnotationsCount({
+    datasetId,
+    isAdminDownloader,
+    sourceHypothesisGroup,
+  })
+  const sourceAnnotations = await getTotalAnnotations({
+    totalAnnotationsCount,
+    datasetId,
+    isAdminDownloader,
+    sourceHypothesisGroup,
+  })
+  sourceAnnotations.sort(annotationLocationCompareFn)
+  const newAnnotations = sourceAnnotations.map((sourceAnnotation, i) => {
+    return createNewAnnotation({
+      sourceAnnotation,
+      destinationUrl,
+      destinationHypothesisGroup,
+      privateAnnotation,
+      addQdrInfo,
+      newAnnotationPrefixIndex: i + 1,
+    })
+  })
+  let totalExportedCount = 0
+  const exportOffsets = range(0, newAnnotations.length - 1, REQUEST_BATCH_SIZE)
+  for (const exportOffset of exportOffsets) {
+    if (taskDispatch) {
+      taskDispatch({
+        type: TaskActionType.NEXT_STEP,
+        payload: generateProcessingBatchMesssage(
+          exportOffset + 1,
+          Math.min(exportOffset + REQUEST_BATCH_SIZE, newAnnotations.length),
+          newAnnotations.length
+        ),
+      })
+    }
+    const batchOfNewAnnotations = newAnnotations.slice(
+      exportOffset,
+      exportOffset + REQUEST_BATCH_SIZE
+    )
+    const exportedCount = await batchPostAnnotations({
+      datasetId,
+      newAnnotations: batchOfNewAnnotations,
+      isAdminAuthor,
+    })
+    totalExportedCount += exportedCount
+  }
+
+  return totalExportedCount
+}
+
+async function exportAnnotationsWithoutNumberAnnotations({
+  datasetId,
+  isAdminDownloader,
+  isAdminAuthor,
+  destinationUrl,
+  sourceHypothesisGroup,
+  destinationHypothesisGroup,
+  privateAnnotation,
+  addQdrInfo,
+  taskDispatch,
+}: Omit<ExportAnnotationsArgs, "numberAnnotations">): Promise<number> {
+  const totalAnnotationsCount = await getTotalAnnotationsCount({
+    datasetId,
+    isAdminDownloader,
+    sourceHypothesisGroup,
+  })
+
+  const sort = "created"
+  const order = "asc"
+  let searchAfter: string | undefined
+
+  const totalBatchesCount = Math.ceil(totalAnnotationsCount / REQUEST_BATCH_SIZE)
+  let batchCount = 0
+
+  let totalExportedCount = 0
+
+  while (batchCount < totalBatchesCount) {
+    if (taskDispatch) {
+      taskDispatch({
+        type: TaskActionType.NEXT_STEP,
+        payload: generateProcessingBatchMesssage(
+          batchCount * REQUEST_BATCH_SIZE + 1,
+          Math.min(batchCount * REQUEST_BATCH_SIZE + REQUEST_BATCH_SIZE, totalAnnotationsCount),
+          totalAnnotationsCount
+        ),
+      })
+    }
+    const annotations = await batchSearchForAnnotations({
+      datasetId,
+      isAdminDownloader,
+      sourceHypothesisGroup,
+      sort,
+      order,
+      searchAfter,
+      limit: REQUEST_BATCH_SIZE,
+    })
+    searchAfter = annotations[annotations.length - 1][sort]
+
+    const newAnnotations = annotations.map((sourceAnnotation) => {
+      return createNewAnnotation({
+        sourceAnnotation,
+        destinationUrl,
+        destinationHypothesisGroup,
+        privateAnnotation,
+        addQdrInfo,
+        newAnnotationPrefixIndex: null,
+      })
+    })
+    const exportedCount = await batchPostAnnotations({
+      newAnnotations,
+      datasetId,
+      isAdminAuthor,
+    })
+    totalExportedCount += exportedCount
+    batchCount++
+  }
+
+  return totalExportedCount
+}
+
 async function batchSearchForAnnotations({
   datasetId,
   isAdminDownloader,
@@ -308,29 +362,20 @@ async function batchPostAnnotations({
   datasetId,
   isAdminAuthor,
 }: BatchPostAnnotationsArgs): Promise<number> {
-  let exportedCount = 0
-  const exportOffsets = range(0, newAnnotations.length - 1, REQUEST_BATCH_SIZE)
-  for (const exportOffset of exportOffsets) {
-    const batchOfNewAnnotations = newAnnotations.slice(
-      exportOffset,
-      exportOffset + REQUEST_BATCH_SIZE
-    )
-    const postData = {
-      newAnnotations: batchOfNewAnnotations,
-      isAdminAuthor,
-    }
-    const { data } = await axiosClient.post<{ total: number }>(
-      `/api/hypothesis/${datasetId}/export-annotations`,
-      JSON.stringify(postData),
-      {
-        headers: {
-          "Content-type": "application/json",
-        },
-      }
-    )
-    exportedCount += data.total
+  const postData = {
+    newAnnotations,
+    isAdminAuthor,
   }
-  return exportedCount
+  const { data } = await axiosClient.post<{ total: number }>(
+    `/api/hypothesis/${datasetId}/export-annotations`,
+    JSON.stringify(postData),
+    {
+      headers: {
+        "Content-type": "application/json",
+      },
+    }
+  )
+  return data.total
 }
 
 function createNewAnnotation({
@@ -428,6 +473,9 @@ interface PostAnnotationArgs {
 
 interface BatchPostAnnotationsArgs extends PostAnnotationArgs {
   newAnnotations: { sourceId: string; data: IHypothesisPostAnnotationBodySchema }[]
+  //batchStart: number
+  //totalAnnotationsCount: number
+  //taskDispatch?: Dispatch<ITaskAction>
 }
 
 interface NewAnnotationConfigs {
