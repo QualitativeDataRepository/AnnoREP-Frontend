@@ -30,7 +30,8 @@ import { getMessageFromError } from "../../../utils/httpRequestUtils"
 import {
   deleteAnnotations,
   exportAnnotations,
-  getAnnotations,
+  getTotalAnnotations,
+  getTotalAnnotationsCount,
 } from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiExportAnnotations.module.css"
@@ -70,18 +71,25 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     deleteAnnotationsModalIsOpen,
     { setTrue: openDeleteAnnotationsModal, setFalse: closeDeleteAnnotationsModal },
   ] = useBoolean(false)
-  const [deleteAnnotationsHypothesisGroup, setDeleteAnnotationsHypothesisGroup] =
-    useState<string>("")
+  const [deleteAnnotationsHypothesisGroup, setDeleteAnnotationsHypothesisGroup] = useState<
+    string | undefined
+  >(undefined)
   const [annotationsJsonStr, setAnnotationsJsonStr] = useState<string>("")
   useEffect(() => {
     let didCancel = false
     const getAnnotationsJson = async () => {
-      const annotations = await getAnnotations({
+      const totalAnnotationsCount = await getTotalAnnotationsCount({
         datasetId: dataset.id,
-        hypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
         isAdminDownloader: false,
+        sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
       })
-      const jsonStrs = annotations.map((annotation: any) => JSON.stringify(annotation))
+      const annotations = await getTotalAnnotations({
+        totalAnnotationsCount,
+        datasetId: dataset.id,
+        isAdminDownloader: false,
+        sourceHypothesisGroup: HYPOTHESIS_PUBLIC_GROUP_ID,
+      })
+      const jsonStrs = annotations.map((annotation) => JSON.stringify(annotation))
       const arrayStr = encodeURIComponent(`[${jsonStrs.join(",")}]`)
       if (!didCancel) {
         setAnnotationsJsonStr(arrayStr)
@@ -134,6 +142,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               }
             : false,
         numberAnnotations: target.numberAnnotations.checked,
+        taskDispatch: exportTaskDispatch,
       })
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
@@ -166,7 +175,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     }
     setDeleteAnnotationsHypothesisGroup(
       target.sourceHypothesisGroup.value === ALL_HYPOTHESIS_GROUPS_ID
-        ? ""
+        ? undefined
         : target.sourceHypothesisGroup.value
     )
     openDeleteAnnotationsModal()
@@ -176,10 +185,16 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
     closeDeleteAnnotationsModal()
     try {
       deleteTaskDispatch({ type: TaskActionType.START, payload: "Deleting annotations..." })
-      const annotations = await getAnnotations({
+      const totalAnnotationsCount = await getTotalAnnotationsCount({
         datasetId: dataset.id,
-        hypothesisGroup: deleteAnnotationsHypothesisGroup,
         isAdminDownloader: false,
+        sourceHypothesisGroup: deleteAnnotationsHypothesisGroup,
+      })
+      const annotations = await getTotalAnnotations({
+        totalAnnotationsCount,
+        datasetId: dataset.id,
+        isAdminDownloader: false,
+        sourceHypothesisGroup: deleteAnnotationsHypothesisGroup,
       })
 
       const totalDeleted = await deleteAnnotations({

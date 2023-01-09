@@ -16,7 +16,11 @@ import useTask, {
 } from "../../../hooks/useTask"
 import { IDataset, IManuscript } from "../../../types/dataverse"
 import { getMessageFromError } from "../../../utils/httpRequestUtils"
-import { deleteAnnotations, getAnnotations } from "../../../utils/hypothesisUtils"
+import {
+  deleteAnnotations,
+  getTotalAnnotations,
+  getTotalAnnotationsCount,
+} from "../../../utils/hypothesisUtils"
 
 import styles from "./AtiSettings.module.css"
 import formStyles from "../../../styles/Form.module.css"
@@ -44,7 +48,12 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
     closeDeleteAtiModal()
     try {
       taskDispatch({ type: TaskActionType.START, payload: "Deleting ATI project..." })
-      const deleteAnns = await getAnnotations({
+      const totalAnnotationsCount = await getTotalAnnotationsCount({
+        datasetId: dataset.id,
+        isAdminDownloader: false,
+      })
+      const deleteAnns = await getTotalAnnotations({
+        totalAnnotationsCount,
         datasetId: dataset.id,
         isAdminDownloader: false,
       })
