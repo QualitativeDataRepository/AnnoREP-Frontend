@@ -464,9 +464,6 @@ interface PostAnnotationArgs {
 
 interface BatchPostAnnotationsArgs extends PostAnnotationArgs {
   newAnnotations: { sourceId: string; data: IHypothesisPostAnnotationBodySchema }[]
-  //batchStart: number
-  //totalAnnotationsCount: number
-  //taskDispatch?: Dispatch<ITaskAction>
 }
 
 interface NewAnnotationConfigs {
