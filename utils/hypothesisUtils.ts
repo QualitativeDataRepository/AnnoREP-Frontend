@@ -138,24 +138,6 @@ export async function exportAnnotations({
         taskDispatch,
       })
 
-  if (addQdrInfo) {
-    await axiosClient.post(
-      `/api/hypothesis/${datasetId}/title-annotation`,
-      JSON.stringify({
-        destinationUrl,
-        destinationHypothesisGroup,
-        privateAnnotation,
-        manuscriptId: addQdrInfo.manuscriptId,
-        datasetDoi: addQdrInfo.datasetDoi,
-      }),
-      {
-        headers: {
-          "Content-type": "application/json",
-        },
-      }
-    )
-  }
-
   return totalExportedCount
 }
 

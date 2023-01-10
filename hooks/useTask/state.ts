@@ -17,7 +17,7 @@ export enum TaskActionType {
 export type ITaskAction =
   | { type: TaskActionType.START; payload: string }
   | { type: TaskActionType.FINISH; payload: ReactNode }
-  | { type: TaskActionType.FAIL; payload: string }
+  | { type: TaskActionType.FAIL; payload: ReactNode }
   | { type: TaskActionType.NEXT_STEP; payload: string }
   | { type: TaskActionType.RESET }
 
