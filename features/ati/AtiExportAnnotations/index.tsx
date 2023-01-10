@@ -139,8 +139,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       }
 
       exportTaskDispatch({ type: TaskActionType.START, payload: "Exporting annotations..." })
-      //don't show start status notification
-      createTitleAnnotationDispatch({ type: TaskActionType.START, payload: "" })
       const totalExported = await exportAnnotations({
         datasetId: dataset.id,
         sourceHypothesisGroup: target.sourceHypothesisGroup.value,
@@ -153,7 +151,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         numberAnnotations: target.numberAnnotations.checked,
         taskDispatch: exportTaskDispatch,
       })
-
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
       exportHypothesisUrl.current = hypothesisUrl
       const exportTaskSuccessPayload = (
@@ -170,12 +167,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
           .
         </span>
       )
-
       exportTaskDispatch({
         type: TaskActionType.FINISH,
         payload: exportTaskSuccessPayload,
       })
 
+      //don't show start status notification, don't start until export task is successful
+      createTitleAnnotationDispatch({ type: TaskActionType.START, payload: "" })
       if (addQdrInfo) {
         axiosClient
           .post(
@@ -208,6 +206,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               payload: createTitleAnnotationTaskErrorPayload,
             })
           })
+      } else {
+        //don't show success status notification
+        createTitleAnnotationDispatch({ type: TaskActionType.FINISH, payload: "" })
       }
     } catch (e) {
       exportTaskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
