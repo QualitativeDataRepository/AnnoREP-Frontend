@@ -14,6 +14,8 @@ import {
 } from "carbon-components-react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
+import { axiosClient } from "../../app"
+
 import { AtiTab } from "../../../constants/ati"
 import { HYPOTHESIS_PUBLIC_GROUP_ID } from "../../../constants/hypothesis"
 import { ALL_HYPOTHESIS_GROUPS_ID } from "./constants"
@@ -60,6 +62,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 }) => {
   const exportHypothesisUrl = useRef("")
   const { state: exportTaskState, dispatch: exportTaskDispatch } = useTask({
+    status: "inactive",
+    desc: "",
+  })
+  const { state: createTitleAnnotationState, dispatch: createTitleAnnotationDispatch } = useTask({
     status: "inactive",
     desc: "",
   })
@@ -115,6 +121,13 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       addQdrInfo: { checked: boolean }
       numberAnnotations: { checked: boolean }
     }
+    const addQdrInfo =
+      target.addQdrInfo && target.addQdrInfo.checked
+        ? {
+            manuscriptId: manuscript.id,
+            datasetDoi: dataset.doi,
+          }
+        : false
     try {
       if (
         target.sourceUrl.value === target.destinationUrl.value &&
@@ -134,22 +147,65 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         destinationHypothesisGroup: target.destinationHypothesisGroup.value,
         privateAnnotation: target.privateAnnotation.checked,
         isAdminAuthor: false,
-        addQdrInfo:
-          target.addQdrInfo && target.addQdrInfo.checked
-            ? {
-                manuscriptId: manuscript.id,
-                datasetDoi: dataset.doi,
-              }
-            : false,
+        addQdrInfo,
         numberAnnotations: target.numberAnnotations.checked,
         taskDispatch: exportTaskDispatch,
       })
+
+      if (addQdrInfo) {
+        //don't show start status notification
+        createTitleAnnotationDispatch({ type: TaskActionType.START, payload: "" })
+        axiosClient
+          .post(
+            `/api/hypothesis/${dataset.id}/title-annotation`,
+            JSON.stringify({
+              destinationUrl: target.destinationUrl.value,
+              destinationHypothesisGroup: target.destinationHypothesisGroup.value,
+              privateAnnotation: target.privateAnnotation.checked,
+              manuscriptId: manuscript.id,
+              datasetDoi: dataset.doi,
+            }),
+            {
+              headers: {
+                "Content-type": "application/json",
+              },
+            }
+          )
+          .then(() => {
+            //don't show success status notification
+            createTitleAnnotationDispatch({ type: TaskActionType.FINISH, payload: "" })
+          })
+          .catch(() => {
+            const payload = (
+              <span>
+                Could not create the title annotation on the{" "}
+                <Link
+                  href={target.destinationUrl.value}
+                  size="md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    destination <abbr>URL</abbr>
+                  </span>
+                </Link>
+                .
+              </span>
+            )
+            createTitleAnnotationDispatch({
+              type: TaskActionType.FAIL,
+              payload,
+            })
+          })
+      }
 
       const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
       exportHypothesisUrl.current = hypothesisUrl
       const payload = (
         <span>
-          {`Exported ${totalExported} annotation(s). Your manuscript with annotation(s) can
+          {`Exported ${totalExported} annotation(s)${
+            addQdrInfo ? " with QDR information" : ""
+          }. Your manuscript with annotation(s) can
             be accessed at your`}{" "}
           <Link href={hypothesisUrl} size="md" target="_blank" rel="noopener noreferrer">
             <span>
@@ -235,8 +291,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               )}
             </div>
           )}
-          {exportTaskState.status !== "inactive" && (
-            <div className={formStyles.item}>
+
+          <div className={formStyles.item}>
+            {exportTaskState.status !== "inactive" && (
               <InlineNotification
                 hideCloseButton
                 lowContrast
@@ -258,8 +315,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                   ) : undefined
                 }
               />
-            </div>
-          )}
+            )}
+            {exportTaskState.status !== "error" && (
+              <InlineNotification
+                hideCloseButton
+                lowContrast
+                kind={getTaskNotificationKind(createTitleAnnotationState)}
+                subtitle={createTitleAnnotationState.desc}
+                title={getTaskStatus(createTitleAnnotationState)}
+              />
+            )}
+          </div>
           <div className={formStyles.item}>
             <TextInput
               readOnly
