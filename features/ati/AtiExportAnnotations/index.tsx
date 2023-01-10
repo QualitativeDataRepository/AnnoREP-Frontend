@@ -154,6 +154,28 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
         taskDispatch: exportTaskDispatch,
       })
 
+      const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
+      exportHypothesisUrl.current = hypothesisUrl
+      const exportTaskSuccessPayload = (
+        <span>
+          {`Exported ${totalExported} annotation(s)${
+            addQdrInfo ? " with QDR information" : ""
+          }. Your manuscript with annotation(s) can
+            be accessed at your`}{" "}
+          <Link href={hypothesisUrl} size="md" target="_blank" rel="noopener noreferrer">
+            <span>
+              destination <abbr>URL</abbr>
+            </span>
+          </Link>
+          .
+        </span>
+      )
+
+      exportTaskDispatch({
+        type: TaskActionType.FINISH,
+        payload: exportTaskSuccessPayload,
+      })
+
       if (addQdrInfo) {
         axiosClient
           .post(
@@ -176,49 +198,17 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             createTitleAnnotationDispatch({ type: TaskActionType.FINISH, payload: "" })
           })
           .catch(() => {
-            const payload = (
+            const createTitleAnnotationTaskErrorPayload = (
               <span>
-                Could not create the title annotation on the{" "}
-                <Link
-                  href={target.destinationUrl.value}
-                  size="md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span>
-                    destination <abbr>URL</abbr>
-                  </span>
-                </Link>
-                .
+                Could not create the title annotation on the destination <abbr>URL</abbr>.
               </span>
             )
             createTitleAnnotationDispatch({
               type: TaskActionType.FAIL,
-              payload,
+              payload: createTitleAnnotationTaskErrorPayload,
             })
           })
       }
-
-      const hypothesisUrl = `https://hyp.is/go?url=${target.destinationUrl.value}&group=${target.destinationHypothesisGroup.value}`
-      exportHypothesisUrl.current = hypothesisUrl
-      const payload = (
-        <span>
-          {`Exported ${totalExported} annotation(s)${
-            addQdrInfo ? " with QDR information" : ""
-          }. Your manuscript with annotation(s) can
-            be accessed at your`}{" "}
-          <Link href={hypothesisUrl} size="md" target="_blank" rel="noopener noreferrer">
-            <span>
-              destination <abbr>URL</abbr>
-            </span>
-          </Link>
-          .
-        </span>
-      )
-      exportTaskDispatch({
-        type: TaskActionType.FINISH,
-        payload,
-      })
     } catch (e) {
       exportTaskDispatch({ type: TaskActionType.FAIL, payload: getMessageFromError(e) })
     }
