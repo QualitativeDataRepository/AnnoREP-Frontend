@@ -139,6 +139,8 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       }
 
       exportTaskDispatch({ type: TaskActionType.START, payload: "Exporting annotations..." })
+      //don't show start status notification
+      createTitleAnnotationDispatch({ type: TaskActionType.START, payload: "" })
       const totalExported = await exportAnnotations({
         datasetId: dataset.id,
         sourceHypothesisGroup: target.sourceHypothesisGroup.value,
@@ -153,8 +155,6 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
       })
 
       if (addQdrInfo) {
-        //don't show start status notification
-        createTitleAnnotationDispatch({ type: TaskActionType.START, payload: "" })
         axiosClient
           .post(
             `/api/hypothesis/${dataset.id}/title-annotation`,
@@ -211,8 +211,8 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             <span>
               destination <abbr>URL</abbr>
             </span>
-            .
           </Link>
+          .
         </span>
       )
       exportTaskDispatch({
@@ -316,7 +316,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 }
               />
             )}
-            {exportTaskState.status !== "error" && (
+            {createTitleAnnotationState.status === "error" && (
               <InlineNotification
                 hideCloseButton
                 lowContrast
