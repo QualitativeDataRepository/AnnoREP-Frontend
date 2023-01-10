@@ -410,7 +410,9 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             className={formStyles.submitBtn}
             type="submit"
             renderIcon={Export16}
-            disabled={exportTaskState.status === "active"}
+            disabled={
+              exportTaskState.status === "active" || createTitleAnnotationState.status === "active"
+            }
           >
             Export annotations
           </Button>
