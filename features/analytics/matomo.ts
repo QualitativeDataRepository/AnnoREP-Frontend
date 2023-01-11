@@ -50,21 +50,21 @@ export function init({
     refElement.parentNode.insertBefore(scriptElement, refElement)
   }
 
-  //start with location.pathname
-  //when user navigate the site, use Router.pathname
-  let previousPathname = location.pathname
+  //start with location.origin + location.pathname
+  //when user navigate the site, use Router.pathname to get the next url
+  let previousUrl = `${location.origin}${location.pathname}`
 
   Router.events.on("routeChangeStart", (path: string): void => {
     //just the pathname
-    console.warn("routeChangeStart", path)
     const [pathname] = path.split("?")
 
-    if (previousPathname) {
-      push(["setReferrerUrl", previousPathname])
+    if (previousUrl) {
+      push(["setReferrerUrl", previousUrl])
     }
-    push(["setCustomUrl", pathname]) //need the full url without query
+    const nextUrl = `${location.origin}${pathname}`
+    push(["setCustomUrl", nextUrl])
     push(["deleteCustomVariables", "page"])
-    previousPathname = pathname
+    previousUrl = nextUrl
   })
 
   Router.events.on("routeChangeComplete", (): void => {
