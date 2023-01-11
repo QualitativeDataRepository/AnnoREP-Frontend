@@ -38,14 +38,14 @@ export function init({
 
   push(["trackPageView"])
   push(["enableLinkTracking"])
-  push(["setTrackerUrl", `${url}${phpTrackerFile}`])
+  push(["setTrackerUrl", `${url}/${phpTrackerFile}`])
   push(["setSiteId", siteId])
 
   const scriptElement = document.createElement("script")
   const refElement = document.getElementsByTagName("script")[0]
   scriptElement.type = "text/javascript"
   scriptElement.async = true
-  scriptElement.src = `${url}${jsTrackerFile}`
+  scriptElement.src = `${url}/${jsTrackerFile}`
   if (refElement.parentNode) {
     refElement.parentNode.insertBefore(scriptElement, refElement)
   }
@@ -62,7 +62,7 @@ export function init({
     if (previousPathname) {
       push(["setReferrerUrl", previousPathname])
     }
-    push(["setCustomUrl", pathname])
+    push(["setCustomUrl", pathname]) //need the full url without query
     push(["deleteCustomVariables", "page"])
     previousPathname = pathname
   })
