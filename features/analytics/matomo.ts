@@ -2,18 +2,8 @@ import { default as Router } from "next/router"
 
 declare global {
   interface Window {
-    _paq: any[]
+    _paq: string[][]
   }
-}
-
-const isExcludedUrl = (url: string, patterns: RegExp[]): boolean => {
-  let excluded = false
-  patterns.forEach((pattern) => {
-    if (pattern.exec(url) !== null) {
-      excluded = true
-    }
-  })
-  return excluded
 }
 
 interface InitSettings {
@@ -21,117 +11,68 @@ interface InitSettings {
   siteId: string
   jsTrackerFile?: string
   phpTrackerFile?: string
-  excludeUrlsPatterns?: RegExp[]
 }
 
-interface Dimensions {
-  dimension1?: string
-  dimension2?: string
-  dimension3?: string
-  dimension4?: string
-  dimension5?: string
-  dimension6?: string
-  dimension7?: string
-  dimension8?: string
-  dimension9?: string
-  dimension10?: string
-}
-
-// to push custom events
-export function push(
-  args: (Dimensions | number[] | string[] | number | string | null | undefined)[]
-): void {
+function push(args: string[]): void {
   if (!window._paq) {
     window._paq = []
   }
   window._paq.push(args)
 }
 
-const startsWith = (str: string, needle: string): boolean => {
-  // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
-  return str.substring(0, needle.length) === needle
-}
-
-// initialize the tracker
 export function init({
   url,
   siteId,
   jsTrackerFile = "matomo.js",
   phpTrackerFile = "matomo.php",
-  excludeUrlsPatterns = [],
 }: InitSettings): void {
   window._paq = window._paq !== null ? window._paq : []
   if (!url) {
     console.warn("Matomo disabled, please provide matomo url")
     return
   }
-  let previousPath = ""
-  // order is important -_- so campaign are detected
-  const excludedUrl =
-    typeof window !== "undefined" && isExcludedUrl(window.location.pathname, excludeUrlsPatterns)
-
-  if (excludedUrl) {
-    if (typeof window !== "undefined") {
-      //console.log(`matomo: exclude track ${window.location.pathname}`)
-    }
-  } else {
-    push(["trackPageView"])
+  if (!siteId) {
+    console.warn("Matomo disabled, please provide site id")
+    return
   }
 
+  push(["trackPageView"])
   push(["enableLinkTracking"])
-  push(["setTrackerUrl", `${url}/${phpTrackerFile}`])
+  push(["setTrackerUrl", `${url}${phpTrackerFile}`])
   push(["setSiteId", siteId])
-
-  /**
-   * for initial loading we use the location.pathname
-   * as the first url visited.
-   * Once user navigate across the site,
-   * we rely on Router.pathname
-   */
 
   const scriptElement = document.createElement("script")
   const refElement = document.getElementsByTagName("script")[0]
   scriptElement.type = "text/javascript"
   scriptElement.async = true
-  scriptElement.defer = true
-  scriptElement.src = `${url}/${jsTrackerFile}`
+  scriptElement.src = `${url}${jsTrackerFile}`
   if (refElement.parentNode) {
     refElement.parentNode.insertBefore(scriptElement, refElement)
   }
-  previousPath = location.pathname
+
+  //start with location.pathname
+  //when user navigate the site, use Router.pathname
+  let previousPathname = location.pathname
 
   Router.events.on("routeChangeStart", (path: string): void => {
-    if (isExcludedUrl(path, excludeUrlsPatterns)) return
-
-    // We use only the part of the url without the querystring to ensure piwik is happy
-    // It seems that piwik doesn't track well page with querystring
+    //just the pathname
+    console.warn("routeChangeStart", path)
     const [pathname] = path.split("?")
 
-    if (previousPath) {
-      push(["setReferrerUrl", `${previousPath}`])
+    if (previousPathname) {
+      push(["setReferrerUrl", previousPathname])
     }
     push(["setCustomUrl", pathname])
     push(["deleteCustomVariables", "page"])
-    previousPath = pathname
+    previousPathname = pathname
   })
 
-  Router.events.on("routeChangeComplete", (path: string): void => {
-    if (isExcludedUrl(path, excludeUrlsPatterns)) {
-      return
-    }
-
+  Router.events.on("routeChangeComplete", (): void => {
     // In order to ensure that the page title had been updated,
     // we delayed pushing the tracking to the next tick.
     setTimeout(() => {
-      const { q } = Router.query
       push(["setDocumentTitle", document.title])
-      if (startsWith(path, "/recherche") || startsWith(path, "/search")) {
-        push(["trackSiteSearch", q ?? ""])
-      } else {
-        push(["trackPageView"])
-      }
+      push(["trackPageView"])
     }, 0)
   })
 }
-
-export default init
