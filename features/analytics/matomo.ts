@@ -38,6 +38,7 @@ export function init({
 
   push(["trackPageView"])
   push(["enableLinkTracking"])
+  push(["enableJSErrorTracking"])
   push(["setTrackerUrl", `${url}/${phpTrackerFile}`])
   push(["setSiteId", siteId])
 
