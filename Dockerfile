@@ -17,6 +17,9 @@ RUN npm run build
 FROM node:14-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV production
+ENV NEXT_PUBLIC_MATOMO_URL=https://analytics.qdr.syr.edu
+ARG MATOMO_SITE_ID
+ENV NEXT_PUBLIC_MATOMO_SITE_ID=$MATOMO_SITE_ID
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
