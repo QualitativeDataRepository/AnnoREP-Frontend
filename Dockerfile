@@ -11,6 +11,9 @@ FROM node:14-alpine AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
+ENV NEXT_PUBLIC_MATOMO_URL=https://analytics.qdr.syr.edu
+ARG MATOMO_SITE_ID
+ENV NEXT_PUBLIC_MATOMO_SITE_ID=$MATOMO_SITE_ID
 RUN npm run build
 
 # Production image, copy all the files and run next
