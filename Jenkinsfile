@@ -15,7 +15,7 @@ pipeline {
             }
         }
         stage('build (main)') {
-            when { branch 'stage' }
+            when { branch 'main' }
             steps {
                 checkout scm
                 script {
