@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import { InlineNotification, NotificationActionButton } from "carbon-components-react"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import qs from "qs"
 

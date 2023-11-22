@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import type { AppProps } from "next/app"
-import { Provider } from "next-auth/client"
+import { Provider } from "next-auth/react"
 
 import { init } from "../features/analytics/matomo"
 

@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import { User24, Login24, Information24 } from "@carbon/icons-react"
 import { Button, OverflowMenu, OverflowMenuItem } from "carbon-components-react"
-import { signOut } from "next-auth/client"
+import { signOut } from "next-auth/react"
 
 import { IAnnoRepUser } from "../../../types/auth"
 

@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 import { GetServerSideProps } from "next"
 
 import AppGuide from "../../features/components/AppGuide"

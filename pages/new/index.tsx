@@ -1,7 +1,7 @@
 import { FC } from "react"
 
 import { InlineNotification } from "carbon-components-react"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 import { GetServerSideProps } from "next"
 import qs from "qs"
 
