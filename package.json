@@ -61,7 +61,7 @@
     "lodash": "^4.17.21",
     "next": "10.2.3",
     "next-auth": "^3.27.0",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "react": "^16.14.0",
     "react-copy-to-clipboard": "^5.0.3",
     "react-dom": "^16.14.0",
