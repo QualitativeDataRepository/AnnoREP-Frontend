@@ -82,6 +82,7 @@ pipeline {
                         }
                     }
                 }
+                slackMessage("Success", "good")
             }
         }
         stage('deploy (main)') {
@@ -104,6 +105,7 @@ pipeline {
                         }
                     }
                 }
+                slackMessage("Success", "good")
             }
         }
     }
