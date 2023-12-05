@@ -11,5 +11,7 @@ updates:
       interval: "weekly"
     target-branch: "stage"
     allow:
-      - dependency-type: "production"
+      - dependency-type: "all"
+    ignore:
+      - dependency-type: "development"
     versioning-strategy: widen
