@@ -12,10 +12,4 @@ updates:
     target-branch: "stage"
     allow:
       - dependency-type: "production"
-        severity: "high"
-      - dependency-type: "production"
-        severity: "critical"
     versioning-strategy: widen
-    security:
-      advisories: true
-      
