@@ -14,7 +14,7 @@ jobs:
         node-version: '14.x'
     - name: Install Dependencies
       run: |
-        npm i
+        npm ci
     - name: Run Unit Tests
       run: |
         CI=true npm run test:all-unit
@@ -30,7 +30,7 @@ jobs:
           node-version: "14.x"
       - name: Install Dependencies
         run: |
-          npm i
+          npm ci
       - name: Run Lint
         run: |
           npm run lint
@@ -49,7 +49,7 @@ jobs:
           node-version: "14.x"
       - name: Install Dependencies
         run: |
-          npm i
+          npm ci
       - name: Run Build
         run: |
           npm run build
