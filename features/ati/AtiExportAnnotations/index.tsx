@@ -187,7 +187,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             }),
             {
               headers: {
-                "Content-type": "application/json",
+                "Content-Type": "application/json",
               },
             }
           )

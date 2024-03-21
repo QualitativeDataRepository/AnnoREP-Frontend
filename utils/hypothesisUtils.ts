@@ -344,7 +344,7 @@ async function batchPostAnnotations({
     JSON.stringify(postData),
     {
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
     }
   )

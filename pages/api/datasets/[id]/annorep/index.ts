@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             [ANNOREP_METADATA_FIELD]: ANNOREP_METADATA_VALUE,
           }),
           headers: {
-            "Content-type": "application/json-ld", //TODO: change ld+json?
+            "Content-Type": "application/json-ld", //TODO: change ld+json?
             [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },

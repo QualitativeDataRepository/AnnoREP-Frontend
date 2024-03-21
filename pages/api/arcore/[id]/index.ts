@@ -59,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     {
                       headers: {
                         Authorization: `Bearer ${hypothesisApiToken}`,
-                        "Content-type": "application/json",
+                        "Content-Type": "application/json",
                         [REQUEST_DESC_HEADER_NAME]: `Sending annotations from source manuscript ${id} to Hypothes.is server`,
                       },
                     }
