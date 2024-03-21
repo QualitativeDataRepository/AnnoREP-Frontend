@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return axiosClient.post(exportApiUrl, JSON.stringify(annotation.data), {
               headers: {
                 Authorization: `Bearer ${exportApiToken}`,
-                "Content-type": "application/json",
+                "Content-Type": "application/json",
                 [REQUEST_DESC_HEADER_NAME]: `Exporting annotation ${annotation.sourceId} to ${destinationUrl}`,
               },
             })
