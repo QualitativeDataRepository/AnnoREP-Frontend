@@ -21,9 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { status, data } = await axiosClient({
           method: "PUT",
           url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}/metadata/delete`,
-          data: JSON.stringify({
+          data: {
             [ANNOREP_METADATA_FIELD]: ANNOREP_METADATA_VALUE,
-          }),
+          },
           headers: {
             "Content-Type": "application/json-ld", //TODO: change ld+json?
             [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,

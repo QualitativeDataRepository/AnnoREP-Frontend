@@ -24,9 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           params: {
             replace: true,
           },
-          data: JSON.stringify({
+          data: {
             [ANNOREP_METADATA_FIELD]: ANNOREP_METADATA_VALUE,
-          }),
+          },
           headers: {
             "Content-Type": "application/json-ld", //TODO: change ld+json?
             [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
