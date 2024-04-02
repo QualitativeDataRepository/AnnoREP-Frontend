@@ -60,7 +60,7 @@
     "isomorphic-dompurify": "^0.15.0",
     "lodash": "^4.17.21",
     "next": "10.2.3",
-    "next-auth": "^3.29.10",
+    "next-auth": "^4.24.7",
     "qs": "^6.10.3",
     "react": "^16.14.0",
     "react-copy-to-clipboard": "^5.0.3",
