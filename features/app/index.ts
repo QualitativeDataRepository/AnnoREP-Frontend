@@ -10,9 +10,18 @@ axiosRetry(axiosClient, {
     if (error.response) {
       const retryAfter = error.response.headers["retry-after"]
       if (retryAfter) {
-        return retryAfter
+        const retryAfterSeconds = parseInt(retryAfter.trim(), 10)
+        if (!isNaN(retryAfterSeconds)) {
+          return retryAfterSeconds
+        }
+        const retryAfterDate = Date.parse(retryAfter.trim())
+        if (!isNaN(retryAfterDate)) {
+          const currentTime = Date.now()
+          const delay = Math.max(retryAfterDate - currentTime, 0)
+          return delay
+        }
       }
-      if (error.response.status === 429 && error.config.url?.includes(HYPOTHESIS_API_BASE_URL)) {
+      if (error.response.status === 429 && error.config?.url?.includes(HYPOTHESIS_API_BASE_URL)) {
         return retryCount * 2000 /** ms */
       }
     }
