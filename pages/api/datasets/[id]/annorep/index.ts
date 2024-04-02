@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
           headers: {
             "Content-Type": "application/json-ld", //TODO: change ld+json?
-            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken as string,
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })

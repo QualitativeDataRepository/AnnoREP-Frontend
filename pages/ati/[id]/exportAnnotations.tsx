@@ -86,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     await axiosClient
       .get(`${process.env.DATAVERSE_SERVER_URL}/api/datasets/${datasetId}`, {
         headers: {
-          [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+          [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
           [REQUEST_DESC_HEADER_NAME]: `Getting JSON for data project ${datasetId}`,
           Accept: "application/json",
         },
@@ -108,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             {
               responseType: "arraybuffer",
               headers: {
-                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
                 Accept: "application/pdf",
               },
             }
