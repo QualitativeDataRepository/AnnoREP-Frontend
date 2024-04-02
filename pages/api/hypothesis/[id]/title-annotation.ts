@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             `${process.env.ARCORE_SERVER_URL}/api/documents/${manuscriptId}/titleann`,
             {
               headers: {
-                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
                 [REQUEST_DESC_HEADER_NAME]: `Getting title annotation from source manuscript ${manuscriptId}`,
                 Accept: "application/json",
               },

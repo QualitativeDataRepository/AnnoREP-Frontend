@@ -59,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               data: addManuscriptForm,
               headers: {
                 "Content-Type": `${addManuscriptForm.getHeaders()["content-type"]}`,
-                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
                 [REQUEST_DESC_HEADER_NAME]: requestDesc,
               },
             })

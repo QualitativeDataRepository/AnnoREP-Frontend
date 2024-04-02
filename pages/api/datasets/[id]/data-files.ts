@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           method: "GET",
           url: `${process.env.DATAVERSE_SERVER_URL}/api/datasets/${id}`,
           headers: {
-            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken,
+            [DATAVERSE_HEADER_NAME]: session.dataverseApiToken as string,
             [REQUEST_DESC_HEADER_NAME]: requestDesc,
           },
         })

@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         await axiosClient.put(`${process.env.ARCORE_SERVER_URL}/api/documents/${id}`, undefined, {
           headers: {
-            [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+            [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
             [REQUEST_DESC_HEADER_NAME]: `Creating ingest PDF and extracting annotations from source manuscript ${id}`,
           },
         })
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             `${process.env.ARCORE_SERVER_URL}/api/documents/${id}/ann`,
             {
               headers: {
-                [DATAVERSE_HEADER_NAME]: dataverseApiToken,
+                [DATAVERSE_HEADER_NAME]: dataverseApiToken as string,
                 [REQUEST_DESC_HEADER_NAME]: `Getting annotations from source manuscript ${id}`,
               },
             }
