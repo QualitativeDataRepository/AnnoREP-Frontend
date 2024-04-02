@@ -12,7 +12,7 @@ axiosRetry(axiosClient, {
       if (retryAfter) {
         const retryAfterSeconds = parseInt(retryAfter.trim(), 10)
         if (!isNaN(retryAfterSeconds)) {
-          return retryAfterSeconds
+          return retryAfterSeconds * 1000
         }
         const retryAfterDate = Date.parse(retryAfter.trim())
         if (!isNaN(retryAfterDate)) {
