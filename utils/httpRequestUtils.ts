@@ -5,10 +5,14 @@ import { AnnoRepResponse } from "../types/http"
 export const getResponseFromError = (e: unknown, requestDesc?: string): AnnoRepResponse => {
   const annoRepResponse: AnnoRepResponse = { status: 400, message: "" }
   if (axios.isAxiosError(e)) {
-    const requestInfo =
-      e.config.headers[REQUEST_DESC_HEADER_NAME] ||
-      requestDesc ||
-      `${e.config.method} ${e.config.url}`
+    let requestInfo = "Request"
+    if (e.config && e.config.headers && e.config.headers[REQUEST_DESC_HEADER_NAME]) {
+      requestInfo = e.config.headers[REQUEST_DESC_HEADER_NAME] as string
+    } else if (requestDesc) {
+      requestInfo = requestDesc
+    } else if (e.config && e.config.method && e.config.url) {
+      requestInfo = `${e.config.method} ${e.config.url}`
+    }
     let failureMessage = `${requestInfo} failed.`
     if (e.response) {
       const additional =
