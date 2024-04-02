@@ -45,3 +45,14 @@ export const getMessageFromError = (e: unknown): string => {
   }
   return msg
 }
+
+export const isSameHostName = (urlStr: string, otherUrlStr: string): boolean => {
+  try {
+    const url = new URL(urlStr)
+    const otherUrl = new URL(otherUrlStr)
+    return url.hostname === otherUrl.hostname
+  } catch (e) {
+    console.warn("Invalid URL:", (e as Error).message)
+    return false
+  }
+}
