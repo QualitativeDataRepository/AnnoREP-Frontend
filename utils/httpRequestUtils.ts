@@ -52,7 +52,7 @@ export const isSameHostName = (urlStr: string, otherUrlStr: string): boolean => 
     const otherUrl = new URL(otherUrlStr)
     return url.hostname === otherUrl.hostname
   } catch (e) {
-    console.warn("Invalid URL:", (e as Error).message)
+    console.warn("Invalid URL:", getMessageFromError(e))
     return false
   }
 }
