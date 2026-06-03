@@ -12,7 +12,7 @@
     "url": "https://github.com/QualitativeDataRepository/AnnoREP-Frontend.git"
   },
   "engines": {
-    "node": ">=18.17.0",
+    "node": ">=20.0.0",
     "npm": ">=9.x"
   },
   "overrides": {
@@ -78,7 +78,7 @@
     "@types/formidable": "^1.2.2",
     "@types/jest": "^26.0.20",
     "@types/lodash": "^4.14.175",
-    "@types/node": "^14.14.31",
+    "@types/node": "^20.0.0",
     "@types/qs": "^6.9.18",
     "@types/react": "18.2.0",
     "@types/react-copy-to-clipboard": "^5.0.0",
