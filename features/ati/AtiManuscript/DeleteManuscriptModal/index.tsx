@@ -27,10 +27,7 @@ const DeleteManuscriptModal: FC<DeleteManuscriptModalProps> = ({
       size="xs"
       aria-label="Delete manuscript confirmation"
     >
-      <ModalHeader
-        title={`Delete ${manuscriptName}`}
-        iconDescription="Close"
-      />
+      <ModalHeader title={`Delete ${manuscriptName}`} iconDescription="Close" />
       <ModalBody>Are you sure you want to delete this manuscript?</ModalBody>
       <ModalFooter
         danger

@@ -1,4 +1,3 @@
-
 export const DATAVERSE_HEADER_NAME = "X-Dataverse-Key"
 
 export const SOURCE_MANUSCRIPT_TAG = "Source manuscript"

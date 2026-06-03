@@ -27,10 +27,7 @@ const DeleteAnnotations: FC<DeleteAnnotationsModalProps> = ({
       size="xs"
       aria-label="Delete annotations confirmation"
     >
-      <ModalHeader
-        title={`Delete annotations from ${manuscriptName}`}
-        iconDescription="Close"
-      />
+      <ModalHeader title={`Delete annotations from ${manuscriptName}`} iconDescription="Close" />
       <ModalBody>Are you sure you want to delete annotations from this manuscript?</ModalBody>
       <ModalFooter
         danger

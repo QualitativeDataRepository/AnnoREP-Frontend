@@ -27,13 +27,8 @@ const DeleteAtiModal: FC<DeleteAtiModalProps> = ({
       size="xs"
       aria-label="Delete ATI project confirmation"
     >
-      <ModalHeader
-        title={`Delete ${atiName}`}
-        iconDescription="Close"
-      />
-      <ModalBody>
-        Are you sure you want to delete this project?
-      </ModalBody>
+      <ModalHeader title={`Delete ${atiName}`} iconDescription="Close" />
+      <ModalBody>Are you sure you want to delete this project?</ModalBody>
       <ModalFooter
         danger
         primaryButtonText="Continue"

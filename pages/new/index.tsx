@@ -42,12 +42,7 @@ const NewAti: FC<NewAtiProps> = ({ user, datasets, serverUrl, totalCount, datase
           datasetsPerPage={datasetsPerPage}
         />
       ) : (
-        <InlineNotification
-          hideCloseButton
-          lowContrast
-          kind="info"
-          title="Unauthorized!"
-        >
+        <InlineNotification hideCloseButton lowContrast kind="info" title="Unauthorized!">
           Please login to create a new ATI project.
         </InlineNotification>
       )}

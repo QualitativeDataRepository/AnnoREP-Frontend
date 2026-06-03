@@ -1,13 +1,6 @@
 import React, { FC, FormEventHandler } from "react"
 
-import {
-  PaginationNav,
-  Search,
-  Form,
-  FormGroup,
-  Checkbox,
-  InlineLoading,
-} from "@carbon/react"
+import { PaginationNav, Search, Form, FormGroup, Checkbox, InlineLoading } from "@carbon/react"
 
 import AtiProject from "../AtiProject"
 import useSearch from "./useSearch"
@@ -76,7 +69,10 @@ const AtiProjects: FC<AtiProjectsProps> = ({
     const target = e.target as typeof e.target & {
       elements: { "ati-search": { value: string } }
     }
-    dispatch({ type: SearchActionType.UPDATE_Q, payload: target.elements["ati-search"].value.trim() })
+    dispatch({
+      type: SearchActionType.UPDATE_Q,
+      payload: target.elements["ati-search"].value.trim(),
+    })
   }
   const onFacetFieldChange = (
     _evt: React.ChangeEvent<HTMLInputElement>,

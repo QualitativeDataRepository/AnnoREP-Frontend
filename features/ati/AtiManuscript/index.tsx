@@ -242,21 +242,11 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       <div className={styles.tabContainer}>
         <HypothesisLoginNotification />
         <div className={styles.buttonContainer}>
-          <Button
-            kind="tertiary"
-            size="md"
-            onClick={openDatasourcesModal}
-            renderIcon={DocumentAdd}
-          >
+          <Button kind="tertiary" size="md" onClick={openDatasourcesModal} renderIcon={DocumentAdd}>
             Add data sources
           </Button>
           {manuscript.id && (
-            <Button
-              kind="danger"
-              size="md"
-              renderIcon={TrashCan}
-              onClick={onClickDeleteManuscript}
-            >
+            <Button kind="danger" size="md" renderIcon={TrashCan} onClick={onClickDeleteManuscript}>
               Delete manuscript
             </Button>
           )}
@@ -275,12 +265,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
           manuscript.ingest ? (
             <IngestPdf pdf={manuscript.ingest} />
           ) : (
-            <InlineNotification
-              hideCloseButton
-              lowContrast
-              kind="info"
-              title="Error!"
-            >
+            <InlineNotification hideCloseButton lowContrast kind="info" title="Error!">
               Ingest PDF of manuscript not found.
             </InlineNotification>
           )

@@ -1,12 +1,5 @@
 import { FC } from "react"
-import {
-  UnorderedList,
-  ListItem,
-  Link,
-  Tag,
-  Button,
-  InlineNotification,
-} from "@carbon/react"
+import { UnorderedList, ListItem, Link, Tag, Button, InlineNotification } from "@carbon/react"
 import { Launch } from "@carbon/react/icons"
 import { useRouter } from "next/router"
 

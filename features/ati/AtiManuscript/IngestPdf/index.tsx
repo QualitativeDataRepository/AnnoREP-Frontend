@@ -38,12 +38,7 @@ const IngestPdf: FC<IngestPdfProps> = ({ pdf }) => {
           file={`data:application/pdf;base64,${pdf}`}
           onLoadSuccess={onDocumentLoadSuccess}
           loading={
-            <InlineNotification
-              hideCloseButton
-              lowContrast
-              kind="info"
-              title="Status"
-            >
+            <InlineNotification hideCloseButton lowContrast kind="info" title="Status">
               Loading manuscript...
             </InlineNotification>
           }

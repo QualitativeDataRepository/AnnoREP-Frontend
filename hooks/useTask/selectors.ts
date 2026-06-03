@@ -1,4 +1,3 @@
-
 import { ITaskState } from "./state"
 
 export function getTaskStatus(state: ITaskState): string {

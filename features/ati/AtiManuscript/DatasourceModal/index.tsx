@@ -77,10 +77,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
         title="Copy the data source URL and paste it into an annotation on the right"
         iconDescription="Close"
       />
-      <ModalBody
-        aria-label="Data source URLs"
-        hasScrollingContent={true}
-      >
+      <ModalBody aria-label="Data source URLs" hasScrollingContent={true}>
         <div className={styles.twoColumns} aria-live="assertive">
           <Link
             href={`${serverUrl}/dataset.xhtml?persistentId=${datasetDoi}`}
