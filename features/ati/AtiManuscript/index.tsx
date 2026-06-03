@@ -1,4 +1,4 @@
-import { FC, FormEventHandler, useReducer, ChangeEvent } from "react"
+import { FC, FormEventHandler, useReducer } from "react"
 
 import { Button, Form, FileUploader, InlineNotification, Toggle } from "@carbon/react"
 import FormData from "form-data"
