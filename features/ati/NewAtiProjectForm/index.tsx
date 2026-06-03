@@ -179,7 +179,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           <h1 className={formStyles.title}>
             New <abbr>ATI</abbr> Project
           </h1>
-          <p className={formStyles.desc}>
+          <div className={formStyles.desc}>
             An <abbr>ATI</abbr> project has two components:
             <OrderedList native isExpressive>
               <ListItem>
@@ -187,7 +187,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               </ListItem>
               <ListItem>A manuscript to annotate</ListItem>
             </OrderedList>
-          </p>
+          </div>
           {taskState.status !== "inactive" && (
             <div className={formStyles.item}>
               <InlineNotification
@@ -214,20 +214,21 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
                 itemToString={(item) => item?.label || ""}
                 placeholder="Please choose a data project"
                 titleText={
-                  <div className={styles.searchTitle}>
-                    <div>
+                  <span className={styles.searchTitle}>
+                    <span>
                       Link to a <abbr>QDR</abbr> data project
-                    </div>
-                    <div>
+                    </span>
+                    <span>
                       {state.status !== "error" && (
                         <InlineLoading
+                          id="search-loading"
                           className={styles.searchLoader}
                           status={state.status}
                           description={getResultDesc(state)}
                         />
                       )}
-                    </div>
-                  </div>
+                    </span>
+                  </span>
                 }
                 helperText={
                   <span>
@@ -277,6 +278,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
           </fieldset>
           <div className={formStyles.item}>
             <FileUploader
+              id="manuscript-upload"
               aria-required={true}
               accept={[
                 ManuscriptFileExtension.docx,

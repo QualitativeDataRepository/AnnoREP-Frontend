@@ -65,9 +65,9 @@ const LoginForm: FC<LoginFormProps> = ({
             id="dataverse-api-token"
             name="dataverseApiToken"
             labelText={
-              <div>
+              <span>
                 <abbr>QDR</abbr> <abbr>API</abbr> token
-              </div>
+              </span>
             }
             helperText={
               <div>
@@ -101,9 +101,9 @@ const LoginForm: FC<LoginFormProps> = ({
             id="hypothesis-api-token"
             name="hypothesisApiToken"
             labelText={
-              <div>
+              <span>
                 Hypothes.is <abbr>API</abbr> token
-              </div>
+              </span>
             }
             helperText={
               <div>

@@ -37,6 +37,7 @@
 }
 
 .guide > div > a {
+  display:inline-flex;
   margin-top: 24px;
 }
 
