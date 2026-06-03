@@ -1,6 +1,6 @@
 import { FC, FormEventHandler, useReducer } from "react"
 
-import { Button, Form, FileUploader, InlineNotification, Toggle } from "@carbon/react"
+import { Button, Form, FileUploader, FileUploaderItem, InlineNotification, Toggle } from "@carbon/react"
 import FormData from "form-data"
 import { DocumentAdd, TrashCan, Upload } from "@carbon/react/icons"
 import { useRouter } from "next/router"
@@ -92,10 +92,18 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
   }
 
   const onChangeFileUpload = (
-    _e: React.SyntheticEvent<HTMLElement>,
+    e: React.SyntheticEvent<HTMLElement>,
     data?: { addedFiles: any[] }
   ) => {
-    const file = data?.addedFiles?.[0]?.file
+    let file
+    if (data && data.addedFiles && data.addedFiles.length > 0) {
+      file = data.addedFiles[0].file
+    } else {
+      const target = e.target as HTMLInputElement
+      if (target.files && target.files.length > 0) {
+        file = target.files[0]
+      }
+    }
     if (file) {
       uploadManuscriptTaskDispatch({
         type: UploadManuscriptActionType.SAVE_FILE_SELECTION,
@@ -292,6 +300,13 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   onChange={onChangeFileUpload}
                   onDelete={onClearFile}
                 />
+                {uploadManuscriptTaskState.manuscript && (
+                  <FileUploaderItem
+                    name={uploadManuscriptTaskState.manuscript.name}
+                    status="edit"
+                    onDelete={onClearFile}
+                  />
+                )}
               </div>
               <div className={formStyles.item}>
                 <Toggle

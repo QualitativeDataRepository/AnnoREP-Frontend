@@ -6,6 +6,7 @@ import {
   Button,
   Form,
   FileUploader,
+  FileUploaderItem,
   InlineNotification,
   ComboBox,
   InlineLoading,
@@ -98,10 +99,17 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
 
   const [selectedManuscript, setSelectedManuscript] = useState<File[] | null>(null)
   const onChangeFileUpload = (
-    _e: React.SyntheticEvent<HTMLElement>,
+    e: React.SyntheticEvent<HTMLElement>,
     data?: { addedFiles: any[] }
   ) => {
-    setSelectedManuscript(data?.addedFiles.map((f) => f.file) || [])
+    if (data && data.addedFiles) {
+      setSelectedManuscript(data.addedFiles.map((f) => f.file))
+    } else {
+      const target = e.target as HTMLInputElement
+      if (target.files) {
+        setSelectedManuscript(Array.from(target.files))
+      }
+    }
   }
   const onClearFile = () => {
     setSelectedManuscript(null)
@@ -297,6 +305,15 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               onDelete={onClearFile}
               onChange={onChangeFileUpload}
             />
+            {selectedManuscript &&
+              selectedManuscript.map((file) => (
+                <FileUploaderItem
+                  key={file.name}
+                  name={file.name}
+                  status="edit"
+                  onDelete={onClearFile}
+                />
+              ))}
           </div>
           <Button className={formStyles.submitBtn} type="submit" renderIcon={Add}>
             <span>
