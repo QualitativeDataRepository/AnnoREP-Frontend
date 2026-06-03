@@ -1,8 +1,16 @@
 module.exports = {
   stories: [
-    "../stories/**/*.stories.mdx",
+    "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|jsx|ts|tsx)",
-    "../**/*.stories.@(tsx|mdx)",
+    "../**/*.@(mdx|stories.@(tsx))"
   ],
-  addons: ["@storybook/addon-essentials", "@storybook/addon-a11y", "storybook-css-modules-preset"],
+
+  addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
+
+  framework: {
+    name: "@storybook/nextjs",
+    options: {}
+  },
+
+  staticDirs: ["../public"]
 }

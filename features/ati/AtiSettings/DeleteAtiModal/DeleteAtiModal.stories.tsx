@@ -1,4 +1,4 @@
-import { Story, Meta } from "@storybook/react"
+import { Story, Meta } from "@storybook/nextjs"
 
 import DeleteAtiModal, { DeleteAtiModalProps } from "."
 
