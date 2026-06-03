@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 
 import { axiosClient } from "../../../features/app"
 

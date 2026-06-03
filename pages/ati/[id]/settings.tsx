@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import axios, { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 
 import AtiSettings from "../../../features/ati/AtiSettings"
 import AtiTab from "../../../features/ati/AtiTab"

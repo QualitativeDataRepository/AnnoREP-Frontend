@@ -1,15 +1,7 @@
-import React, {
-  FC,
-  FormEventHandler,
-  useState,
-  ChangeEvent,
-  useCallback,
-  useMemo,
-  useEffect,
-} from "react"
+import React, { FC, FormEventHandler, useState, useCallback, useMemo, useEffect } from "react"
 
 import FormData from "form-data"
-import { Add16, OverflowMenuVertical24 } from "@carbon/icons-react"
+import { Add, OverflowMenuVertical } from "@carbon/react/icons"
 import {
   Button,
   Form,
@@ -19,7 +11,7 @@ import {
   InlineLoading,
   OrderedList,
   ListItem,
-} from "carbon-components-react"
+} from "@carbon/react"
 import { debounce } from "lodash"
 import { useRouter } from "next/router"
 
@@ -104,9 +96,12 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
     setSelectedDataset(data.selectedItem)
   }
 
-  const [selectedManuscript, setSelectedManuscript] = useState<FileList | null>(null)
-  const onChangeFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedManuscript(e.target.files)
+  const [selectedManuscript, setSelectedManuscript] = useState<File[] | null>(null)
+  const onChangeFileUpload = (
+    _e: React.SyntheticEvent<HTMLElement>,
+    data?: { addedFiles: any[] }
+  ) => {
+    setSelectedManuscript(data?.addedFiles.map((f) => f.file) || [])
   }
   const onClearFile = () => {
     setSelectedManuscript(null)
@@ -199,13 +194,14 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(taskState)}
-                subtitle={<span>{taskState.desc}</span>}
                 title={getTaskStatus(taskState)}
-              />
+              >
+                {taskState.desc}
+              </InlineNotification>
             </div>
           )}
           <fieldset>
-            <legend className="bx--file--label">
+            <legend className="cds--file--label">
               1. <abbr>QDR</abbr> data project
             </legend>
             <div className={`${formStyles.item} ${styles.searchBox}`}>
@@ -254,12 +250,12 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
                   tooltipAlignment="end"
                   onClick={onShowMore}
                 >
-                  <OverflowMenuVertical24 />
+                  <OverflowMenuVertical />
                 </Button>
               )}
             </div>
             <div className={formStyles.item}>
-              <p className="bx--label">
+              <p className="cds--label">
                 Don&apos;t have a <abbr>QDR</abbr> data project?
               </p>
               <div>
@@ -300,7 +296,7 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               onChange={onChangeFileUpload}
             />
           </div>
-          <Button className={formStyles.submitBtn} type="submit" renderIcon={Add16}>
+          <Button className={formStyles.submitBtn} type="submit" renderIcon={Add}>
             <span>
               Create <abbr>ATI</abbr> project
             </span>

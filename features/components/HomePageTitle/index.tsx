@@ -2,8 +2,8 @@ import { FC } from "react"
 
 import Link from "next/link"
 
-import { Add16 } from "@carbon/icons-react"
-import { Button } from "carbon-components-react"
+import { Add } from "@carbon/react/icons"
+import { Button } from "@carbon/react"
 
 import styles from "./HomePageTitle.module.css"
 
@@ -15,7 +15,7 @@ const HomePageTitle: FC = () => {
         <abbr>ATI</abbr> Projects
       </h1>
       <Link href="/new">
-        <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add16}>
+        <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add}>
           <span>
             New <abbr>ATI</abbr> Project
           </span>

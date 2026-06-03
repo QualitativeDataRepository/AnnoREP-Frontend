@@ -1,7 +1,7 @@
 import { FC } from "react"
 
-import { Launch16 } from "@carbon/icons-react"
-import { Link } from "carbon-components-react"
+import { Launch } from "@carbon/react/icons"
+import { Link } from "@carbon/react"
 
 import AppDesc from "../AppDesc"
 
@@ -59,7 +59,7 @@ const AppGuide: FC<AppGuideProps> = ({ isLoggedIn }) => {
             href="https://web.hypothes.is/help/annotation-basics"
             target="_blank"
             rel="noopener noreferrer"
-            renderIcon={Launch16}
+            renderIcon={Launch}
           >
             Hypothes.is annotation basics
           </Link>

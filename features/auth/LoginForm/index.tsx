@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC, FormEventHandler } from "react"
 
-import { Login16 } from "@carbon/icons-react"
-import { Button, Form, TextInput, Link } from "carbon-components-react"
+import { Login } from "@carbon/react/icons"
+import { Button, Form, TextInput, Link } from "@carbon/react"
 
 import formStyles from "../../../styles/Form.module.css"
 
@@ -89,7 +89,7 @@ const LoginForm: FC<LoginFormProps> = ({
             required={true}
             aria-required={true}
             placeholder="Enter your QDR API token"
-            size="xl"
+            size="lg"
             type="text"
             autoComplete="on"
             value={dataverseApiToken}
@@ -134,14 +134,14 @@ const LoginForm: FC<LoginFormProps> = ({
             required={true}
             aria-required={true}
             placeholder="Enter your Hypothes.is API token"
-            size="xl"
+            size="lg"
             type="text"
             autoComplete="on"
             value={hypothesisApiToken}
             onChange={onHypothesisApiTokenChange}
           />
         </div>
-        <Button className={formStyles.submitBtn} type="submit" renderIcon={Login16}>
+        <Button className={formStyles.submitBtn} type="submit" renderIcon={Login}>
           Login
         </Button>
       </Form>

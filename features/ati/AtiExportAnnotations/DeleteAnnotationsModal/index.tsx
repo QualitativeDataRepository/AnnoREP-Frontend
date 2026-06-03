@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "carbon-components-react"
+import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "@carbon/react"
 
 export interface DeleteAnnotationsModalProps {
   /** The manuscript name */
@@ -27,21 +27,16 @@ const DeleteAnnotations: FC<DeleteAnnotationsModalProps> = ({
       size="xs"
       aria-label="Delete annotations confirmation"
     >
-      <ModalHeader
-        id="delete-annotations-modal-header"
-        title={`Delete annotations from ${manuscriptName}`}
-        iconDescription="Close"
-      />
-      <ModalBody id="delete-annotations-modal-body">
-        Are you sure you want to delete annotations from this manuscript?
-      </ModalBody>
+      <ModalHeader title={`Delete annotations from ${manuscriptName}`} iconDescription="Close" />
+      <ModalBody>Are you sure you want to delete annotations from this manuscript?</ModalBody>
       <ModalFooter
-        id="delete-annotations-modal-footer"
         danger
         primaryButtonText="Continue"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
-      />
+      >
+        {null}
+      </ModalFooter>
     </ComposedModal>
   )
 }

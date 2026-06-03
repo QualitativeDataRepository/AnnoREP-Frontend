@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "carbon-components-react"
+import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "@carbon/react"
 
 export interface DeleteManuscriptModalProps {
   /** The manuscript name */
@@ -27,21 +27,16 @@ const DeleteManuscriptModal: FC<DeleteManuscriptModalProps> = ({
       size="xs"
       aria-label="Delete manuscript confirmation"
     >
-      <ModalHeader
-        id="delete-manuscript-modal-header"
-        title={`Delete ${manuscriptName}`}
-        iconDescription="Close"
-      />
-      <ModalBody id="delete-manuscript-modal-body">
-        Are you sure you want to delete this manuscript?
-      </ModalBody>
+      <ModalHeader title={`Delete ${manuscriptName}`} iconDescription="Close" />
+      <ModalBody>Are you sure you want to delete this manuscript?</ModalBody>
       <ModalFooter
-        id="delete-manuscript-modal-footer"
         danger
         primaryButtonText="Continue"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
-      />
+      >
+        {null}
+      </ModalFooter>
     </ComposedModal>
   )
 }

@@ -1,5 +1,5 @@
 import NextAuth from "next-auth"
-import Providers from "next-auth/providers"
+import CredentialsProvider from "next-auth/providers/credentials"
 
 import { axiosClient } from "../../../features/app"
 
@@ -13,7 +13,7 @@ interface Creds {
 
 export default NextAuth({
   providers: [
-    Providers.Credentials({
+    CredentialsProvider({
       id: LOGIN_ID,
       type: "credentials",
       name: "Dataverse and Hypothes.is Credentials",
@@ -24,10 +24,11 @@ export default NextAuth({
       async authorize(credentials) {
         const creds = { ...credentials } as Creds
         const user = {
+          id: "",
           dataverseApiToken: "",
           hypothesisApiToken: "",
           dataverseUserName: "",
-          hypothesisUserId: null,
+          hypothesisUserId: undefined,
         }
         let dataverseErrorMsg
         try {
@@ -40,6 +41,7 @@ export default NextAuth({
             }
           )
           if (status === 200 && data.status === "OK") {
+            user.id = data.data.id.toString()
             user.dataverseApiToken = creds.dataverseApiToken.trim()
             user.dataverseUserName = data.data.displayName
           }
@@ -83,34 +85,32 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async jwt(token, user) {
-      const isSignIn = user ? true : false
-      if (isSignIn) {
-        token.dataverseApiToken = user?.dataverseApiToken
-        token.dataverseUserName = user?.dataverseUserName
-        token.hypothesisApiToken = user?.hypothesisApiToken
-        token.hypothesisUserId = user?.hypothesisUserId
+    async jwt({ token, user }) {
+      if (user) {
+        token.dataverseApiToken = user.dataverseApiToken
+        token.dataverseUserName = user.dataverseUserName
+        token.hypothesisApiToken = user.hypothesisApiToken
+        token.hypothesisUserId = user.hypothesisUserId
       }
       return token
     },
-    async session(session, user) {
-      session.dataverseApiToken = user?.dataverseApiToken
-      session.dataverseUserName = user?.dataverseUserName
-      session.hypothesisApiToken = user?.hypothesisApiToken
-      session.hypothesisUserId = user?.hypothesisUserId
+    async session({ session, token }) {
+      session.dataverseApiToken = token.dataverseApiToken
+      session.dataverseUserName = token.dataverseUserName
+      session.hypothesisApiToken = token.hypothesisApiToken
+      session.hypothesisUserId = token.hypothesisUserId
       return session
     },
-    async redirect(url, baseUrl) {
+    async redirect({ url, baseUrl }) {
       return url.startsWith(baseUrl) ? url : `${baseUrl}${url}`
     },
   },
   secret: process.env.SECRET,
   session: {
-    jwt: true,
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
   jwt: {
     secret: process.env.SECRET,
-    encryption: true,
   },
 })

@@ -1,4 +1,5 @@
-import { InlineLoadingStatus } from "carbon-components-react"
+export type InlineLoadingStatus = "inactive" | "active" | "finished" | "error"
+
 import { IMyDataSearch } from "../../../types/api"
 
 import { IDatasetOption } from "../../../types/dataverse"

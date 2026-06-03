@@ -38,3 +38,7 @@ storybook-static
 
 # vscode
 .vscode
+
+# JetBrains IDE
+.idea
+.junie

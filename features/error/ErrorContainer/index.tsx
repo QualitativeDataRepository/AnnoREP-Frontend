@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { Button } from "carbon-components-react"
+import { Button } from "@carbon/react"
 
 import Layout from "../../components/Layout"
 

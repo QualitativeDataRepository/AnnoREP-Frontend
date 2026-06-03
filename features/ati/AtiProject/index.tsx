@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 
-import { Link, Tag } from "carbon-components-react"
+import { Link, Tag } from "@carbon/react"
 import NextLink from "next/link"
 import DOMPurify from "isomorphic-dompurify"
 
@@ -50,7 +50,7 @@ const AtiProject: FC<AtiProjectProps> = ({
       <div className={styles.titleContainer}>
         <h2>
           <NextLink href={`/ati/${id}/${AtiTab.summary.id}`}>
-            <a className="bx--link" href={`/ati/${id}/${AtiTab.summary.id}`}>
+            <a className="cds--link" href={`/ati/${id}/${AtiTab.summary.id}`}>
               {name}
             </a>
           </NextLink>

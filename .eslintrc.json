@@ -9,7 +9,8 @@
     // Is not enabled right now to avoid issues with the Next.js repo
     "prettier",
     "plugin:jsx-a11y/recommended",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+    "plugin:storybook/recommended"
   ],
   "env": {
     "es6": true,

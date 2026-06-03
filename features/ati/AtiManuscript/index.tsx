@@ -1,8 +1,8 @@
-import { FC, FormEventHandler, useReducer, ChangeEvent } from "react"
+import { FC, FormEventHandler, useReducer } from "react"
 
-import { Button, Form, FileUploader, InlineNotification, Toggle } from "carbon-components-react"
+import { Button, Form, FileUploader, InlineNotification, Toggle } from "@carbon/react"
 import FormData from "form-data"
-import { DocumentAdd20, TrashCan20, Upload16 } from "@carbon/icons-react"
+import { DocumentAdd, TrashCan, Upload } from "@carbon/react/icons"
 import { useRouter } from "next/router"
 
 import { axiosClient } from "../../app"
@@ -91,11 +91,15 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       })
   }
 
-  const onChangeFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
+  const onChangeFileUpload = (
+    _e: React.SyntheticEvent<HTMLElement>,
+    data?: { addedFiles: any[] }
+  ) => {
+    const file = data?.addedFiles?.[0]?.file
+    if (file) {
       uploadManuscriptTaskDispatch({
         type: UploadManuscriptActionType.SAVE_FILE_SELECTION,
-        payload: e.target.files[0],
+        payload: file,
       })
     } else {
       uploadManuscriptTaskDispatch({ type: UploadManuscriptActionType.CLEAR_FILE_SELECTION })
@@ -238,21 +242,11 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
       <div className={styles.tabContainer}>
         <HypothesisLoginNotification />
         <div className={styles.buttonContainer}>
-          <Button
-            kind="tertiary"
-            size="md"
-            onClick={openDatasourcesModal}
-            renderIcon={DocumentAdd20}
-          >
+          <Button kind="tertiary" size="md" onClick={openDatasourcesModal} renderIcon={DocumentAdd}>
             Add data sources
           </Button>
           {manuscript.id && (
-            <Button
-              kind="danger"
-              size="md"
-              renderIcon={TrashCan20}
-              onClick={onClickDeleteManuscript}
-            >
+            <Button kind="danger" size="md" renderIcon={TrashCan} onClick={onClickDeleteManuscript}>
               Delete manuscript
             </Button>
           )}
@@ -262,21 +256,18 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
             hideCloseButton
             lowContrast
             kind={getTaskNotificationKind(taskState)}
-            subtitle={<span>{taskState.desc}</span>}
             title={getTaskStatus(taskState)}
-          />
+          >
+            {taskState.desc}
+          </InlineNotification>
         )}
         {manuscript.id ? (
           manuscript.ingest ? (
             <IngestPdf pdf={manuscript.ingest} />
           ) : (
-            <InlineNotification
-              hideCloseButton
-              lowContrast
-              kind="info"
-              subtitle={<span>Ingest PDF of manuscript not found.</span>}
-              title="Error!"
-            />
+            <InlineNotification hideCloseButton lowContrast kind="info" title="Error!">
+              Ingest PDF of manuscript not found.
+            </InlineNotification>
           )
         ) : (
           <div className={styles.centerUploadManuscript}>
@@ -311,7 +302,7 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   name="uploadAnnotations"
                 />
               </div>
-              <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload16}>
+              <Button type="submit" kind="tertiary" size="sm" renderIcon={Upload}>
                 Upload manuscript
               </Button>
             </Form>

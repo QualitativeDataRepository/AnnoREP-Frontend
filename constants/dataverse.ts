@@ -1,5 +1,3 @@
-import { TagTypeName } from "carbon-components-react"
-
 export const DATAVERSE_HEADER_NAME = "X-Dataverse-Key"
 
 export const SOURCE_MANUSCRIPT_TAG = "Source manuscript"
@@ -28,7 +26,21 @@ export const PUBLICATION_STATUSES = [
   "Deaccessioned",
 ]
 
-export const PUBLICATION_STATUSES_COLOR: Record<string, TagTypeName> = {
+export const PUBLICATION_STATUSES_COLOR: Record<
+  string,
+  | "red"
+  | "magenta"
+  | "purple"
+  | "blue"
+  | "cyan"
+  | "teal"
+  | "green"
+  | "gray"
+  | "cool-gray"
+  | "warm-gray"
+  | "high-contrast"
+  | "outline"
+> = {
   [PUBLICATION_STATUSES[0]]: "green",
   [PUBLICATION_STATUSES[1]]: "red",
   [PUBLICATION_STATUSES[2]]: "blue",
