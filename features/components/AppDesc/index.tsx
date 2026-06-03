@@ -1,6 +1,6 @@
 import { FC } from "react"
-import { ArrowRight16, Launch16 } from "@carbon/icons-react"
-import { Button } from "carbon-components-react"
+import { ArrowRight, Launch } from "@carbon/react/icons"
+import { Button } from "@carbon/react"
 
 import styles from "./AppDesc.module.css"
 
@@ -23,7 +23,7 @@ const AppDesc: FC<AppDescProps> = ({ isLoggedIn }) => {
           target="_blank"
           rel="noopener noreferrer"
           kind="tertiary"
-          renderIcon={Launch16}
+          renderIcon={Launch}
         >
           Learn more about ATI
         </Button>
@@ -31,7 +31,7 @@ const AppDesc: FC<AppDescProps> = ({ isLoggedIn }) => {
           as="a"
           href={isLoggedIn ? "/new" : "/auth/login"}
           kind="primary"
-          renderIcon={ArrowRight16}
+          renderIcon={ArrowRight}
         >
           {isLoggedIn ? "Create a new ATI project" : "Login to create a new ATI project"}
         </Button>

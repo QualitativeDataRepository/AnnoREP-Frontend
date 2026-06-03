@@ -1,4 +1,3 @@
-import { NotificationKind } from "carbon-components-react"
 
 import { ITaskState } from "./state"
 
@@ -7,7 +6,9 @@ export function getTaskStatus(state: ITaskState): string {
   return status === "active" ? "Status" : status === "finished" ? "Success!" : "Error!"
 }
 
-export function getTaskNotificationKind(state: ITaskState): NotificationKind {
+export function getTaskNotificationKind(
+  state: ITaskState
+): "error" | "info" | "info-square" | "success" | "warning" | "warning-alt" {
   const { status } = state
   return status === "active" ? "info" : status === "finished" ? "success" : "error"
 }

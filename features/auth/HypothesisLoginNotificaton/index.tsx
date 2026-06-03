@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from "react"
 
-import { InlineNotification, NotificationActionButton } from "carbon-components-react"
+import { InlineNotification, NotificationActionButton } from "@carbon/react"
 
 const HYPOTHESIS_LOGIN_NOTIFICATION_IS_VISIBLE = "hypotheis-login-notification-is-visible"
 
@@ -27,8 +27,9 @@ const HypothesisLoginNotification: FC = () => {
         kind="warning-alt"
         statusIconDescription="warning"
         title="Log in to Hypothes.is in the Annotation sidebar to the right to see your annotations."
-        actions={<NotificationActionButton onClick={onClickOK}>OK</NotificationActionButton>}
-      />
+      >
+        <NotificationActionButton onClick={onClickOK}>OK</NotificationActionButton>
+      </InlineNotification>
     )
   }
 

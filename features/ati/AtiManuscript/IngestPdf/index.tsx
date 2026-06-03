@@ -1,6 +1,6 @@
 import { FC, useState } from "react"
 
-import { InlineNotification } from "carbon-components-react"
+import { InlineNotification } from "@carbon/react"
 import DOMPurify from "isomorphic-dompurify"
 
 import { Document, Page, pdfjs } from "react-pdf"
@@ -42,9 +42,10 @@ const IngestPdf: FC<IngestPdfProps> = ({ pdf }) => {
               hideCloseButton
               lowContrast
               kind="info"
-              subtitle={<span>Loading manuscript...</span>}
               title="Status"
-            />
+            >
+              Loading manuscript...
+            </InlineNotification>
           }
         >
           {Array.from({ length: numPages }, (_, index) => (

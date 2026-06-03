@@ -1,8 +1,8 @@
 import { FC } from "react"
 
-import { InlineNotification, NotificationActionButton } from "carbon-components-react"
+import { InlineNotification, NotificationActionButton } from "@carbon/react"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import qs from "qs"
 
@@ -60,12 +60,11 @@ const Home: FC<HomeProps> = ({
                 lowContrast
                 kind={errorMsg ? "error" : "info"}
                 title={errorMsg ? errorMsg : "You have no ATI projects."}
-                actions={
-                  <NotificationActionButton onClick={() => router.push("/new")}>
-                    Create new
-                  </NotificationActionButton>
-                }
-              />
+              >
+                <NotificationActionButton onClick={() => router.push("/new")}>
+                  Create new
+                </NotificationActionButton>
+              </InlineNotification>
             ) : (
               <AtiProjects
                 atiProjects={atiProjects}

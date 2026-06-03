@@ -1,7 +1,7 @@
 import { FC, FormEventHandler } from "react"
 
-import { TrashCan16 } from "@carbon/icons-react"
-import { Button, Form, InlineNotification } from "carbon-components-react"
+import { TrashCan } from "@carbon/react/icons"
+import { Button, Form, InlineNotification } from "@carbon/react"
 import { useRouter } from "next/router"
 
 import { axiosClient } from "../../app"
@@ -105,12 +105,13 @@ const AtiSettings: FC<AtiSettingsProps> = ({ dataset, manuscript }) => {
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(taskState)}
-                subtitle={<span>{taskState.desc}</span>}
                 title={getTaskStatus(taskState)}
-              />
+              >
+                {taskState.desc}
+              </InlineNotification>
             </div>
           )}
-          <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan16}>
+          <Button type="submit" kind="danger" size="sm" renderIcon={TrashCan}>
             Delete
           </Button>
         </Form>

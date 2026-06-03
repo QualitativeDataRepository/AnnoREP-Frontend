@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
 
-import { InlineNotification, Tabs, Tab } from "carbon-components-react"
+import { InlineNotification, Tabs, Tab, TabList, TabPanels, TabPanel } from "@carbon/react"
 
 import Layout from "../../components/Layout"
 
@@ -34,36 +34,34 @@ const AtiTab: FC<AtiTabProps> = ({ dataset, children, user, selectedTab }: AtiTa
         hideCloseButton
         lowContrast
         kind={dataset === null ? "error" : "info"}
-        subtitle={
-          <span>
-            {dataset === null ? "You don't have access to this ATI project." : "Please login."}
-          </span>
-        }
         title={dataset === null ? "Error!" : "Unauthorized!"}
-      />
+      >
+        {dataset === null ? "You don't have access to this ATI project." : "Please login."}
+      </InlineNotification>
     )
   } else {
     content = (
       <>
         <h1>{dataset?.title}</h1>
-        <Tabs
-          className={styles.tabs}
-          selected={selectedTabIndex}
-          onSelectionChange={onSelectionChange}
-        >
-          <Tab id={AtiTabs.summary.id} label={AtiTabs.summary.label}>
-            {selectedTab === AtiTabs.summary.id && <>{children}</>}
-          </Tab>
-          <Tab id={AtiTabs.manuscript.id} label={AtiTabs.manuscript.label}>
-            {selectedTab === AtiTabs.manuscript.id && <>{children}</>}
-          </Tab>
-          <Tab id={AtiTabs.exportAnnotations.id} label={AtiTabs.exportAnnotations.label}>
-            {selectedTab === AtiTabs.exportAnnotations.id && <>{children}</>}
-          </Tab>
-          <Tab id={AtiTabs.settings.id} label={AtiTabs.settings.label}>
-            {selectedTab === AtiTabs.settings.id && <>{children}</>}
-          </Tab>
-        </Tabs>
+        <div className={styles.tabs}>
+          <Tabs
+            selectedIndex={selectedTabIndex}
+            onChange={({ selectedIndex }) => onSelectionChange(selectedIndex)}
+          >
+            <TabList aria-label="ATI Project Tabs">
+              <Tab>{AtiTabs.summary.label}</Tab>
+              <Tab>{AtiTabs.manuscript.label}</Tab>
+              <Tab>{AtiTabs.exportAnnotations.label}</Tab>
+              <Tab>{AtiTabs.settings.label}</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>{selectedTab === AtiTabs.summary.id && <>{children}</>}</TabPanel>
+              <TabPanel>{selectedTab === AtiTabs.manuscript.id && <>{children}</>}</TabPanel>
+              <TabPanel>{selectedTab === AtiTabs.exportAnnotations.id && <>{children}</>}</TabPanel>
+              <TabPanel>{selectedTab === AtiTabs.settings.id && <>{children}</>}</TabPanel>
+            </TabPanels>
+          </Tabs>
+        </div>
       </>
     )
   }

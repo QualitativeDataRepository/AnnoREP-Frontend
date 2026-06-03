@@ -1,8 +1,8 @@
 import { FC } from "react"
 
-import { User24, Login24, Information24 } from "@carbon/icons-react"
-import { Button, OverflowMenu, OverflowMenuItem } from "carbon-components-react"
-import { signOut } from "next-auth/client"
+import { User, Login, Information } from "@carbon/react/icons"
+import { Button, OverflowMenu, OverflowMenuItem } from "@carbon/react"
+import { signOut } from "next-auth/react"
 
 import { IAnnoRepUser } from "../../../types/auth"
 
@@ -34,12 +34,12 @@ const AppBar: FC<AppBarProps> = ({ user }) => {
             as="a"
             href="/guide"
           >
-            <Information24 />
+            <Information />
           </Button>
           {user ? (
             <OverflowMenu
               flipped
-              renderIcon={User24}
+              renderIcon={User}
               size="lg"
               className={styles.user}
               iconDescription=""
@@ -49,15 +49,13 @@ const AppBar: FC<AppBarProps> = ({ user }) => {
                 requireTitle
                 itemText={user.dataverse.name}
                 href={user.dataverse.link}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...({ target: "_blank", rel: "noopener noreferrer" } as any)}
               />
               <OverflowMenuItem
                 requireTitle
                 itemText={user.hypothesis.name}
                 href={user.hypothesis.link}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...({ target: "_blank", rel: "noopener noreferrer" } as any)}
               />
               <OverflowMenuItem itemText="Log out" hasDivider onClick={handleLogout} />
             </OverflowMenu>
@@ -73,7 +71,7 @@ const AppBar: FC<AppBarProps> = ({ user }) => {
               as="a"
               href="/auth/login"
             >
-              <Login24 />
+              <Login />
             </Button>
           )}
         </div>

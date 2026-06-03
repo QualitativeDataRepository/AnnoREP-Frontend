@@ -1,6 +1,6 @@
 import { FC, useState, FormEventHandler, useEffect, useRef } from "react"
 
-import { Export16, TrashCan16 } from "@carbon/icons-react"
+import { Export, TrashCan } from "@carbon/react/icons"
 import {
   Link,
   TextInput,
@@ -11,7 +11,7 @@ import {
   SelectItem,
   Toggle,
   CopyButton,
-} from "carbon-components-react"
+} from "@carbon/react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
 import { axiosClient } from "../../app"
@@ -289,32 +289,32 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(exportTaskState)}
-                subtitle={exportTaskState.desc}
                 title={getTaskStatus(exportTaskState)}
-                actions={
-                  exportTaskState.status === "finished" ? (
-                    <div className={styles.copyAction}>
-                      <CopyToClipboard text={exportHypothesisUrl.current}>
-                        <CopyButton
-                          className={styles.copyButton}
-                          feedback="Copied!"
-                          feedbackTimeout={3000}
-                          iconDescription="Copy URL to clipboard"
-                        />
-                      </CopyToClipboard>
-                    </div>
-                  ) : undefined
-                }
-              />
+              >
+                {exportTaskState.desc}
+                {exportTaskState.status === "finished" && (
+                  <div className={styles.copyAction}>
+                    <CopyToClipboard text={exportHypothesisUrl.current}>
+                      <CopyButton
+                        className={styles.copyButton}
+                        feedback="Copied!"
+                        feedbackTimeout={3000}
+                        iconDescription="Copy URL to clipboard"
+                      />
+                    </CopyToClipboard>
+                  </div>
+                )}
+              </InlineNotification>
             )}
             {createTitleAnnotationState.status === "error" && (
               <InlineNotification
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(createTitleAnnotationState)}
-                subtitle={createTitleAnnotationState.desc}
                 title={getTaskStatus(createTitleAnnotationState)}
-              />
+              >
+                {createTitleAnnotationState.desc}
+              </InlineNotification>
             )}
           </div>
           <div className={formStyles.item}>
@@ -326,7 +326,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
-              size="xl"
+              size="lg"
             />
           </div>
           <div className={formStyles.item}>
@@ -357,7 +357,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               helperText="Enter the URL of where you want to export the annotations"
               required={true}
               aria-required={true}
-              size="xl"
+              size="lg"
             />
           </div>
           <div className={formStyles.item}>
@@ -410,7 +410,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
           <Button
             className={formStyles.submitBtn}
             type="submit"
-            renderIcon={Export16}
+            renderIcon={Export}
             disabled={
               exportTaskState.status === "active" || createTitleAnnotationState.status === "active"
             }
@@ -429,9 +429,10 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(deleteTaskState)}
-                subtitle={<span>{deleteTaskState.desc}</span>}
                 title={getTaskStatus(deleteTaskState)}
-              />
+              >
+                {deleteTaskState.desc}
+              </InlineNotification>
             </div>
           )}
           <div className={formStyles.item}>
@@ -443,7 +444,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
               value={`${appUrl}/ati/${dataset.id}/${AtiTab.manuscript.id}`}
               type="url"
               labelText="Source URL"
-              size="xl"
+              size="lg"
             />
           </div>
           <div className={formStyles.item}>
@@ -474,7 +475,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
             kind="danger"
             className={formStyles.submitBtn}
             type="submit"
-            renderIcon={TrashCan16}
+            renderIcon={TrashCan}
             disabled={deleteTaskState.status === "active"}
           >
             Delete annotations

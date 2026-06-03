@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react"
 
 import axios from "axios"
-import { Renew20 } from "@carbon/icons-react"
+import { Renew } from "@carbon/react/icons"
 import {
   ComposedModal,
   ModalBody,
@@ -11,7 +11,7 @@ import {
   CopyButton,
   Button,
   InlineLoading,
-} from "carbon-components-react"
+} from "@carbon/react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
 import useTask, { TaskActionType } from "../../../../hooks/useTask"
@@ -73,13 +73,11 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
       onClose={closeModal}
     >
       <ModalHeader
-        id="datasources-modal-header"
         label="Data sources"
         title="Copy the data source URL and paste it into an annotation on the right"
         iconDescription="Close"
       />
       <ModalBody
-        id="datasources-modal-body"
         aria-label="Data source URLs"
         hasScrollingContent={true}
       >
@@ -107,7 +105,7 @@ const DatasourceModal: FC<DatasourceModalProps> = ({
               iconDescription="Refresh"
               tooltipPosition="bottom"
               tooltipAlignment="center"
-              renderIcon={Renew20}
+              renderIcon={Renew}
               onClick={() => handleRefreshDatasources()}
             />
           )}

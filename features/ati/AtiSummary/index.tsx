@@ -6,8 +6,8 @@ import {
   Tag,
   Button,
   InlineNotification,
-} from "carbon-components-react"
-import { Launch16 } from "@carbon/icons-react"
+} from "@carbon/react"
+import { Launch } from "@carbon/react/icons"
 import { useRouter } from "next/router"
 
 import { axiosClient } from "../../app"
@@ -111,9 +111,10 @@ const AtiSummary: FC<AtiSummaryProps> = ({
           hideCloseButton
           lowContrast
           kind={getTaskNotificationKind(taskState)}
-          subtitle={<span>{taskState.desc}</span>}
           title={getTaskStatus(taskState)}
-        />
+        >
+          {taskState.desc}
+        </InlineNotification>
       )}
       <div>
         <h2>
@@ -122,7 +123,7 @@ const AtiSummary: FC<AtiSummaryProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             size="lg"
-            renderIcon={Launch16}
+            renderIcon={Launch}
           >
             {title}
           </Link>

@@ -1,7 +1,7 @@
 import { FC } from "react"
 
-import { InlineNotification } from "carbon-components-react"
-import { getSession } from "next-auth/client"
+import { InlineNotification } from "@carbon/react"
+import { getSession } from "next-auth/react"
 import { GetServerSideProps } from "next"
 import qs from "qs"
 
@@ -46,9 +46,10 @@ const NewAti: FC<NewAtiProps> = ({ user, datasets, serverUrl, totalCount, datase
           hideCloseButton
           lowContrast
           kind="info"
-          subtitle={<span>{"Please login to create a new ATI project."}</span>}
           title="Unauthorized!"
-        />
+        >
+          Please login to create a new ATI project.
+        </InlineNotification>
       )}
     </Layout>
   )

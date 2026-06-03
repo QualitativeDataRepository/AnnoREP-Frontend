@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react"
 
 import { GetServerSideProps } from "next"
-import { getSession, signIn } from "next-auth/client"
+import { getSession, signIn } from "next-auth/react"
 import { useRouter } from "next/router"
 
 import useCredential, {

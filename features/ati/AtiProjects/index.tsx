@@ -7,7 +7,7 @@ import {
   FormGroup,
   Checkbox,
   InlineLoading,
-} from "carbon-components-react"
+} from "@carbon/react"
 
 import AtiProject from "../AtiProject"
 import useSearch from "./useSearch"
@@ -74,14 +74,17 @@ const AtiProjects: FC<AtiProjectsProps> = ({
   const onSearch: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
-      atiSearch: { value: string }
+      elements: { "ati-search": { value: string } }
     }
-    dispatch({ type: SearchActionType.UPDATE_Q, payload: target.atiSearch.value.trim() })
+    dispatch({ type: SearchActionType.UPDATE_Q, payload: target.elements["ati-search"].value.trim() })
   }
-  const onFacetFieldChange = (checked: boolean, id: string) =>
+  const onFacetFieldChange = (
+    _evt: React.ChangeEvent<HTMLInputElement>,
+    data: { checked: boolean; id: string }
+  ) =>
     dispatch({
       type: SearchActionType.UPDATE_SELECTED_PUBLICATION_STATUS,
-      payload: { id, checked },
+      payload: { id: data.id, checked: data.checked },
     })
 
   const totalPages = getTotalPages(state)
@@ -94,11 +97,11 @@ const AtiProjects: FC<AtiProjectsProps> = ({
       <Form onSubmit={onSearch}>
         <Search
           id="ati-search"
-          name="atiSearch"
           labelText="Search"
           placeholder="Search"
           closeButtonLabelText="Clear search input"
           size="lg"
+          defaultValue={state.q}
         />
       </Form>
       <div className={styles.resultContainer}>

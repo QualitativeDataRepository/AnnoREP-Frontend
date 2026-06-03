@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "carbon-components-react"
+import { ComposedModal, ModalBody, ModalHeader, ModalFooter } from "@carbon/react"
 
 export interface DeleteAtiModalProps {
   /** The ati project name */
@@ -28,20 +28,20 @@ const DeleteAtiModal: FC<DeleteAtiModalProps> = ({
       aria-label="Delete ATI project confirmation"
     >
       <ModalHeader
-        id="delete-ati-modal-header"
         title={`Delete ${atiName}`}
         iconDescription="Close"
       />
-      <ModalBody id="delete-ati-modal-body">
+      <ModalBody>
         Are you sure you want to delete this project?
       </ModalBody>
       <ModalFooter
-        id="delete-ati-modal-footer"
         danger
         primaryButtonText="Continue"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
-      />
+      >
+        {null}
+      </ModalFooter>
     </ComposedModal>
   )
 }

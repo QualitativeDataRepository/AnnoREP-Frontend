@@ -2,7 +2,7 @@ import formidable from "formidable"
 import FormData from "form-data"
 import fs from "fs"
 import { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/client"
+import { getSession } from "next-auth/react"
 
 import { axiosClient } from "../../../../../features/app"
 

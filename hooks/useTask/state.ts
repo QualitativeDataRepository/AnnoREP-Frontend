@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
-import { InlineLoadingStatus } from "carbon-components-react"
+
+export type InlineLoadingStatus = "inactive" | "active" | "finished" | "error"
 
 export interface ITaskState {
   status: InlineLoadingStatus
