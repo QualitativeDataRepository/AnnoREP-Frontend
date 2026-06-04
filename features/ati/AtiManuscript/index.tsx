@@ -1,6 +1,6 @@
 import { FC, FormEventHandler, useReducer } from "react"
 
-import { Button, Form, FileUploader, FileUploaderItem, InlineNotification, Toggle } from "@carbon/react"
+import { Button, Form, FileUploader, InlineNotification, Toggle } from "@carbon/react"
 import FormData from "form-data"
 import { DocumentAdd, TrashCan, Upload } from "@carbon/react/icons"
 import { useRouter } from "next/router"
@@ -300,13 +300,6 @@ const AtiManuscript: FC<AtiManuscriptProps> = ({
                   onChange={onChangeFileUpload}
                   onDelete={onClearFile}
                 />
-                {uploadManuscriptTaskState.manuscript && (
-                  <FileUploaderItem
-                    name={uploadManuscriptTaskState.manuscript.name}
-                    status="edit"
-                    onDelete={onClearFile}
-                  />
-                )}
               </div>
               <div className={formStyles.item}>
                 <Toggle

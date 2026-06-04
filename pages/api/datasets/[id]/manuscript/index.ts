@@ -30,23 +30,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const requestDesc = `Adding manuscript to data project ${id}`
         const form = formidable({ multiples: false })
         form.parse(req, async (err, _, files) => {
-          const manuscript = files.manuscript as formidable.File
-          if (err) {
+          const manuscript = (
+            Array.isArray(files.manuscript) ? files.manuscript[0] : files.manuscript
+          ) as formidable.File
+          if (err || !manuscript) {
             res.status(400).json({ message: `Failed to parse form data. ${err}` })
             resolve()
           }
 
           try {
             const addManuscriptForm = new FormData()
-            addManuscriptForm.append("file", fs.createReadStream(manuscript.path), {
-              filename: manuscript.name as string,
-              contentType: manuscript.type as string,
+            // formidable v3 uses filepath, originalFilename, and mimetype
+            const filepath = (manuscript as any).filepath || (manuscript as any).path
+            const filename = (manuscript as any).originalFilename || (manuscript as any).name
+            const mimetype = (manuscript as any).mimetype || (manuscript as any).type
+
+            addManuscriptForm.append("file", fs.createReadStream(filepath), {
+              filename: filename as string,
+              contentType: mimetype as string,
             })
             addManuscriptForm.append(
               "jsonData",
               JSON.stringify({
-                mimeType: manuscript.type,
-                label: manuscript.name,
+                mimeType: mimetype,
+                label: filename,
                 description: SOURCE_MANUSCRIPT_TAG,
                 directoryLabel: `${ANNOREP_METADATA_VALUE}`,
                 categories: [SOURCE_MANUSCRIPT_TAG],

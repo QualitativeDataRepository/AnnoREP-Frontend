@@ -6,7 +6,6 @@ import {
   Button,
   Form,
   FileUploader,
-  FileUploaderItem,
   InlineNotification,
   ComboBox,
   InlineLoading,
@@ -305,15 +304,6 @@ const NewAtiProjectForm: FC<NewAtiProjectFormProps> = ({
               onDelete={onClearFile}
               onChange={onChangeFileUpload}
             />
-            {selectedManuscript &&
-              selectedManuscript.map((file) => (
-                <FileUploaderItem
-                  key={file.name}
-                  name={file.name}
-                  status="edit"
-                  onDelete={onClearFile}
-                />
-              ))}
           </div>
           <Button className={formStyles.submitBtn} type="submit" renderIcon={Add}>
             <span>
