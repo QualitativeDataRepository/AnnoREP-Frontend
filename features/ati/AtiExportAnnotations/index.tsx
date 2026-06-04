@@ -7,6 +7,7 @@ import {
   Form,
   Button,
   InlineNotification,
+  ActionableNotification,
   Select,
   SelectItem,
   Toggle,
@@ -285,7 +286,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
 
           <div className={formStyles.item}>
             {exportTaskState.status !== "inactive" && (
-              <InlineNotification
+              <ActionableNotification
                 hideCloseButton
                 lowContrast
                 kind={getTaskNotificationKind(exportTaskState)}
@@ -304,7 +305,7 @@ const AtiExportAnnotations: FC<AtiExportAnnotationstProps> = ({
                     </CopyToClipboard>
                   </div>
                 )}
-              </InlineNotification>
+              </ActionableNotification>
             )}
             {createTitleAnnotationState.status === "error" && (
               <InlineNotification

@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { InlineNotification, NotificationActionButton } from "@carbon/react"
+import { ActionableNotification } from "@carbon/react"
 import { GetServerSideProps } from "next"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "./api/auth/[...nextauth]"
@@ -56,16 +56,14 @@ const Home: FC<HomeProps> = ({
           <div className={styles.container}>
             <HomePageTitle />
             {totalCount === 0 || errorMsg ? (
-              <InlineNotification
+              <ActionableNotification
                 hideCloseButton
                 lowContrast
                 kind={errorMsg ? "error" : "info"}
                 title={errorMsg ? errorMsg : "You have no ATI projects."}
-              >
-                <NotificationActionButton onClick={() => router.push("/new")}>
-                  Create new
-                </NotificationActionButton>
-              </InlineNotification>
+                actionButtonLabel="Create new"
+                onActionButtonClick={() => router.push("/new")}
+              />
             ) : (
               <AtiProjects
                 atiProjects={atiProjects}
