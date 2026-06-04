@@ -1,7 +1,8 @@
 import { FC } from "react"
 
 import { InlineNotification } from "@carbon/react"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../api/auth/[...nextauth]"
 import { GetServerSideProps } from "next"
 import qs from "qs"
 
@@ -53,7 +54,7 @@ const NewAti: FC<NewAtiProps> = ({ user, datasets, serverUrl, totalCount, datase
 export default NewAti
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const props: NewAtiProps = {
     user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     datasets: [],

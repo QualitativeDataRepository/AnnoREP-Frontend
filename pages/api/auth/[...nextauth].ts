@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 
 import { axiosClient } from "../../../features/app"
@@ -11,7 +11,7 @@ interface Creds {
   hypothesisApiToken: string
 }
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       id: LOGIN_ID,
@@ -113,4 +113,6 @@ export default NextAuth({
   jwt: {
     secret: process.env.SECRET,
   },
-})
+}
+
+export default NextAuth(authOptions)

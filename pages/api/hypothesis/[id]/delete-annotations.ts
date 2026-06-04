@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../auth/[...nextauth]"
 
 import { axiosClient } from "../../../../features/app"
 
@@ -8,7 +9,7 @@ import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "DELETE") {
-    const session = await getSession({ req })
+    const session = await getServerSession(req, res, authOptions)
     const { data } = await axiosClient.get(`${process.env.HYPOTHESIS_SERVER_URL}/api/profile`, {
       headers: { Authorization: `Bearer ${process.env.ADMIN_HYPOTHESIS_API_TOKEN}` },
     })

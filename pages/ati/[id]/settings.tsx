@@ -2,7 +2,8 @@ import { FC } from "react"
 
 import axios, { AxiosResponse } from "axios"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../api/auth/[...nextauth]"
 
 import AtiSettings from "../../../features/ati/AtiSettings"
 import AtiTab from "../../../features/ati/AtiTab"
@@ -42,7 +43,7 @@ const AtiPage: FC<AtiPageProps> = ({ user, atiProjectDetails }) => {
 export default AtiPage
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const props: AtiPageProps = {
     user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjectDetails: null,

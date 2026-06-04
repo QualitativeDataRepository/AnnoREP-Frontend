@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../auth/[...nextauth]"
 import qs from "qs"
 
 import { axiosClient } from "../../../../features/app"
@@ -15,7 +16,7 @@ import { createInitialAnnotationText } from "../../../../utils/hypothesisUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "POST") {
-    const session = await getSession({ req })
+    const session = await getServerSession(req, res, authOptions)
     if (session) {
       const { id } = req.query
       const {

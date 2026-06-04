@@ -1,7 +1,9 @@
 import { FC, useEffect } from "react"
 
 import { GetServerSideProps } from "next"
-import { getSession, signIn } from "next-auth/react"
+import { signIn } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../api/auth/[...nextauth]"
 import { useRouter } from "next/router"
 
 import useCredential, {
@@ -85,7 +87,7 @@ const Login: FC<LoginProps> = ({ user, serverUrl }) => {
 export default Login
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const user = getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL)
   return {
     props: {

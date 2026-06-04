@@ -2,7 +2,8 @@ import { FC } from "react"
 
 import { InlineNotification, NotificationActionButton } from "@carbon/react"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "./api/auth/[...nextauth]"
 import { useRouter } from "next/router"
 import qs from "qs"
 
@@ -86,7 +87,7 @@ const Home: FC<HomeProps> = ({
 export default Home
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const props: HomeProps = {
     user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjects: [],

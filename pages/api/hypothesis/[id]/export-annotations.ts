@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../auth/[...nextauth]"
 
 import { axiosClient } from "../../../../features/app"
 
@@ -8,7 +9,7 @@ import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "POST") {
-    const session = await getSession({ req })
+    const session = await getServerSession(req, res, authOptions)
     if (session) {
       const { newAnnotations, isAdminAuthor } = req.body
       const destinationUrl = newAnnotations[0].data.uri

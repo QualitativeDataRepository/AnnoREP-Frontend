@@ -1,6 +1,7 @@
 import { FC } from "react"
 
-import { getSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../api/auth/[...nextauth]"
 import { GetServerSideProps } from "next"
 
 import AppGuide from "../../features/components/AppGuide"
@@ -24,7 +25,7 @@ const Guide: FC<GuideProps> = ({ user }) => {
 export default Guide
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
+  const session = await getServerSession(context.req, context.res, authOptions)
   const user = getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL)
   const props: GuideProps = {
     user,
