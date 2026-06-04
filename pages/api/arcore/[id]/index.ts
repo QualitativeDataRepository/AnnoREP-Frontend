@@ -13,10 +13,14 @@ import { getResponseFromError } from "../../../../utils/httpRequestUtils"
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method === "PUT") {
     const session = await getSession({ req })
-    if (session) {
+    const dataverseApiToken =
+      session?.dataverseApiToken || (req.headers[DATAVERSE_HEADER_NAME.toLowerCase()] as string)
+    const hypothesisApiToken =
+      session?.hypothesisApiToken ||
+      (req.headers["authorization"]?.replace("Bearer ", "") as string)
+    if (dataverseApiToken) {
       const { id } = req.query
       const { datasetId, uploadAnnotations } = req.body
-      const { dataverseApiToken, hypothesisApiToken } = session
       try {
         await axiosClient.put(`${process.env.ARCORE_SERVER_URL}/api/documents/${id}`, undefined, {
           headers: {
