@@ -49,14 +49,12 @@ const AtiProject: FC<AtiProjectProps> = ({
     <section aria-label={name} className={styles.atiProject}>
       <div className={styles.titleContainer}>
         <h2>
-          <NextLink href={`/ati/${id}/${AtiTab.summary.id}`}>
-            <a className="cds--link" href={`/ati/${id}/${AtiTab.summary.id}`}>
-              {name}
-            </a>
+          <NextLink href={`/ati/${id}/${AtiTab.summary.id}`} className="cds--link">
+            {name}
           </NextLink>
         </h2>
         <div className={styles.tags}>
-          {publicationStatuses.sort().map((status, i) => (
+          {[...publicationStatuses].sort().map((status, i) => (
             <Tag
               key={i}
               id={`${status} status`}
@@ -66,7 +64,7 @@ const AtiProject: FC<AtiProjectProps> = ({
               {status}
             </Tag>
           ))}
-          {userRoles.sort().map((role, i) => (
+          {[...userRoles].sort().map((role, i) => (
             <Tag key={i} id={`${role} role`} type="teal" size="sm">
               {role}
             </Tag>

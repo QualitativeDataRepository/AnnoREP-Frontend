@@ -14,8 +14,8 @@ const HomePageTitle: FC = () => {
       <h1>
         <abbr>ATI</abbr> Projects
       </h1>
-      <Link href="/new">
-        <Button as="a" href="/new" kind="primary" size="md" renderIcon={Add}>
+      <Link href="/new" passHref legacyBehavior>
+        <Button as="a" kind="primary" size="md" renderIcon={Add}>
           <span>
             New <abbr>ATI</abbr> Project
           </span>

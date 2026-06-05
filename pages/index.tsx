@@ -57,6 +57,7 @@ const Home: FC<HomeProps> = ({
             <HomePageTitle />
             {totalCount === 0 || errorMsg ? (
               <ActionableNotification
+                id="home-page-notification"
                 hideCloseButton
                 lowContrast
                 kind={errorMsg ? "error" : "info"}
@@ -90,6 +91,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     user: getAnnoRepUser(session, process.env.DATAVERSE_SERVER_URL),
     atiProjects: [],
     totalCount: 0,
+    publicationStatusCount: {},
+    selectedFilters: { publication_statuses: [] },
   }
   if (session) {
     try {
