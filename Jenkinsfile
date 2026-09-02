@@ -11,12 +11,12 @@ pipeline {
                     try {
                         head_hash = sh(script:"git rev-parse HEAD | head -c 8", returnStdout:true).trim()
                         sh """
-                            docker build --build-arg MATOMO_SITE_ID=10 -t annorep:${head_hash} -f Dockerfile .
+                            docker build --build-arg MATOMO_SITE_ID=10 -t annorep-frontend:${head_hash} -f Dockerfile .
                         """
                     } catch (Exception e) {
                         slackMessage(e.toString(), "danger")
                     }
-                } 
+                }
             }
         }
         stage('build (main)') {
@@ -28,7 +28,7 @@ pipeline {
                     try {
                         head_hash = sh(script:"git rev-parse HEAD | head -c 8", returnStdout:true).trim()
                         sh """
-                            docker build --build-arg MATOMO_SITE_ID=4 -t annorep:${head_hash} -f Dockerfile .
+                            docker build --build-arg MATOMO_SITE_ID=4 -t annorep-frontend:${head_hash} -f Dockerfile .
                         """
                     } catch (Exception e) {
                         slackMessage(e.toString(), "danger")
@@ -52,7 +52,7 @@ pipeline {
                                 head_hash = sh(script:"git rev-parse HEAD | head -c 8", returnStdout:true).trim()
                                 sh """
                                     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                                    docker tag annorep:${head_hash} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ANNOREP_ECR_NAME}:${head_hash}
+                                    docker tag annorep-frontend:${head_hash} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ANNOREP_ECR_NAME}:${head_hash}
                                     docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ANNOREP_ECR_NAME}:${head_hash}
                                 """
                             } catch (Exception e) {
