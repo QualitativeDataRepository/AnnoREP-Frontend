@@ -58,7 +58,7 @@
     "form-data": "^4.0.0",
     "formidable": "^1.2.2",
     "isomorphic-dompurify": "^0.15.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "next": "10.2.3",
     "next-auth": "^3.29.10",
     "qs": "^6.10.3",
